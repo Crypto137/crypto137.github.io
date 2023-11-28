@@ -64,7 +64,7 @@
 
 <p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/warcraft-3-trigger-editor.jpg"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/warcraft-3-trigger-editor.jpg" alt="Warcraft III Trigger Editor" /></a></p>
 
-<p>This is actually a common of developing video games, also known as data-driven design. Engineers develop a set of tools that expose various systems to game designers, who in turn define what the actual game is supposed to be through data, like what abilities should a hero have access to and how much damage should an enemy deal. These tools often contain some form of scripting functionality that allows designers to also define behaviours (like the trigger editor from Warcraft III shown on the screenshot above).</p>
+<p>In fact, this is a common way of developing video games, also known as data-driven design. Engineers develop a set of tools that expose various systems to game designers, who in turn define what the actual game is supposed to be through data, like what abilities should a hero have access to and how much damage should an enemy deal. These tools often contain some form of scripting functionality that allows designers to also define behaviours (like the trigger editor from Warcraft III shown on the screenshot above).</p>
 
 <p>So while we do have all the original data for Marvel Heroes, to make use of it we also need to reverse engineer the framework it ran on. Calligraphy is a pretty powerful one: it features pretty advanced scripting capabilities and was used to define enemy AI, mission logic, damage formulas, and much more. And as we know, with great power comes great responsibility: there is a lot of moving parts, and just setting everything up requires a lot of steps.</p>
 
@@ -101,7 +101,7 @@
 
 <p>It’s essentially a piece cut from an older MHServerEmu version, so it works very similarly: you copy game data files to the tool’s subdirectory, run it, wait for it to initialize, and then enter commands to export the data you want to human-readable JSON/TSV files. However, all the file definitions are up to date with the latest versions of the server, and there’s even a little bit of extra functionality that allows you to parse and export locale and string files.</p>
 
-<p>As I was working on this, I actually made a pretty hilarious discovery: in earlier versions of the game there is a hidden “Pig Latin” localization that was used for testing:</p>
+<p>As I was working on this, I made a pretty hilarious discovery: in earlier versions of the game there is a hidden “Pig Latin” localization that was used for testing:</p>
 
 <p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/pig-latin-login-screen.jpg"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/pig-latin-login-screen.jpg" alt="Pig Latin Login Screen" /></a></p>
 
@@ -126,7 +126,7 @@
     <p>There is a number of <em>games</em> running on a server. Each game is very similar to games on Battle.net in Diablo II, but you transition in and out of them seamlessly.</p>
   </li>
   <li>
-    <p>Each game hosts a number of <em>regions</em>, which is places like Avengers Tower, Midtown, and so own. As you transition between regions, you also often transfer between different games and even servers.</p>
+    <p>Each game hosts a number of <em>regions</em>, which are places like Avengers Tower, Midtown, and so on. As you transition between regions, you also often transfer between different games and even servers.</p>
   </li>
   <li>
     <p>Each region consists of <em>areas</em> that have their own names and other characteristics. You can go to different areas in a region without a loading screen by moving around. For example, in the Madripoor region the first area would be Buccaneer Beach, from which you can go to Bamboo Forest, and then eventually reach Lowtown.</p>
@@ -146,7 +146,7 @@
 
 <p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/diablo-3-procedural-layout.jpg"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/diablo-3-procedural-layout.jpg" alt="Diablo III Procedural Layout" /></a></p>
 
-<p>Marvel Heroes actually uses a number of different region and area generators for various cases:</p>
+<p>Marvel Heroes uses a number of different region and area generators for various cases:</p>
 
 <p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/region-generators.png"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/region-generators.png" alt="Diablo III Procedural Layout" /></a></p>
 
