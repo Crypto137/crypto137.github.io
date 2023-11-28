@@ -78,7 +78,7 @@
     <p>Data is deserialized into these classes using a combination of blueprint and prototype files: blueprints contain field definitions, and prototypes contain the actual values.</p>
   </li>
   <li>
-    <p>Each blueprint is paired with a default prototype that contain default values for a given blueprint. Most of the prototypes that are actually used in the game inherit from these default prototypes and override values as needed. For example, there is a blueprint / default prototype for an avatar, and prototypes for each playable hero override this default avatar prototype. This is a simple example, but there are often multiple levels of data inheritance here.</p>
+    <p>Each blueprint is paired with a default prototype that contains default values for a given blueprint. Most of the prototypes that are actually used in the game inherit from these default prototypes and override values as needed. For example, there is a blueprint / default prototype for an avatar, and prototypes for each playable hero override this default avatar prototype. This is a simple example, but there are often multiple levels of data inheritance here.</p>
   </li>
   <li>
     <p>Blueprints have their own inheritance that is really more like composition: each blueprint defines its own field group, but it can also reference other blueprints. And then a prototype gets its field groups from the blueprint it is directly bound to and all the other blueprints referenced in it.</p>
@@ -91,11 +91,11 @@
   </li>
 </ul>
 
-<p>As you can see, there’s a lot to unwrap here, and the devil is in the details. So figuring out all of this has been very time consuming, but progress is definitely being made. And once we get it all up running, it’s going to open the way for implementing all sorts of in-game systems.</p>
+<p>As you can see, there’s a lot to unwrap here, and the devil is in the details. So figuring out all of this has been very time consuming, but progress is definitely being made. And once we get it all up and running, it’s going to open the way for implementing all sorts of in-game systems.</p>
 
 <h2 id="mhdataparser">MHDataParser</h2>
 
-<p>When we began investigating what data even was present in the client, we started by examining various file types on their own, and that lead to the server emulator getting some data parsing and exporting functionality. As our understanding of the bigger picture grew, it became evident that rather than using the data structures present in the files as is, the game actually does a significant amount of post-processing during initialization. So it became harder and harder to maintain this functionality as our implementation of the game database matured.</p>
+<p>When we began investigating what data even was present in the client, we started by examining various file types on their own, and that led to the server emulator getting some data parsing and exporting functionality. As our understanding of the bigger picture grew, it became evident that rather than using the data structures present in the files as is, the game actually does a significant amount of post-processing during initialization. So it became harder and harder to maintain this functionality as our implementation of the game database matured.</p>
 
 <p>However, there is a lot of value to having raw data parsed and represented as is in a more readable format. It’s more version-agnostic, it can be used for datamining, and eventually it can even be expanded for modding game data. So, to keep the main codebase clean while not losing anything, I separated raw data parsing into a separate tool called <a href="https://github.com/Crypto137/MHDataParser">MHDataParser</a>. I tested it with various builds of the game, and so far it seems to work on PC clients going as far back as June 2015, as well as console ports. It won’t work with 2013-2014 versions of the game due to data archive format differences, but implementing support for them is definitely possible in the future.</p>
 
