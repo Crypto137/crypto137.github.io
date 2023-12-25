@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: December 2023 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.2" />
+<meta property="og:title" content="MHServerEmu Progress Report: December 2023" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2023/12/25/progress-report-december-2023.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2023/12/25/progress-report-december-2023.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2023-12-25T11:00:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: December 2023" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-12-25T11:00:00+03:00","datePublished":"2023-12-25T11:00:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: December 2023","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2023/12/25/progress-report-december-2023.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2023/12/25/progress-report-december-2023.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: December 2023</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2023-12-25T11:00:00+03:00" itemprop="datePublished">Dec 25, 2023
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2023-12/header.jpg" alt="MHServerEmu Progress Report - December 2023" /></p>
+
+<p>Happy holidays everyone! This month and year are coming to an end, and it is time for another MHServerEmu progress report.</p>
+
+<h2 id="game-database-update">Game Database Update</h2>
+
+<p>In December there has been significant progress reimplementing the game database. If you have not yet read <a href="/MHServerEmu/blog/2023/11/28/progress-report-november-2023.html">the last month’s report</a>, I suggest you go and do that right now, because what is coming is very much a continuation of that post.</p>
+
+<p>The most significant milestone we have been able to achieve this month is restoring the original hierarchy of prototypes. This allows us to understand relationships between various pieces of data and make use of them.</p>
+
+<p>For example, MHServerEmu has a command that allows you to look up costumes, <code class="language-plaintext highlighter-rouge">!lookup costume</code>. Previously it was implemented by iterating through all data files and checking every single file path for a certain pattern. This approach has always been a temporary solution: it is slow and it relies on files being consistently named (spoiler: they are not). What we can do instead now is just get a collection of all prototypes that reference the costume blueprint. This reduces pattern matching complexity and the number of iterations we have to do, and removes the reliance on naming. To put it in simpler terms, it is much faster and more convenient.</p>
+
+<p>The prototype hierachy is also going to be essential for implementing the property system, which is the foundation of all game entities, such as player avatars and enemies. We are going to go into more detail on this topic in a future report, once it is actually up and running.</p>
+
+<p>Another thing this development has allowed us to do is make some charts. Exciting, am I right?</p>
+
+<p>First we have a chart of top 30 most used prototype classes. These use standard inheritance, so there is some overlap here (e.g. all world entity prototypes are also entity prototypes).</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-12/top-prototype-classes.png"><img src="/MHServerEmu/assets/blog/progress-report/2023-12/top-prototype-classes.png" alt="Top 30 Most Used Prototype Classes" /></a></p>
+
+<p>Next is top 30 most referenced blueprints. These function more like composition: entities at their core are collections of properties, such as their level or maximum health, and what properties an entity is supposed to have is defined by referencing individual property blueprints.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-12/top-blueprints.png"><img src="/MHServerEmu/assets/blog/progress-report/2023-12/top-blueprints.png" alt="Top 30 Most Referenced Blueprints" /></a></p>
+
+<p>However, while restoring the hierarchy is an important step, this is just one piece of the puzzle. Since there is a lot of interdependency between pieces of data, everything has to be loaded in the right order, or else things are going to get very messy very fast. So there has also been ongoing work on restoring various underlying systems that are going to allow us to do just that.</p>
+
+<p>A good example of such system is on demand prototype loading. A naive approach that we used to take is to load all 93144 prototypes on startup in the order they are stored. Other than loading in the wrong order, this way we also load a lot of unnecessary data, including prototypes for cut and unfinished content, as well as debug prototypes that are disabled in shipping versions of the game. Although optimization is not really a high priority for us right now, it is still good to keep it in mind, especially when it comes as a side effect of doing something else.</p>
+
+<p>So we have reverse engineered the solution Gazillion had: store all data in memory compressed using the <a href="https://en.wikipedia.org/wiki/LZ4_(compression_algorithm)">LZ4</a> algorithm and decompress and deserialize only what is requested. By doing it this way we not only gain control over what is loaded and in what order, but also get some convenient savings on initial memory usage and initialization time. And this is despite the fact that we now spend additional memory and time on initializing and storing the hierarchy cache!</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-12/memory-usage.png"><img src="/MHServerEmu/assets/blog/progress-report/2023-12/memory-usage.png" alt="MHServerEmu Initial Memory Usage" /></a></p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-12/game-database-initialization-time.png"><img src="/MHServerEmu/assets/blog/progress-report/2023-12/game-database-initialization-time.png" alt="MHServerEmu Game Database Initialization Time" /></a></p>
+
+<p>This is going to be especially useful for playing solo offline on lower end hardware. For potential larger scale servers this may cause hitching if too much new data is requested at once, and for that we have implemented an option to frontload all data in the correct order that is also present in the original game.</p>
+
+<p>As we implement additional functionality, these numbers are going to gradually go back up. However, considering the amount of unused data I mentioned previously, even after loading all the relevant data it may end up using less memory than loading everything without storing a compressed copy.</p>
+
+<p>Despite the great progress we have had with the game database this month, there is still work to be done. As I write this, we are approaching a point where we will be able to implement proper deserialization for Calligraphy prototypes, which is the biggest roadblock for working on game systems. When that happens, we are going see more things happening in-game.</p>
+
+<h2 id="region-generation-update">Region Generation Update</h2>
+
+<p>Meanwhile, as I have been working mostly on the game database, Alex continues his efforts on reimplementing the procedural region generation. If you have not yet, you can check his progress in the <a href="https://github.com/AlexBond2/MHServerEmu/tree/experimental">experimental branch</a>.</p>
+
+<p>We are lucky to have most of the logic for procedural generation in the client. However,  implementing it still proved to be a very laborious process due to how intricate and occasionally buggy the original code is. Once all the pieces are done and put together, this, along with the game database, is going to make all regions in the game explorable and, where applicable, randomly generated, as they should be.</p>
+
+<p>To keep everything as authentic as possible and avoid future replication issues we try to stick to the disassembled original code as much as possible. This includes reimplementing even the basic building blocks that are usually already taken care of by various existing game engines these days.</p>
+
+<p>One example of such building block are quadtrees, which is a data structure commonly used in video games for optimization. For instance, if you were to do collision detection without any tricks, you would have to check every single object against every other object, so the number of checks you would have to do would increase exponentially with the amount of objects in your game (which is the ultimate evil in computer science, also known as an O(n²) algorithm).</p>
+
+<p>But when you think about it, it does not make any sense to check for collisions against far away objects. So it is common to divide space into sections, and do checks within each section separately. This is where quadtrees come in: they are used to divide objects into four sections (quads), but they are also trees, so each section can have subsections of its own. This may be a little difficult to grasp in writing, so here is a visualization of collision detection using quadtrees I found on YouTube:</p>
+
+<style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style>
+<div class="embed-container">    <iframe title="YouTube video player" width="640" height="390" src="//www.youtube.com/embed/TJzq_kjtGTc" frameborder="0" allowfullscreen=""></iframe></div>
+
+<p>Although the Marvel Heroes game client is built using Unreal Engine 3, the game logic actually running everything is all custom Gazillion code. In a way this resembles the semi-recently released Diablo II Resurrected, where the original game is running underneath a new graphical engine. Except in the case of Marvel Heroes the “original game” does not have any graphics of its own.</p>
+
+<p>So when we reimplement things such as quadtrees, we have to figure out and take into account all the original quirks. For example, the Marvel Heroes implementation of this data structure uses what is known as an intrusive circular linked list for storing its elements: each element is linked to elements before and after it, these links are stored within the element itself rather externally (which is why it is intrusive), and the link to the next element at the end of the list points back to the first element (circular).</p>
+
+<p>This is just one example of the work that goes into restoring this system. The good news is, region generation is also steadily approaching testable state, and once everything is ready to combine it with the game database implementation, we are going to have a lot of fun.</p>
+
+<h2 id="core-system-improvements">Core System Improvements</h2>
+
+<p>In December I have also taken some time to do a pass on some of the foundational systems of MHServerEmu that could have used some extra work.</p>
+
+<p>Previously we used a TCP server implementation ported from a Diablo III Beta server emulator that was in development in 2011-2012. This is the part of the server that handles client connections, as well as receiving and sending data. While this implementation does get the job done, it never got the chance to get polished, and it was built on an absolete design pattern known as <a href="https://learn.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/asynchronous-programming-model-apm">asynchronous programming model (APM)</a>. So this month I have written a new implementation based on the newer and hipper <a href="https://learn.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap">task-base asynchronous pattern (TAP)</a>, which is hopefully going to be cleaner and more maintainable.</p>
+
+<p>Another piece ported from the Diablo III server is our logging system. I was mostly happy with it, however one issue it had was the fact that it was synchronous, meaning that while something was being logged nothing else could be happening on the caller thread. This was an issue for logging large quantities of messages from the main game thread, which is supposed to update on a 50 millisecond cycle. And instead of running the game, everything had to wait until messages finished printing in the console window. Now this problem is gone: log messages are now enqueued synchronously allowing us to get accurate timestamps for each message, but the output now happens asynchronously as a separate task. So the impact of logging on game performance is now just about as low as it can get without compromises.</p>
+
+<p>Finally, as a test for doing Calligraphy prototype deserialization later on, I have improved our configuration system using the reflection capabilities of C#. This is not something that is going to affect the end user, but it has made the adding and removing of various server settings easier.</p>
+
+<p>The end goal is to have not just something that is capable of running the game, but it also being maintainable and reasonably fast, so expect the work on this front to continue.</p>
+
+<h2 id="miscellaneous-updates">Miscellaneous Updates</h2>
+
+<p>Here are some additional points I would like to highlight without dedicating entire sections to them:</p>
+
+<ul>
+  <li>
+    <p>We now a dedicated tool for unpacking and packing <code class="language-plaintext highlighter-rouge">.sip</code> files. This is the first step for modding game data files. You can grab the source code for it <a href="https://github.com/Crypto137/MHServerEmu/tree/master/tools">here</a>.</p>
+  </li>
+  <li>
+    <p>The work on documenting various versions of the game mentioned in the previous report continues. There is now <a href="https://github.com/Crypto137/MHProtobufs">a dedicated repository</a> for documenting the evolution of the game’s network protocol.</p>
+  </li>
+</ul>
+
+<hr />
+
+<p>That’s it for today. A lot has happened this year, and even exciting stuff awaits us in the next. See you next time!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2023/12/25/progress-report-december-2023.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

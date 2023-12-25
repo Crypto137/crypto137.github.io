@@ -7,8 +7,8 @@
 <meta name="generator" content="Jekyll v4.3.2" />
 <meta property="og:title" content="MHServerEmu Progress Report: November 2023" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="MHServerEmu is a volunteer-driven research project. We do not host any game servers or distribute any of the original game files." />
-<meta property="og:description" content="MHServerEmu is a volunteer-driven research project. We do not host any game servers or distribute any of the original game files." />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
 <link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2023/11/28/progress-report-november-2023.html" />
 <meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2023/11/28/progress-report-november-2023.html" />
 <meta property="og:site_name" content="MHServerEmu Blog" />
@@ -17,7 +17,7 @@
 <meta name="twitter:card" content="summary" />
 <meta property="twitter:title" content="MHServerEmu Progress Report: November 2023" />
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-11-28T03:00:00+03:00","datePublished":"2023-11-28T03:00:00+03:00","description":"MHServerEmu is a volunteer-driven research project. We do not host any game servers or distribute any of the original game files.","headline":"MHServerEmu Progress Report: November 2023","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2023/11/28/progress-report-november-2023.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2023/11/28/progress-report-november-2023.html"}</script>
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2023-11-28T03:00:00+03:00","datePublished":"2023-11-28T03:00:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: November 2023","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2023/11/28/progress-report-november-2023.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2023/11/28/progress-report-november-2023.html"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/MHServerEmu/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
 <body><header class="site-header" role="banner">
@@ -48,7 +48,9 @@
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <p><img src="/MHServerEmu/assets/blog/progress-report/november-2023/header.jpg" alt="MHServerEmu Progress Report - November 2023" /></p>
+    <!--more-->
+
+<p><img src="/MHServerEmu/assets/blog/progress-report/2023-11/header.jpg" alt="MHServerEmu Progress Report - November 2023" /></p>
 
 <p>Hey everyone! Crypto here with the very first MHServerEmu progress report. I will try to do these semi-regularly to shine a light on all the latest things we are working on. Without further ado, let’s dive right in!</p>
 
@@ -62,7 +64,7 @@
 
 <p>Gazillion developed their own custom framework for managing game data called <em>Calligraphy</em>. It appears most of the actual game was made with it, and it must have also included a set of custom tools reminiscent of programs like the Warcraft III World Editor:</p>
 
-<p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/warcraft-3-trigger-editor.jpg"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/warcraft-3-trigger-editor.jpg" alt="Warcraft III Trigger Editor" /></a></p>
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-11/warcraft-3-trigger-editor.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2023-11/warcraft-3-trigger-editor.jpg" alt="Warcraft III Trigger Editor" /></a></p>
 
 <p>In fact, this is a common way of developing video games, also known as data-driven design. Engineers develop a set of tools that expose various systems to game designers, who in turn define what the actual game is supposed to be through data, like what abilities should a hero have access to and how much damage should an enemy deal. These tools often contain some form of scripting functionality that allows designers to also define behaviours (like the trigger editor from Warcraft III shown on the screenshot above).</p>
 
@@ -103,15 +105,15 @@
 
 <p>As I was working on this, I made a pretty hilarious discovery: in earlier versions of the game there is a hidden “Pig Latin” localization that was used for testing:</p>
 
-<p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/pig-latin-login-screen.jpg"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/pig-latin-login-screen.jpg" alt="Pig Latin Login Screen" /></a></p>
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-11/pig-latin-login-screen.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2023-11/pig-latin-login-screen.jpg" alt="Pig Latin Login Screen" /></a></p>
 
 <p>And with a little bit of file renaming, hex editing, and config adjustment I was able to get it running in version 1.52:</p>
 
-<p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/pig-latin-mission-log.jpg"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/pig-latin-mission-log.jpg" alt="Pig Latin Mission Log" /></a></p>
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-11/pig-latin-mission-log.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2023-11/pig-latin-mission-log.jpg" alt="Pig Latin Mission Log" /></a></p>
 
 <p>Not even S.H.I.E.L.D. Agent Stan Lee is safe from it (or should I say, Say.Hay.Iay.Eay.Lay.Day Agentay Anstay Eelay):</p>
 
-<p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/pig-latin-stan-lee.jpg"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/pig-latin-stan-lee.jpg" alt="Pig Latin Stan Lee" /></a></p>
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-11/pig-latin-stan-lee.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2023-11/pig-latin-stan-lee.jpg" alt="Pig Latin Stan Lee" /></a></p>
 
 <p>Having fun aside, this is actually a working proof-of-concept for translating the game into more languages. And way more ambitious mods may also be possible far in the future.</p>
 
@@ -140,17 +142,17 @@
 
 <p>Cells, just like tiles in Diablo, are classified by their cardinal directions:</p>
 
-<p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/diablo-3-cardinal-directions.jpg"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/diablo-3-cardinal-directions.jpg" alt="Diablo III Tile Cardinal Directions" /></a></p>
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-11/diablo-3-cardinal-directions.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2023-11/diablo-3-cardinal-directions.jpg" alt="Diablo III Tile Cardinal Directions" /></a></p>
 
 <p>These cells are combined into areas according to sets of rules defined by game designers in development tools like these:</p>
 
-<p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/diablo-3-procedural-layout.jpg"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/diablo-3-procedural-layout.jpg" alt="Diablo III Procedural Layout" /></a></p>
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-11/diablo-3-procedural-layout.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2023-11/diablo-3-procedural-layout.jpg" alt="Diablo III Procedural Layout" /></a></p>
 
 <p>Marvel Heroes uses a number of different region and area generators for various cases:</p>
 
-<p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/region-generators.png"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/region-generators.png" alt="Diablo III Procedural Layout" /></a></p>
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-11/region-generators.png"><img src="/MHServerEmu/assets/blog/progress-report/2023-11/region-generators.png" alt="Diablo III Procedural Layout" /></a></p>
 
-<p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/area-generators.png"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/area-generators.png" alt="Diablo III Procedural Layout" /></a></p>
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-11/area-generators.png"><img src="/MHServerEmu/assets/blog/progress-report/2023-11/area-generators.png" alt="Diablo III Procedural Layout" /></a></p>
 
 <p>Some regions are actually static and do not use procedural generation. But they still follow the same general rules and are built out of cells: regions like Avengers Tower can get away with using a single huge cell, while places like Midtown are collections of regular cells in a predefined layout, also known as a district.</p>
 
@@ -236,7 +238,7 @@
 
 <p>Finally, not all builds are made equal. Most publicly available game clients are compiled using the <code class="language-plaintext highlighter-rouge">Shipping</code> configuration that automatically removes all the spicy stuff, such as the developer console and cheats. On the other hand, <code class="language-plaintext highlighter-rouge">Internal</code> builds contain everything but the kitchen sink (and even that after Deadpool’s level 52 review). For instance, MichaelMayhem and Ryolnir demonstrated some of their dev might during the <a href="https://www.youtube.com/watch?v=MekhABg5gCo">Rogue preview livestream</a> in August 2014:</p>
 
-<p><a href="/MHServerEmu/assets/blog/progress-report/november-2023/internal-cheats.jpg"><img src="/MHServerEmu/assets/blog/progress-report/november-2023/internal-cheats.jpg" alt="MichaelMayhem and Ryolnir using cheats" /></a></p>
+<p><a href="/MHServerEmu/assets/blog/progress-report/2023-11/internal-cheats.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2023-11/internal-cheats.jpg" alt="MichaelMayhem and Ryolnir using cheats" /></a></p>
 
 <p>Turns out, there was a number of slip-ups, and some of these internal builds actually ended up being uploaded to Steam. So far I’ve found five of them, with the earliest one being <code class="language-plaintext highlighter-rouge">1.10.0.69</code> from late May 2013, and the newest so far is <code class="language-plaintext highlighter-rouge">1.0.4932.0</code> from June 2015. While we have no way of getting them up and running right now, eventually it’s going to be possible, and we may end up being able to access forbidden powers reserved only for the few. Exciting!</p>
 
@@ -265,7 +267,7 @@
 </div>
 
       <div class="footer-col footer-col-3">
-        <p>MHServerEmu is a volunteer-driven research project. We do not host any game servers or distribute any of the original game files.</p>
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
       </div>
     </div>
 
