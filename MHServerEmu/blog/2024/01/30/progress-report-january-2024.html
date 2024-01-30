@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: January 2024 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.2" />
+<meta property="og:title" content="MHServerEmu Progress Report: January 2024" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2024/01/30/progress-report-january-2024.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2024/01/30/progress-report-january-2024.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-01-30T03:06:40+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: January 2024" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-01-30T03:06:40+03:00","datePublished":"2024-01-30T03:06:40+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: January 2024","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2024/01/30/progress-report-january-2024.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2024/01/30/progress-report-january-2024.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: January 2024</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2024-01-30T03:06:40+03:00" itemprop="datePublished">Jan 30, 2024
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2024-01/header.jpg" alt="MHServerEmu Progress Report - January 2024" /></p>
+
+<p>Hello there! The first month of 2024 is now almost behind us, and we have been hard at work on all things Marvel Heroes. Let us dive right in!</p>
+
+<h2 id="calligraphyserializer-is-a-lie">CalligraphySerializer is a Lie</h2>
+
+<p>Before continuing I strongly suggest you read the reports from <a href="/MHServerEmu/blog/2023/11/28/progress-report-november-2023.html">November 2023</a> and <a href="/MHServerEmu/blog/2023/12/25/progress-report-december-2023.html">December 2023</a> if you have not done so already. You have been warned.</p>
+
+<p>Most of my time in January has been spent untangling the web that is the <code class="language-plaintext highlighter-rouge">CalligraphySerializer</code> class. And the fun begins right from the name: despite being called a “serializer”, it literally cannot serialize any data. It is used strictly for deserialization of Calligraphy prototypes. You literally cannot trust things to do what they say they do.</p>
+
+<p>What it actually does can be summarized like this:</p>
+
+<ol>
+  <li>
+    <p>It takes a blank prototype instance of a certain type as input.</p>
+  </li>
+  <li>
+    <p>If the prototype references a parent prototype, the parent data is copied to the child. If the parent has not yet been loaded, it goes through the deserialization process itself, and this continues until all parents are loaded.</p>
+  </li>
+  <li>
+    <p>All serialized Calligraphy field groups are processed. Regular field group have their fields matched to fields defined in the prototype class, its parents, and mixin fields, and then deserialized using the appropriate parser method. Property field groups represent individual properties and are used to reconstruct property collections.</p>
+  </li>
+  <li>
+    <p>A prototype can have embedded prototypes, so this whole process is recursive.</p>
+  </li>
+</ol>
+
+<p>As of right now, we have most of the regular field group processing working, but we still need to implement property collection reconstruction, as well as some small things here and there. Our overall current implementation progress is represented in the following diagram:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-01/calligraphy-serializer-wip.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-01/calligraphy-serializer-wip.png" alt="CalligraphySerializer WIP" /></a></p>
+
+<p>One of the biggest challenges I have had to deal with implementing this has been matching serialized fields to appropriate class fields. The client uses a custom <a href="https://en.wikipedia.org/wiki/Run-time_type_information">run-time type information</a> system for this called GRTTI. While it should be technically possible to reimplement GRTTI, it would also be somewhat like reinventing the wheel when our server emulator is written in C#, which already has very strong reflection capabilities that can be used to get a very similar result.</p>
+
+<p>C# reflection has its drawbacks though: while extremely flexible, it is notoriously slow, and when you have to use it literally hundreds of thousands of times, it really adds up. In one of our unoptimized testing cases it took over 80 seconds to load all prototypes, while the original game did it in 3. In the end, with some targeted result caching, I have been able to get it to a pretty reasonable time of about 12 seconds, which should be more than good enough for our current needs. There is always more room for more optimization, but that is going to come later on. It should also be noted that all of this is a one-time cost during server startup, and if you do not have prototype frontloading enabled, you are most likely not going to notice this at all.</p>
+
+<p>Another big issue that has come up has been taking care of mixins. While most embedded prototypes can be handled with recursion, there are some very specific cases where you have so-called mixin prototypes that need to be deserialized as if they were a part of the prototype itself. Their field groups are mixed with regular field groups (which is where I am guessing the name is coming from), and there are cases where you have entire collections of mixin prototypes. There is a significant amount of extra code that handles mixins specifically, and they are used in literally only three prototypes classes (out of over a thousand) in the entire game: <code class="language-plaintext highlighter-rouge">LocomotorPrototype</code> and <code class="language-plaintext highlighter-rouge">PopulationInfoPrototype</code> in <code class="language-plaintext highlighter-rouge">AgentPrototype</code>, <code class="language-plaintext highlighter-rouge">ProductPrototype</code> in <code class="language-plaintext highlighter-rouge">ItemPrototype</code>, and lists of <code class="language-plaintext highlighter-rouge">ConditionPrototype</code> and <code class="language-plaintext highlighter-rouge">ConditionEffectPrototype</code> in <code class="language-plaintext highlighter-rouge">PowerPrototype</code>. So in the case of list mixins there is literally a single prototype class that this entire subsystem exists for.</p>
+
+<p>While there has been very good progress, the work on CalligraphySerializer is still not done. It is now possible to access a lot of the game data from code and use it in features like region generation, but there are still some aspects of mixin fields that need to be finished, as well as the property system, which is tightly tangled with the entire game.</p>
+
+<h2 id="pipeline-improvements">Pipeline Improvements</h2>
+
+<p>Another thing I have been able to work on this month is some general improvements to our delivery pipeline.</p>
+
+<p>First of all, MHServerEmu now clearly states its version, build time, and build configuration:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-01/versioning.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-01/versioning.png" alt="MHServerEmu Versioning" /></a></p>
+
+<p>This is a pretty minor change, but it is going to make it much easier to figure out and solve issues as they arise.</p>
+
+<p>Also, we now have automated nightly builds powered by GitHub actions and <a href="https://nightly.link/">nightly.link</a>. Thanks to that, if you want to try MHServerEmu out, instead of building the source code yourself, you can just download the latest build <a href="https://nightly.link/Crypto137/MHServerEmu/workflows/nightly-release-windows-x64/master?preview">here</a>. Those builds are based on the the latest <code class="language-plaintext highlighter-rouge">master</code> branch code, and are in general a decent representation of our current progress.</p>
+
+<p>These small steps bring us closer towards a big milestone, which would be our first official binary release, tentatively numbered 0.1.0. We are going to talk more about that in the future.</p>
+
+<h2 id="here-comes-a-new-challenger">Here Comes a New Challenger!</h2>
+
+<p>This month our development team has expanded by 50%: <strong>Kawaikikinou</strong> has joined me (Crypto137) and AlexBond in restoring Marvel Heroes back to its glory.</p>
+
+<p>MHServerEmu is a very complex project that involves many moving parts, so some time had to be spent to bring our new team member up to speed with what we are working on, but there are already some results that can be seen. So far Kawaikikinou has been mostly helping AlexBond with ironing out issues with region generation (more on that later), as well as improving the reliability of our code by introducing unit testing.</p>
+
+<p>Another thing I am personally very excited about is <a href="https://github.com/Kawaikikinou/MHLogHelper">the new region visualization tool</a> he developed. Knowing is half the battle, and getting a better visual idea of what exactly is going on on the backend is going to be very helpful in the long run.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-01/mhloghelper-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-01/mhloghelper-1.png" alt="MHLogHelper Screenshot 1" /></a></p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-01/mhloghelper-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-01/mhloghelper-2.png" alt="MHLogHelper Screenshot 2" /></a></p>
+
+<h2 id="the-joy-of-region-generation-with-alexbond">The Joy of Region Generation with AlexBond</h2>
+
+<p>This time I am joined by a co-writer: in this section AlexBond is going to go in-depth on what is happening behind the scenes with region generation.</p>
+
+<hr />
+
+<p>Hello everyone. I am AlexBond, and I am working on reimplementing the region generation. We are lucky to have the region generation code ifself present in the client, but it is disabled. Most likely it was among common game files, which is why it ended up in the client, or maybe the developers had the option to enable it for testing. In any case, in two months I was able to reimplement the region generation in C#.</p>
+
+<p>Of course, I am not without faults, so we ended up with a number of bugs. So this month me and <strong>Kawaikikinou</strong> have been testing this new code and fixing all the issues. As of the time of writing, we have tested regions up to chapter 3, and it is also possible to load into other chapters with some workarounds. Our goal is to get an exact copy of a region generated by the client when it has generation enabled. We do the comparisons using logs and the IDA debugger. Over the course of testing I was able to get a slightly better understanding of the generation process, I would like to share with you what I have discovered.</p>
+
+<h3 id="region-prototype">Region Prototype</h3>
+
+<p>A region prototype contains information about the type of generator a region uses. There are three region generators in total, but for now we are going to take a look at the most complicated and interesting one - <code class="language-plaintext highlighter-rouge">SequenceRegionGenerator</code>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">SequenceRegionGenerator</code> is a generator that describes a tree of <em>areas</em>, and this tree contains all possible variations with weights for each one. Branches of this tree contain area prototypes. Overall this can be represented as a kind of a chain sequence:</p>
+
+<center>Area 1 - Area 2 - Area 3 - an so on</center>
+
+<p>The <code class="language-plaintext highlighter-rouge">ProcessSequence()</code> function runs recursively through the tree of areas. During its run it uses a random seed to determine sequences (<code class="language-plaintext highlighter-rouge">PickSequence()</code>), areas (<code class="language-plaintext highlighter-rouge">PickArea()</code>), their positions and connections to other areas (<code class="language-plaintext highlighter-rouge">PickAreaPlacement()</code>), and in the end it runs the generator of the current area. This recursion goes through the entire tree from the end to the beginning.</p>
+
+<p>For example, in Madripoor it goes like this:</p>
+
+<center>LowTown -&gt; Cove -&gt; BambooForest -&gt; Beach</center>
+
+<p>If an area generator runs into an error, all previous areas are destroyed and rebuilt until the error disappears. To prevent infinite rebuilds, there is a special parameter called <code class="language-plaintext highlighter-rouge">MaxGenerationTimeInSec</code>, but currently I am not using it (perhaps I should).</p>
+
+<h3 id="area-prototype">Area Prototype</h3>
+
+<p>An area prototype defines the type of generator and the cell generation rules. In total there are seven different area generators, but I would like to talk about the most commonly used ones - <code class="language-plaintext highlighter-rouge">WideGridAreaGenerator</code> and <code class="language-plaintext highlighter-rouge">CellGridGenerator</code> (<code class="language-plaintext highlighter-rouge">GridAreaGenerator</code>).</p>
+
+<h4 id="cellgridgenerator">CellGridGenerator</h4>
+
+<p><code class="language-plaintext highlighter-rouge">CellGridGenerator</code> is a rectangle of cells, and the size of this rectangle is defined in the area prototype.</p>
+
+<p>The generation process includes ten attempts of creating an arrangement of cells that adheres to certain requirements. Now I am going to describe creation functions.</p>
+
+<p><code class="language-plaintext highlighter-rouge">InitializeContainer()</code> - creates a <code class="language-plaintext highlighter-rouge">CellContainer</code> with a size of <code class="language-plaintext highlighter-rouge">CellsX</code> by <code class="language-plaintext highlighter-rouge">CellsY</code>. This is just a rectangle for holding cells that are going to be added.</p>
+
+<p><code class="language-plaintext highlighter-rouge">EstablishExternalConnections()</code> - defines which sides are going to have cells for connecting to adjacent areas.</p>
+
+<p><code class="language-plaintext highlighter-rouge">GenerateRandomInstanceLinks()</code> - defines connections to various <code class="language-plaintext highlighter-rouge">RandomInstances</code> (not all regions contain those).</p>
+
+<p><code class="language-plaintext highlighter-rouge">CreateRequiredCells()</code> - defines groups of cells to be placed:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">RequiredSuperCells</code> - places consisting of multiple cells (mostly 2x2), like the Fall Tribe village in Savage Land, or buildings.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">NonRequiredSuperCells</code> - this type is used only in the <code class="language-plaintext highlighter-rouge">MutateMarshArea</code>.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">RegionTransitionSpec</code> - these are mostly places for waypoints and entrances to various treasure rooms. These places are determined using teleports contained in <code class="language-plaintext highlighter-rouge">RegionConnectionNodePrototype</code> that exit to this region.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">RandomInstances</code> - a list of random places, these are not in the game…</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">RequiredCells</code> - these are special places that must be present in an area, like shops or cafes (e.g. <code class="language-plaintext highlighter-rouge">Madripoor_Lower_BobaTeaPOI_A</code>).</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">RequiredPOICells</code> - cells from <code class="language-plaintext highlighter-rouge">POIGroups</code>, I cannot say for sure what they are (they appear in <code class="language-plaintext highlighter-rouge">Wakanda</code>, <code class="language-plaintext highlighter-rouge">DangerRooms</code>, <code class="language-plaintext highlighter-rouge">CowRegion</code>).</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">NonRequiredNormalCells</code> - another group of cells, used in <code class="language-plaintext highlighter-rouge">HellsKitchen</code> (<code class="language-plaintext highlighter-rouge">Brownstone_C_Barricade_ESW_A</code>).</p>
+  </li>
+</ul>
+
+<p>Now we have a filled <code class="language-plaintext highlighter-rouge">CellContainer</code> with a number <code class="language-plaintext highlighter-rouge">CellRefs</code>, and if it is successful we can move onto destroying and adding cells to the current area.</p>
+
+<p><code class="language-plaintext highlighter-rouge">ProcessDeleteExtraneousCells()</code> - this process uses <code class="language-plaintext highlighter-rouge">RoomKillChancePct</code> to determine the number of cells that need to be destroyed using the <code class="language-plaintext highlighter-rouge">RoomKillMethod</code>. There are three deletion methods - Random, Edge, and Corner. When deleting cells there are checks for paths between imporant points, and only the cells that can be safely removed without breaking those paths are removed.</p>
+
+<p><code class="language-plaintext highlighter-rouge">ProcessDeleteExtraneousConnections()</code> - removes redundant connections between cells using <code class="language-plaintext highlighter-rouge">ConnectionKillChancePct</code>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">ProcessCellTypes()</code> - the main function that randomly picks cells for creation. If a cell has not been previously defined, it is going to be picked from the appropriate <code class="language-plaintext highlighter-rouge">CellSet</code> based on cell type.</p>
+
+<p>At this point <code class="language-plaintext highlighter-rouge">CellGridGenerator</code> either succeeds or fails. If it fails, all areas are destroyed and regenerated.</p>
+
+<h4 id="widegridareagenerator">WideGridAreaGenerator</h4>
+
+<p><code class="language-plaintext highlighter-rouge">WideGridAreaGenerator</code> differs by having <code class="language-plaintext highlighter-rouge">GenerateRoads()</code> and <code class="language-plaintext highlighter-rouge">CreateProceduralSuperCells()</code>, as well as a different implementation of <code class="language-plaintext highlighter-rouge">ProcessCellTypes()</code> that picks cells based not on their type, but <code class="language-plaintext highlighter-rouge">RequiredWalls</code>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">GenerateRoads()</code> - defined by the Roads prototype in the generator. This function uses the <code class="language-plaintext highlighter-rouge">DijkstraRoad()</code> method based on the <a href="Dijkstra's algorithm">Dijkstra’s algorithm</a> for finding the shortest path between nodes.</p>
+
+<p><code class="language-plaintext highlighter-rouge">CreateProceduralSuperCells()</code> - if the <code class="language-plaintext highlighter-rouge">ProceduralSuperCells</code> field contains data, it creates a random set for a 2x2 square and rotates it randomly.</p>
+
+<p>Here is an example of generation for <code class="language-plaintext highlighter-rouge">CH0204Q36AIMLabAreaA</code>:</p>
+
+<div style="display: flex;">
+<div style="flex: 1;">CellsX = 4<br />CellsY = 3<br />RoomKillChancePct = 60<br />ConnectionKillChancePct = 15<br />RoomKillMethod = Corner</div>
+<div><table style="margin-bottom: 0px;"><tr><td>X</td><td>X</td><td>X</td><td>X</td></tr><tr><td>X</td><td>X</td><td></td><td>X</td></tr><tr><td>B</td><td></td><td></td><td>A</td></tr></table></div>
+</div>
+
+<p>As we can see, in this case the path from A to B is preserved, and 60% of the cells were removed using the corner method.</p>
+
+<p>This is what we get in-game:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-01/region-generation-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-01/region-generation-1.png" alt="Region Generation Example 1" /></a></p>
+
+<p>Now let us take a look at the next area, <code class="language-plaintext highlighter-rouge">CH0204Q36AIMLabAreaC</code>:</p>
+
+<div style="display: flex;">
+<div style="flex: 1;">CellsX = 3<br />CellsY = 3<br />RoomKillChancePct = 60<br />ConnectionKillChancePct = 15<br />RoomKillMethod = Random</div>
+<div><table style="margin-bottom: 0px;"><tr><td>X</td><td></td><td>B</td></tr><tr><td>C</td><td></td><td>X</td></tr><tr><td>X</td><td>X</td><td>X</td></tr></table></div>
+</div>
+
+<p>As we can see, in this case the path from B to C is preserved and 60% of the cells were removed using the random method.</p>
+
+<p>And here is what it looks like in-game:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-01/region-generation-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-01/region-generation-2.png" alt="Region Generation Example 2" /></a></p>
+
+<p>Hopefully now it should be more clear how all of this functions.</p>
+
+<p>As for my work, recently I have merged the new prototype system written by Crypto137, and now the testing of generation is much faster, and it is going to be easier to merge with the main repository. But we still have a lot of tests to do, so please be patient.</p>
+
+<hr />
+
+<p>Back to Crypto to wrap things up. We are getting very close to finally reaping the fruits of our efforts over the past few months, and hopefully we will be able to deliver results that are more visible in-game soon enough. We are just as excited as you are to finally see some things come together. Until next time!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2024/01/30/progress-report-january-2024.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

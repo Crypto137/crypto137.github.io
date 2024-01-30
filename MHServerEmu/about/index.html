@@ -31,7 +31,7 @@
           </span>
         </label>
 
-        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
 <a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
       </nav></div>
 </header>
@@ -46,13 +46,70 @@
   <div class="post-content">
     <p>MHServerEmu is a volunteer-driven research project aimed at reverse engineering the underlying technology developed by Gazillion Entertainment to run Marvel Heroes. We do not host any game servers ourselves.</p>
 
-<p>This website is a blog for documenting progress. The source code for the server emulator we are developing is hosted on <a href="https://github.com/Crypto137/MHServerEmu">GitHub</a>.</p>
-
-<p>MHServerEmu requires original game files to function. You will have to legally acquire and provide them yourself to use the emulator. If you have ever played the game on Steam, you should still be able to download the game in your Steam library.</p>
+<p>This website is a blog for documenting progress. The source code for the server emulator we are developing is hosted on <a href="https://github.com/Crypto137/MHServerEmu">GitHub</a>. You can download the latest nightly build <a href="/MHServerEmu/download/">here</a>.</p>
 
 <p>If you would like to discuss the emulator, ask questions, or help with the development, feel free to join our <a href="https://discord.gg/hjR8Bj52t3">Discord</a>.</p>
 
 <p>MHServerEmu is a completely non-commercial project: we do not make any money off of this or take donations in any form. If you have paid money for this, you have been scammed.</p>
+
+<hr />
+
+<h2 id="faq">FAQ</h2>
+
+<h3 id="what-is-this-are-you-remaking-the-game-is-it-going-to-use-unreal-engine-5">What is this? Are you remaking the game? Is it going to use Unreal Engine 5?</h3>
+
+<p>We are not remaking the game. We are restoring it to the state it was in before it was shut down.</p>
+
+<p>Marvel Heroes was built on a client-server architecture, which means the game consists of an Unreal Engine 3 based client app that runs on your PC and a remote server that the client connects to. We are using the original client as is without any modifications, and we are <a href="https://en.wikipedia.org/wiki/Reverse_engineering">reverse engineering</a> the server software using the information available in the client.</p>
+
+<p>This is possible due to some of the choices made during the development of the game. Even though the “netcode” is server-authoritative, meaning the server runs the game and has the final say in all cases, the client features significant prediction capabilities to keep the gameplay smooth. For that purpose it shares a lot of the code, as well as all game data, with the server. So copies of all the original stat values, drop rates, formulas, and so on, as well as some of the logic that processes them, are in the client.</p>
+
+<p>All of this is completely custom technology developed by Gazillion, and Unreal Engine acts as a sort of graphical wrapper. Porting the client to another engine, such as Unreal Engine 5, is completely outside the scope of this project.</p>
+
+<h3 id="what-versions-of-the-game-do-you-plan-to-support">What versions of the game do you plan to support?</h3>
+
+<p>Currently we are working on version 1.52, released in September 2017. This is the version that was live when the game was shut down. Eventually we plan to move onto 1.53 from November 2017, which was available on the Test Center, but never released.</p>
+
+<p>After we get post-BUE builds working, we plan on going back and trying to implement support for pre-BUE versions as well. The prime candidates for that in the order or priority are:</p>
+
+<ul>
+  <li>
+    <p>1.48 - the final pre-BUE version from December 2016.</p>
+  </li>
+  <li>
+    <p>1.10 - the “vanilla” version from June 2013, around the time the game was first launched.</p>
+  </li>
+</ul>
+
+<p>Each additional version is a significant undertaking, and the further back we go, the harder it is to support due to technical differences and a lack of data.</p>
+
+<p>As of right now we do not have any plans to support console versions of the game due to technical challenges with running and debugging the console client. This may eventually change as work on PlayStation 4 and Xbox One emulation on PC progresses.</p>
+
+<p>BUE refers to the Biggest Update Ever, also known as Marvel Heroes 2016 2.0, released in January 2017. This update contained many changes that were initially made with the upcoming console port in mind, and it ended up being controversial among players.</p>
+
+<h3 id="how-can-i-help">How can I help?</h3>
+
+<p>If you would like to contribute as a developer, right now we are mostly looking for help with reverse engineering the client and reimplementing its server-related functionality in C# / .NET.</p>
+
+<p>We also looking for any game network traffic captures (also known as packet dumps) made with a tool such as Wireshark before the game servers were shut down.</p>
+
+<p>Another thing you might be able to contribute is some of the rarer versions of the game client that are not on Steam:</p>
+
+<ul>
+  <li>
+    <p>Early beta versions released in late 2012-early 2013: <code class="language-plaintext highlighter-rouge">1.5.0.361</code>, <code class="language-plaintext highlighter-rouge">1.5.0.408</code>, <code class="language-plaintext highlighter-rouge">1.5.0.417</code>, <code class="language-plaintext highlighter-rouge">1.5.0.422</code>, <code class="language-plaintext highlighter-rouge">1.7.0.258</code>, <code class="language-plaintext highlighter-rouge">1.7.0.597</code>, <code class="language-plaintext highlighter-rouge">1.8.0.31</code>, <code class="language-plaintext highlighter-rouge">1.8.0.52</code>, <code class="language-plaintext highlighter-rouge">1.8.0.149</code>, <code class="language-plaintext highlighter-rouge">1.8.0.232</code>, <code class="language-plaintext highlighter-rouge">1.8.0.361</code>, <code class="language-plaintext highlighter-rouge">1.8.0.394</code>, <code class="language-plaintext highlighter-rouge">1.8.0.514</code>, <code class="language-plaintext highlighter-rouge">1.8.0.537</code>, <code class="language-plaintext highlighter-rouge">1.8.0.595</code>, <code class="language-plaintext highlighter-rouge">1.9.0.286</code>, <code class="language-plaintext highlighter-rouge">1.9.0.318</code>, <code class="language-plaintext highlighter-rouge">1.9.0.422</code>, <code class="language-plaintext highlighter-rouge">1.9.0.496</code>, <code class="language-plaintext highlighter-rouge">1.9.0.531</code>.</p>
+  </li>
+  <li>
+    <p>Mac open beta from June-July 2014 (most likely <code class="language-plaintext highlighter-rouge">1.23.0.x</code> or <code class="language-plaintext highlighter-rouge">1.24.0.x</code>).</p>
+  </li>
+  <li>
+    <p>Any “whitelist” versions that you had to accept an NDA to access. Some of these are called <code class="language-plaintext highlighter-rouge">Marvel Heroes (Demo)</code>.</p>
+  </li>
+</ul>
+
+<p>Please keep in mind that we are looking for complete copies of all client files, and not installers or leftover files.</p>
+
+<p>If you believe you can help us with any of the above, feel free to contact us on <a href="https://discord.gg/hjR8Bj52t3">Discord</a>.</p>
 
   </div>
 
