@@ -1,4 +1,177 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2024-01-30T13:58:58+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: January 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/01/30/progress-report-january-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: January 2024" /><published>2024-01-30T03:06:40+03:00</published><updated>2024-01-30T03:06:40+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/01/30/progress-report-january-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/01/30/progress-report-january-2024.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2024-01/header.jpg" alt="MHServerEmu Progress Report - January 2024" /></p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2024-02-28T15:44:16+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: February 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/02/28/progress-report-february-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: February 2024" /><published>2024-02-28T15:00:00+03:00</published><updated>2024-02-28T15:00:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/02/28/progress-report-february-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/02/28/progress-report-february-2024.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2024-02/header.jpg" alt="MHServerEmu Progress Report - February 2024" /></p>
+
+<p>February may be the shortest month, but we are definitely not short on progress this time.</p>
+
+<h2 id="the-merging-is-complete">The Merging is Complete</h2>
+
+<p>The biggest news of the month is without doubt that the changes that AlexBond and Kawaikikinou have been implementing and testing on the experimental branch over the past few months have been merged with the master branch. The highlights of these changes include:</p>
+
+<ul>
+  <li>
+    <p>Fully-featured implementation of DRAG (Dynamic Random Area Generator), which makes all regions not only explorable, but also different between visits. The current system refreshes regions every five minutes as long as there are no players in them, but this is something we will continue to iterate on.</p>
+  </li>
+  <li>
+    <p>Early implementation of the population system, which handles the spawning of entities, including enemies, NPCs, and interactable objects, across the entire game. There is still a lot of work to be done here, including dynamic enemy spawning, but the regions now feel a lot less lonely.</p>
+  </li>
+  <li>
+    <p>Early experiment that allows to deal damage to enemies. This is more of a quick hack than a real implementation, but it does make exploration way more fun.</p>
+  </li>
+</ul>
+
+<p>This is an important milestone that brings us closer towards our first official “release”, 0.1.0, that we currently expect to happen in March. In addition to what you can see in the current nightly build, it is also going to have some more additional polish, including a streamlined setup process that would not require you to manually configure a web server.</p>
+
+<p>Once that is out, the current plan is to shift our focus back towards fundamentals, including overhauling our entity management and replication systems.</p>
+
+<p>With the important news out of the way, let us take a closer look at some of the more technical happenings of February.</p>
+
+<h2 id="a-song-of-bits-and-bytes">A Song of Bits and Bytes</h2>
+
+<p>What I have personally spent the most of my time working on this month is finally implementing one of the core systems of Marvel Heroes - properties.</p>
+
+<p>All dynamic objects in the game are called <em>entities</em>. This includes player characters (internally called <em>avatars</em>), NPCs, enemies, projectiles, interactable objects, items, and so on. Entities are essentially collections of properties that define their state: what level they are, how much health they have, whether they are visible or not, and so on. Because of their integral role in pretty much all gameplay interactions, everything related to properties is very highly optimized, which makes it very difficult to untangle. If you include all the research and the foundational systems that had to be done beforehand, you could say that implementing properties actually took six months.</p>
+
+<p>A property is a pair of two 64-bit values: a <em>PropertyId</em> and a <em>PropertyValue</em>. As you can probably guess from their names, one identifies a property, and the other contains its actual value.</p>
+
+<p>The simplest form of a PropertyId looks like this:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-02/propertyid-combatlevel.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-02/propertyid-combatlevel.png" alt="Property Id - Combat Level" /></a></p>
+
+<p>The game initializes the so-called property info table and enumerates all property types during startup. Most of the properties are defined in code and are sorted alphabetically by their name. However, there are some additional data-only properties that are sorted by their blueprint id and appended at the end of the enumeration. Overall in version 1.52.0.1700 there are 1030 properties, of which 29 are data-only.</p>
+
+<p>11 of the 64 bits in a PropertyId are allocated to the enum value, so the maximum possible number of property types is <code class="language-plaintext highlighter-rouge">1 &lt;&lt; 11 = 2048</code>. The remaining 53 bits are distributed amongst 0-4 <em>parameters</em>. For example, this PropertyId for a <code class="language-plaintext highlighter-rouge">Waypoint</code> property contains a single parameter that specifies which waypoint this property unlocks:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-02/propertyid-waypoint.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-02/propertyid-waypoint.png" alt="Property Id - Waypoint" /></a></p>
+
+<p>There are three supported types of parameters: integers, prototype ids, and asset ids. However, there is a problem: prototype and asset ids are actually 64-bit hashes, so how are we supposed to fit multiple 64-bit values in the 53 bits we have for parameters? This is where trickery comes in.</p>
+
+<p>During game database initialization the game sorts all 64-bit prototype ids it contains, and then divides them into two types of buckets: by C++ class they bind to, and by Calligraphy blueprint they use. So you end up with arrays of sorted ids for each prototype class and blueprint. And by knowing which array to look in and where, you can retrieve the full id. A similar process happens for assets, so by knowing the asset type and its index you can get the id.</p>
+
+<p>The game databases server-side and client-side are in sync, and the game makes heavy use of this in network communication to reduce the amount of data that needs to be sent back and forth. Instead of sending a number like <code class="language-plaintext highlighter-rouge">421791326977791218</code>, which is the prototype id of the playable Iron Man avatar, you can send just <code class="language-plaintext highlighter-rouge">3</code>, which is the index in the array of prototypes that use the avatar blueprint.</p>
+
+<p>Property types have corresponding prototypes that contain additional metadata, including the types and subtypes (prototype blueprint or asset type) of all parameters. During property info table initialization the game processes all property prototypes and allocates the 53-bit param budget to defined parameters. First, it allocates the amount of bits needed to store the maximum index value for all prototype and asset parameters, and then it splits the remaining bits amongst any integer parameters, up to 31 bits (so only positive integers with a value up of up to <code class="language-plaintext highlighter-rouge">2147483647</code>). For example, here is a PropertyId for an <code class="language-plaintext highlighter-rouge">AvatarLibraryLevel</code> property that defines the displayed level in the hero roster for Iron Man:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-02/propertyid-avatarlibrarylevel.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-02/propertyid-avatarlibrarylevel.png" alt="Property Id - Avatar Library Level" /></a></p>
+
+<p>7 bits are allocated to hold the maximum value of the avatar prototype index, and then 31 of the remaining 46 bits are taken by an integer value. 15 bits in this case are left unused.</p>
+
+<p>Finally, here is an example of a <code class="language-plaintext highlighter-rouge">Proc</code> property that has four parameters:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-02/propertyid-proc.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-02/propertyid-proc.png" alt="Property Id - Proc" /></a></p>
+
+<p>Param0 is the asset value that defines the proc trigger type, Param1 is the power prototype of the power triggered by this proc, and the remaining params are additional integer values. First <code class="language-plaintext highlighter-rouge">7 + 15 = 22</code> bits are allocated to asset and prototype params, and then the remaining bits are split evenly between integer params, <code class="language-plaintext highlighter-rouge">31 / 2 = 15</code> bits per parameter.</p>
+
+<p>This is not where trickery ends however. Marvel Heroes makes heavy use of the encoding format developed by Google for their <a href="https://protobuf.dev/programming-guides/encoding/">Protocol Buffers</a> technology, and the way it works is that values can take anywhere from one to ten bytes depending on how high they are, with higher values taking more bytes. The number you end up with for a PropertyId often has a lot of zeroes at the end, so you waste a lot of network traffic if you send it as is. To circumvent this, the order of bytes is reversed before serialization: so <code class="language-plaintext highlighter-rouge">0x18E0000000000000</code> from the first example becomes <code class="language-plaintext highlighter-rouge">0x00000000000018E0</code>, or just <code class="language-plaintext highlighter-rouge">0x18E0</code>. However, there is an annoying inconsistency: when serializing a single property instead of a whole property collection, the game reverses the order of individual <em>bits</em> rather than <em>bytes</em>. So <code class="language-plaintext highlighter-rouge">0001 1000 1110 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000</code> becomes <code class="language-plaintext highlighter-rouge">0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0111 0001 1000</code>, or just <code class="language-plaintext highlighter-rouge">111 0001 1000</code>, which is equivalent to a hex value of <code class="language-plaintext highlighter-rouge">0x718</code>.</p>
+
+<p>And then we have PropertyValue. Thankfully, this one is not nearly as complicated. There are eleven data types that can be stored in a property value, most of them are simple 64-bit integer or 32-bit floating point values. But there are two funny ones: <em>Curve</em> and <em>Int21Vector3</em>.</p>
+
+<p>With a curve property rather than assigning it a value, you assign it an index property and a curve. And then the value of the curve property gets automatically updated from the curve, using the value of the index property as the curve index. For example, all heroes have a <code class="language-plaintext highlighter-rouge">HealthBase</code> property that uses <code class="language-plaintext highlighter-rouge">CombatLevel</code> as its index. So the value of <code class="language-plaintext highlighter-rouge">HealthBase</code> automatically changes whenever <code class="language-plaintext highlighter-rouge">CombatLevel</code> is updated (i.e. you level up). The default curve used by playable characters, <code class="language-plaintext highlighter-rouge">CharacterHealthMAX.curve</code>, actually goes all the way to level 101 and looks like this:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-02/healthbase-curve.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-02/healthbase-curve.png" alt="HealthBase Curve Property" /></a></p>
+
+<p>With an Int21Vector3 we have a Vector3 to store, which consists of three 32-bit floating point values (X, Y, and Z coordinates), but we only have 64 bits. In this case the compression is lossy: individual values are rounded and cast to integers. The 64 bits are split into <code class="language-plaintext highlighter-rouge">64 / 3 = 21</code> bits per value. The values remain signed, so we end up with 20 magnitude bits + 1 sign bit, which gives us a range from <code class="language-plaintext highlighter-rouge">-1048576</code> to <code class="language-plaintext highlighter-rouge">1048575</code> for each coordinate.</p>
+
+<p>One challenge with implementing PropertyValue has been adapting the original C++ API to C#. Property collections in the client use templates for property getters and setters that look something along these lines:</p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Getter</span>
+<span class="kt">int</span> <span class="n">characterLevel</span> <span class="o">=</span> <span class="n">properties</span><span class="o">-&gt;</span><span class="n">GetProperty</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="n">PropertyId</span><span class="p">(</span><span class="n">CharacterLevel</span><span class="p">));</span>
+
+<span class="c1">// Setter</span>
+<span class="n">properties</span><span class="o">-&gt;</span><span class="n">SetProperty</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="n">PropertyId</span><span class="p">(</span><span class="n">CharacterLevel</span><span class="p">));</span>
+</code></pre></div></div>
+
+<p>For the C# API we ended up with a combination of indexers and implicit casting that looks like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Getter</span>
+<span class="kt">int</span> <span class="n">characterLevel</span> <span class="p">=</span> <span class="n">properties</span><span class="p">[</span><span class="n">PropertyEnum</span><span class="p">.</span><span class="n">CharacterLevel</span><span class="p">];</span>
+
+<span class="c1">// Setter</span>
+<span class="n">properties</span><span class="p">[</span><span class="n">PropertyEnum</span><span class="p">.</span><span class="n">CharacterLevel</span><span class="p">]</span> <span class="p">=</span> <span class="m">60</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>The final piece of the property puzzle is aggregation. A property collection can be attached as a child to another property collection, and the values of the parent are going to be aggregated with the child. Each property collection actually contains two lists of properties: one for base values held in this particular collection, and one for values aggregated with all of its children. This system is what enables, for example, equipping and unequipping items that affect your character’s stats, or applying buffs and debuffs (internally called <em>conditions</em>). There is not too much interesting to say about aggregation, it is just a lot of mundane work to make sure that all values are updated properly.</p>
+
+<p>And with all of that we now have a working property system. We have already started making use of it to replace some of the hardcoded data from captured packets we had to rely on, as well as doing little experiments, like the recently implemented damage dealing hack. One remaining aspect that we are going to have to tackle on in the future is the eval system, which allows properties to be used as variables in scripted formulas (for example, for calculating maximum health taking into account all bonuses and penalties). But that is going to be a whole massive endeavor of its own.</p>
+
+<h2 id="an-interesting-development">An Interesting Development</h2>
+
+<p>As Alex was implemeting region generation and entity spawning, an issue immerged. Turns out loading an entire region worth of environments and entities puts a significant amount of strain on the client, especially if you are running on lower-end hardware. So we needed to come up with a solution, at least a temporary one.</p>
+
+<p>The way this is supposed to be handled is through a process called replication. The server is the “dungeon master”, it is aware of everything happening to everyone, but each client should only be aware of what is relevant to them. Not only does it reduce the amount of data that needs to be exchanged and improve performance, it also helps prevent some forms of cheating, such as map hacking. If the client literally has no information on what lies ahead, it is much harder to peek beyond what should be observable (<del>there is actually a potential way around this, but I am not going to disclose it here</del>).</p>
+
+<p>Internally the game calls the data that needs to be sent to clients their <em>interest</em>, with each client having their own <em>areas of interest</em> (AOI). There are at least five area of interest channels that we are currently aware of:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ReplicateToProximity</code>: the client needs to know what is happening around its physical location in the game world.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ReplicateToParty</code>: the client needs to be informed of its party members even if they are not in proximity.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ReplicateToOwner</code>: some entities should be replicated only to their owners. For example, this is not Diablo II, so only you should be able to see the loot you get from defeating enemies.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ReplicateToDiscovered</code>: when the client finds an NPC or a transition to another region, the client should still be somewhat aware of the entity, even if they are no longer in proximity with one another (a bit like fog of war in RTS games).</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ReplicateToTrader</code>: when trading items the clients should be aware of what is being traded.</p>
+  </li>
+</ul>
+
+<p>These channels can be mixed together, like <code class="language-plaintext highlighter-rouge">ReplicateToProximity</code> and <code class="language-plaintext highlighter-rouge">ReplicateToOwner</code>, so the client is aware only of the loot that belongs to it and is in proximity. We are still investigating how this system works, so some of these examples may not be completely accurate.</p>
+
+<p>In the current version of MHServerEmu we now have an early implementation of proximity-based area of interest. This allows us to send cell and entity data as you move in the game world, reducing load times significantly. We also have some additional functionality not present in the original game for players running on ultrawide monitors and/or with a custom camera maximum distance: by typing <code class="language-plaintext highlighter-rouge">!player AOIVolume value</code> in chat you can customize the “draw distance” of entities that are considered to be in proximity.</p>
+
+<p>Replication is a core part of any online game, because it is what keeps all clients synchronized with the game state happening on the server. We will most likely go more in-depth on this in future reports, once it is closer to being finished.</p>
+
+<h2 id="live-tuning">Live Tuning</h2>
+
+<p>One fun thing we were able to do this month is get the live tuning system up and running. This is a system that allowed the developers to do quick hotfixes without patching the game. While somewhat limited compared to changing game data directly, there are some interesting things you can do with it.</p>
+
+<p>For instance, regions have the following live tuning “knobs” available to them:</p>
+
+<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">enum</span> <span class="n">RegionTuningVar</span> <span class="p">{</span>
+    <span class="na">eRTV_PlayerLimit</span>    <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="na">eRTV_Enabled</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="na">eRT_BonusXPPct</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="na">eRT_XPBuffDisplay</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="na">eRT_BonusItemFindMultiplier</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="na">eRTV_NumRegionTuningVars</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">eRTV_Enabled</code> allows the server to disable individual regions. This is how, for example, the Mystic Mayhem in Limbo event is implemented: Limbo is a regular region that is disabled with live tuning unless the event is running. So by turning off this setting we can make Limbo accessible in-game.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-02/tuning-limbo-1.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-02/tuning-limbo-1.jpg" alt="Live Tuning - Limbo Waypoint" /></a></p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-02/tuning-limbo-2.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-02/tuning-limbo-2.jpg" alt="Live Tuning - Limbo" /></a></p>
+
+<p>Or we can go in the opposite direction and disable everything <em>but</em> Limbo. Feels like 2013 again!</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-02/tuning-limbo-3.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-02/tuning-limbo-3.jpg" alt="Live Tuning - Disable Regions" /></a></p>
+
+<p>Another group of tuning parameters affects avatar entities:</p>
+
+<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">enum</span> <span class="n">AvatarEntityTuningVar</span> <span class="p">{</span>
+	<span class="na">eAETV_BonusXPPct</span>	<span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="na">eAETV_XPBuffDisplay</span>	<span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+	<span class="na">eAETV_EternitySplinterPrice</span>	<span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+	<span class="na">eAETV_Enabled</span>	<span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+	<span class="na">eAETV_NumAvatarEntityTuningVars</span>	<span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">eAETV_Enabled</code> here works similarly to regions, allowing us to disable individual heroes. One possible use for this feature could be implementing an Infinity War themed event where half of the playable heroes would be picked randomly and disabled for the duration of the event.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-02/tuning-disable-avatar.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-02/tuning-disable-avatar.jpg" alt="Live Tuning - Disable Avatars" /></a></p>
+
+<p>All the tuning parameters are defined in the protocol and can be found <a href="https://github.com/Crypto137/MHServerEmu/blob/master/proto/CommonMessages.proto#L42">here</a>. You can experiment with them yourself by editing <code class="language-plaintext highlighter-rouge">LiveTuningData.json</code> located in <code class="language-plaintext highlighter-rouge">MHServerEmu\Data\Game\</code>.</p>
+
+<hr />
+
+<p>This is all we have to share today. Thank you very much for following the development of MHServerEmu. See you next time!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">MHServerEmu Progress Report: January 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/01/30/progress-report-january-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: January 2024" /><published>2024-01-30T03:06:40+03:00</published><updated>2024-01-30T03:06:40+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/01/30/progress-report-january-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/01/30/progress-report-january-2024.html"><![CDATA[<!--more-->
+
+<p><img src="/MHServerEmu/assets/blog/progress-report/2024-01/header.jpg" alt="MHServerEmu Progress Report - January 2024" /></p>
 
 <p>Hello there! The first month of 2024 is now almost behind us, and we have been hard at work on all things Marvel Heroes. Let us dive right in!</p>
 
