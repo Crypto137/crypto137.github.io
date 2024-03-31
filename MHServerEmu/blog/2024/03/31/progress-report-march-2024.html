@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: March 2024 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.2" />
+<meta property="og:title" content="MHServerEmu Progress Report: March 2024" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2024/03/31/progress-report-march-2024.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2024/03/31/progress-report-march-2024.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-03-31T19:50:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: March 2024" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-03-31T19:50:00+03:00","datePublished":"2024-03-31T19:50:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: March 2024","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2024/03/31/progress-report-march-2024.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2024/03/31/progress-report-march-2024.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: March 2024</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2024-03-31T19:50:00+03:00" itemprop="datePublished">Mar 31, 2024
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2024-03/header.jpg" alt="MHServerEmu Progress Report - March 2024" /></p>
+
+<p>Spring has come to the Northern Hemisphere, and the development of MHServerEmu is blooming.</p>
+
+<h2 id="010-release">0.1.0 Release</h2>
+
+<p>This month we have reached an important milestone: our first “official” binary release. Version 0.1.0 represents the progress we were able to achieve in the first 8 months of this project, including all the work on the game database, properties, and region generation we have been talking about in these reports. In addition to that, we have implemented enough fundamental systems to remove the last remaining hardcoded data packets, which allows us to fully control the data that is serialized to the client and no longer be bound to a specific version of the game.</p>
+
+<p>If you have been following the development and tried out the nightly snapshot builds, most of what is contained in this release should be familiar to you. However, there are a few extras we included.</p>
+
+<p>0.1.0 comes with the new Setup Sorcerer Supreme tool, which is our flavored spin on the setup wizard idea that is common in software. Here is what it currently does:</p>
+
+<ul>
+  <li>
+    <p>Verifies the game client version by finding the main executable, hashing it, and comparing the hash to the expected one.</p>
+  </li>
+  <li>
+    <p>Copies the <code class="language-plaintext highlighter-rouge">.sip</code> files required to run the server to the MHServerEmu data directory.</p>
+  </li>
+  <li>
+    <p>Creates the <code class="language-plaintext highlighter-rouge">StartClient.bat</code> file that launches the client configured to connect to a local server.</p>
+  </li>
+  <li>
+    <p>Creates the <code class="language-plaintext highlighter-rouge">StartClientAutoLogin.bat</code> files that launches the client configured to connect to a local server with automatic login using pre-defined credentials.</p>
+  </li>
+</ul>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-03/setup-sorcerer-supreme.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/setup-sorcerer-supreme.png" alt="Setup Sorcerer Supreme" /></a>
+</center>
+
+<p>This release also comes bundled with the Apache web server and web assets for the in-game store and news panels. These assets are also available separately in the new <a href="https://github.com/Crypto137/MHServerEmuWebAssets">MHServerEmuWebAssets</a> repository.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/news.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/news.jpg" alt="New Web Assets - News Panel" /></a></p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/store.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/store.jpg" alt="New Web Assets - Store Panel" /></a></p>
+
+<p>As soon as 0.1.0 was released, we started working on version 0.2.0. Currently we do not have any estimates for when it is going to be out, but like always you can follow the progress on <a href="https://github.com/Crypto137/MHServerEmu/network">GitHub</a> and via nightly builds.</p>
+
+<h2 id="game-database-browser">Game Database Browser</h2>
+
+<p>Kawaikikinou has finished the work on a new game database browser tool that allows you to easily browse all the static game data we have been decoding over the past few months. Now you can relatively easily find out, for instance, what was the <em>actual</em> drop rate of the infamous Gem of the Kursed.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/game-database-browser.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/game-database-browser.jpg" alt="Game Database Browser" /></a></p>
+
+<p>The browser works by plugging in existing server code into a WPF-based GUI. This is more of a development tool rather than something that is going to be used by end users, but it has already proven to be extremely helpful in getting a better understanding of how everything fits together. The source code is available on <a href="https://github.com/Kawaikikinou/MHServerEmu/tree/game-database-browser">GitHub</a>.</p>
+
+<h2 id="server-architecture-improvements">Server Architecture Improvements</h2>
+
+<p>One of the first things I wanted to do in 0.2.0 was to make improvements to the overall server achitecture and how data flows around. Here is an overview of what has been done so far.</p>
+
+<p>Major parts of the server (game, player management, billing, and so on) have been decoupled from each other and split into separate library projects. This allows us to potentially remove or substitute certain service implementations. For example, the database access layer can now be more easily modified to use various persistent storage solutions, such as a fully featured database management system. Also this allows us to reuse game code for tools, like the previously mentioned game database browser.</p>
+
+<p>Duplicate login handling has been improved. Previously, the player manager would refuse connections for any players that are trying to log in using an account that is already logged in. This could cause potential issues if for some reason a player remained logged in due to an unexpected crash or some other problem. Now it works like most online games: when a duplicate login is detected, the already logged in player is disconnected, their data is saved, and then reassigned to the new session.</p>
+
+<p>Our continuous integration pipeline that is used for nightly builds now has an additional step - running automated tests. As the server codebase grows, it becomes harder and harder to keep track of all the potential things that could break, especially because there are certain parts that have to be 100% in sync with the client. With daily automated testing hopefully we will be able to discover and fix any potential issues with existing code as soon as they come up.</p>
+
+<p>The network message flow has been overhauled. Messages are now deserialized asynchronously before they reach game simulations, which frees up valuable frame time. The way messages are batched together and sent to the clients has also be been redone, and is now closer to the client implementation. Connected players are now represented in the game they are in by <code class="language-plaintext highlighter-rouge">PlayerConnection</code> instances, which allowed us to clean up message handling and improve individiual player state tracking.</p>
+
+<p>The work on this front continues, and some more progress has been made with properly reimplementing the custom Gazillion serialization archive system, which we are going to talk more about in the next report.</p>
+
+<h2 id="steam-deck-support">Steam Deck Support</h2>
+
+<p>Thanks to the efforts of <strong>FF_Lowthor</strong> from our Discord server we have been able to get the game running on Linux (and Steam Deck).</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/steam-deck.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/steam-deck.jpg" alt="Marvel Heroes Steam Deck" /></a></p>
+
+<p>The game client has a rather peculiar compatibility issue when running under Proton. During the authentication process the client receives a session token and a 256-bit AES encryption key from the auth server. It then generates an initialization vector (IV) that it mixes with the encryption key to encrypt the token it received, which is then used to authenticate with the frontend server. Something goes wrong somewhere in this token encryption process under Proton, which causes the authentication to fail.</p>
+
+<p>FF_Lowthor has made a patch that allows the client to ignore this error and proceed with the login without a properly encrypted token. You can apply this patch by either manually changing <code class="language-plaintext highlighter-rouge">75</code> to <code class="language-plaintext highlighter-rouge">EB</code> at <code class="language-plaintext highlighter-rouge">0x019B317E</code> in the Win64 version of <code class="language-plaintext highlighter-rouge">MarvelHeroesOmega.exe</code> with a hex editor, or using our <a href="https://github.com/Crypto137/MHPatcher">MHPatcher</a> tool.</p>
+
+<p>Server-side you also have to enable <code class="language-plaintext highlighter-rouge">BypassAuth</code> in <code class="language-plaintext highlighter-rouge">Config.ini</code> to allow clients without valid session token to log in. As quality of life feature, the server now also saves data for the default account used when BypassAuth is enabled in a JSON file.</p>
+
+<h2 id="entity-spawning-and-navi">Entity Spawning and Navi</h2>
+
+<p>This month AlexBond is back to talk about world entity spawning and the NaviSystem. If you have not already, be sure to check out his explanation of the procedural region generation from the <a href="/MHServerEmu/blog/2024/01/30/progress-report-january-2024.html">January report</a>.</p>
+
+<hr />
+
+<p>Hey everyone, it’s AlexBond. In this report I would like to talk about the enemy spawning process and a little bit about NaviMesh generation.</p>
+
+<h3 id="clusterobject">ClusterObject</h3>
+
+<p><code class="language-plaintext highlighter-rouge">ClusterObject</code> is the foundation of all spawners in the game, from idle NPCs standing around and chatting with each other, to armies of enemies in a formation with their leaders and henchmen.</p>
+
+<p>At the heart of these objects lies data from <code class="language-plaintext highlighter-rouge">PopulationObjectPrototype</code> instances. They describe the number of regulars enemies (called <em>riders</em>), their <em>formation</em>, and a bunch of other settings. This prototype class has various derived classes that define whether a group has a <em>leader</em>, how many <em>henchmen</em> it contains, and many other specifics. ClusterObjects also belong to a <code class="language-plaintext highlighter-rouge">ClusterGroup</code>, and there is a derived <code class="language-plaintext highlighter-rouge">ClusterEntity</code> class that is responsible for spawning specific enemies.</p>
+
+<h3 id="populationmarker-spawning">PopulationMarker Spawning</h3>
+
+<p>Cell prototypes contain <code class="language-plaintext highlighter-rouge">SpawnMarkerPrototype</code> instances. When we load region missions, we look for the <code class="language-plaintext highlighter-rouge">PopulationSpawns</code> field that describes the amount of enemies on the map and the name of the spawn marker. We assemble all of this information into the <code class="language-plaintext highlighter-rouge">PopulationMarkers</code> array, and in the <code class="language-plaintext highlighter-rouge">Cell.PostGenerate()</code> method we add enemies to their places.</p>
+
+<p>For random placements we have the <code class="language-plaintext highlighter-rouge">SpawnMarkerRegistry</code> class that uses <code class="language-plaintext highlighter-rouge">SpawnReservation</code> to randomly pick free markers that are appropriate for specific enemies.</p>
+
+<p>After determining the required marker coordinates, we place the enemy group using the assigned formation method. There are four kinds of formations:</p>
+
+<ul>
+  <li>
+    <p>BoxFormation - grid-type formation that uses rows and columns.</p>
+  </li>
+  <li>
+    <p>LineFormation - formation along a line.</p>
+  </li>
+  <li>
+    <p>ArcFormation - formation along an arc.</p>
+  </li>
+  <li>
+    <p>FixedFormation - formation that uses fixed coordinates (FormationSlot).</p>
+  </li>
+</ul>
+
+<p>Other than formations, there is also placement using coordinates defined in <code class="language-plaintext highlighter-rouge">EncounterResourcePrototype</code>. For example, Jessica Jones and Ben Urich in the Avengers Tower are placed this way.</p>
+
+<h3 id="spawner">Spawner</h3>
+
+<p>A <em>spawner</em> is a special entity type that contains information about the number of enemies, their spawn timers, the uniqueness of their spawn distance, and many other parameters. Since spawners are derived from entities, they can be a part of a ClusterObject.</p>
+
+<p>Currently we do not take into account spawn timers, so all enemies spawn at the same time (which occasionally looks overly populated).</p>
+
+<p>One important distinction of spawners is that they place enemies randomly using the <code class="language-plaintext highlighter-rouge">PickPositionInSector()</code> method. To better illustrate how this works, let’s imagine a game of darts:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/darts.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/darts.png" alt="Spawner Darts" /></a></p>
+
+<p>We divide the space in a radius around an object into equal sections, and then we randomly determine the slot we are going to use for spawning. Then we check for collisions with other objects, and if this check fails we randomly pick another spawning point. Currently we do not have any Navi checks, so many enemies spawn in the air or inside walls.</p>
+
+<p>In addition to spawners described in missions and cells, there are also spawners defined in MetaState prototypes.</p>
+
+<h3 id="metastate-spawning">MetaState Spawning</h3>
+
+<p>All region prototypes have a <code class="language-plaintext highlighter-rouge">MetaGame</code> field. We can get MetaState by going through the following sequence:</p>
+
+<center>
+Region – MetaGames – GameModes – ApplyStates
+</center>
+
+<p>For wave-based regions, such as the S.H.I.E.L.D. Holo-Sim, the path is slightly different:</p>
+
+<center>
+Region – MetaGames – GameModes – States
+</center>
+
+<p>There are different varieties of MetaStates:</p>
+
+<ul>
+  <li>
+    <p>MetaStateMissionProgressionPrototype</p>
+  </li>
+  <li>
+    <p>MetaStateMissionActivatePrototype</p>
+  </li>
+  <li>
+    <p>MetaStateMissionSequencerPrototype</p>
+  </li>
+  <li>
+    <p>MetaStateWaveInstancePrototype</p>
+  </li>
+  <li>
+    <p>MetaStatePopulationMaintainPrototype</p>
+  </li>
+</ul>
+
+<p>Right now we don’t have properly working events in the game, so we just get population objects from the <code class="language-plaintext highlighter-rouge">PopulationRequiredObjectPrototype</code>, and then we retrieve PopulationMarkers, which we then proceed to use as described above.</p>
+
+<p>There is one more type of enemy placements defined in <code class="language-plaintext highlighter-rouge">PopulationThemePrototype</code> instances. Instead of markers, it uses <code class="language-plaintext highlighter-rouge">BlackOutZonePrototype</code> instances and weights. However, we cannot implement this method of spawning without the NaviSystem.</p>
+
+<h3 id="navisystem">NaviSystem</h3>
+
+<p>Over the last month I have been working on reimplementing the NaviSystem, and I have already achieved some results. Essentially, the NaviSystem is a <code class="language-plaintext highlighter-rouge">NaviMesh</code>, which is a set of <code class="language-plaintext highlighter-rouge">NaviTriangles</code> consisting of three <code class="language-plaintext highlighter-rouge">NaviEdges</code> built from two <code class="language-plaintext highlighter-rouge">NaviPoints</code>. The generation process happens in the <code class="language-plaintext highlighter-rouge">NaviCDT</code> class (CDT stands for Constrained Delaunay Triangulation). <a href="https://gwlucastrig.github.io/TinfourDocs/DelaunayIntroCDT/index.html">Here is an article</a> about this technique in case you are interested to learn more.</p>
+
+<p>When we initialize a game region we create a region-sized rectangle consisting of two triangles. Then we add cell information to <code class="language-plaintext highlighter-rouge">ModifyMeshPatch</code> using <code class="language-plaintext highlighter-rouge">AddNavigationDataToRegion()</code>, which we then use to add points to our NaviMesh by breaking our triangles into smaller <code class="language-plaintext highlighter-rouge">SplitTriangles</code>. Afterwards these points are connected by an edge that splits other edges through <code class="language-plaintext highlighter-rouge">SplitEdge()</code>. After adding all edges we mark triangles with <code class="language-plaintext highlighter-rouge">MarkupMesh()</code>. We then apply the following <code class="language-plaintext highlighter-rouge">PathFlags</code> as necessary:</p>
+
+<ul>
+  <li>
+    <p>Walk</p>
+  </li>
+  <li>
+    <p>Fly</p>
+  </li>
+  <li>
+    <p>Power</p>
+  </li>
+  <li>
+    <p>Sight</p>
+  </li>
+  <li>
+    <p>TallWalk</p>
+  </li>
+</ul>
+
+<p>By knowing the coordinates of a point we can determine which triangle it is in, and this way the game understands whether you can walk, fly, use abilities, or aim in this point.</p>
+
+<p>Here is an animation of how triangles are broken down for the <code class="language-plaintext highlighter-rouge">NPEAvengersTowerHUBRegion</code>:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-03/triangulate.gif"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/triangulate.gif" alt="NaviMesh Generation" /></a>
+<p>(Note: P=100 means that 100 NaviPoints were added to the NaviMesh.)</p>
+</center>
+
+<p>If we filter the triangles and show only those that contain the Walk PathFlag we get an outline of the Avengers Tower:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/navimesh.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/navimesh.png" alt="Walkable Triangles" /></a></p>
+
+<p>There is still a work to do with the NaviSystem. For example, it took me three days to find the cause of one of the issues. The system is complex, but it is the foundation of all physics in the game.</p>
+
+<hr />
+
+<p>This is all we have for you today. See you in a month!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2024/03/31/progress-report-march-2024.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>
