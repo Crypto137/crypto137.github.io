@@ -69,10 +69,10 @@
     <p>Copies the <code class="language-plaintext highlighter-rouge">.sip</code> files required to run the server to the MHServerEmu data directory.</p>
   </li>
   <li>
-    <p>Creates the <code class="language-plaintext highlighter-rouge">StartClient.bat</code> file that launches the client configured to connect to a local server.</p>
+    <p>Creates a <code class="language-plaintext highlighter-rouge">StartClient.bat</code> file that launches the client configured to connect to a local server.</p>
   </li>
   <li>
-    <p>Creates the <code class="language-plaintext highlighter-rouge">StartClientAutoLogin.bat</code> files that launches the client configured to connect to a local server with automatic login using pre-defined credentials.</p>
+    <p>Creates a <code class="language-plaintext highlighter-rouge">StartClientAutoLogin.bat</code> file that launches the client configured to connect to a local server with automatic login using pre-defined credentials.</p>
   </li>
 </ul>
 
@@ -94,7 +94,7 @@
 
 <p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/game-database-browser.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/game-database-browser.jpg" alt="Game Database Browser" /></a></p>
 
-<p>The browser works by plugging in existing server code into a WPF-based GUI. This is more of a development tool rather than something that is going to be used by end users, but it has already proven to be extremely helpful in getting a better understanding of how everything fits together. The source code is available on <a href="https://github.com/Kawaikikinou/MHServerEmu/tree/game-database-browser">GitHub</a>.</p>
+<p>The browser works by plugging in existing server code into a WPF-based GUI. This is more of a development tool rather than something that is intended to be used by end users, but it has already proven to be extremely helpful in getting a better understanding of how everything fits together. The source code is available on <a href="https://github.com/Kawaikikinou/MHServerEmu/tree/game-database-browser">GitHub</a>.</p>
 
 <h2 id="server-architecture-improvements">Server Architecture Improvements</h2>
 
@@ -106,7 +106,7 @@
 
 <p>Our continuous integration pipeline that is used for nightly builds now has an additional step - running automated tests. As the server codebase grows, it becomes harder and harder to keep track of all the potential things that could break, especially because there are certain parts that have to be 100% in sync with the client. With daily automated testing hopefully we will be able to discover and fix any potential issues with existing code as soon as they come up.</p>
 
-<p>The network message flow has been overhauled. Messages are now deserialized asynchronously before they reach game simulations, which frees up valuable frame time. The way messages are batched together and sent to the clients has also be been redone, and is now closer to the client implementation. Connected players are now represented in the game they are in by <code class="language-plaintext highlighter-rouge">PlayerConnection</code> instances, which allowed us to clean up message handling and improve individiual player state tracking.</p>
+<p>The network message flow has been overhauled. Messages are now deserialized asynchronously before they reach game simulations, which frees up valuable frame time. The way messages are batched together and sent to the clients has also been redone, and is now closer to the client implementation. Connected players are now represented in the game they are in by <code class="language-plaintext highlighter-rouge">PlayerConnection</code> instances, which allowed us to clean up message handling and improve individual player state tracking.</p>
 
 <p>The work on this front continues, and some more progress has been made with properly reimplementing the custom Gazillion serialization archive system, which we are going to talk more about in the next report.</p>
 
@@ -118,9 +118,9 @@
 
 <p>The game client has a rather peculiar compatibility issue when running under Proton. During the authentication process the client receives a session token and a 256-bit AES encryption key from the auth server. It then generates an initialization vector (IV) that it mixes with the encryption key to encrypt the token it received, which is then used to authenticate with the frontend server. Something goes wrong somewhere in this token encryption process under Proton, which causes the authentication to fail.</p>
 
-<p>FF_Lowthor has made a patch that allows the client to ignore this error and proceed with the login without a properly encrypted token. You can apply this patch by either manually changing <code class="language-plaintext highlighter-rouge">75</code> to <code class="language-plaintext highlighter-rouge">EB</code> at <code class="language-plaintext highlighter-rouge">0x019B317E</code> in the Win64 version of <code class="language-plaintext highlighter-rouge">MarvelHeroesOmega.exe</code> with a hex editor, or using our <a href="https://github.com/Crypto137/MHPatcher">MHPatcher</a> tool.</p>
+<p>FF_Lowthor has made a patch that allows the client to ignore this error and proceed with the login without a properly encrypted token. You can apply this patch by changing <code class="language-plaintext highlighter-rouge">75</code> to <code class="language-plaintext highlighter-rouge">EB</code> at <code class="language-plaintext highlighter-rouge">0x019B317E</code> in the Win64 version of <code class="language-plaintext highlighter-rouge">MarvelHeroesOmega.exe</code> either manually with a hex editor, or using our <a href="https://github.com/Crypto137/MHPatcher">MHPatcher</a> tool.</p>
 
-<p>Server-side you also have to enable <code class="language-plaintext highlighter-rouge">BypassAuth</code> in <code class="language-plaintext highlighter-rouge">Config.ini</code> to allow clients without valid session token to log in. As quality of life feature, the server now also saves data for the default account used when BypassAuth is enabled in a JSON file.</p>
+<p>Server-side you also have to enable <code class="language-plaintext highlighter-rouge">BypassAuth</code> in <code class="language-plaintext highlighter-rouge">Config.ini</code> to allow clients to log in without valid session tokens. As quality of life feature, the server now also saves data for the default account used when BypassAuth is enabled in a JSON file.</p>
 
 <h2 id="entity-spawning-and-navi">Entity Spawning and Navi</h2>
 
@@ -165,7 +165,7 @@
 
 <p>A <em>spawner</em> is a special entity type that contains information about the number of enemies, their spawn timers, the uniqueness of their spawn distance, and many other parameters. Since spawners are derived from entities, they can be a part of a ClusterObject.</p>
 
-<p>Currently we do not take into account spawn timers, so all enemies spawn at the same time (which occasionally looks overly populated).</p>
+<p>Currently we do not take spawn timers into account, so all enemies spawn at the same time (which occasionally looks overly populated).</p>
 
 <p>One important distinction of spawners is that they place enemies randomly using the <code class="language-plaintext highlighter-rouge">PickPositionInSector()</code> method. To better illustrate how this works, let’s imagine a game of darts:</p>
 
@@ -217,7 +217,7 @@ Region – MetaGames – GameModes – States
 
 <p>Over the last month I have been working on reimplementing the NaviSystem, and I have already achieved some results. Essentially, the NaviSystem is a <code class="language-plaintext highlighter-rouge">NaviMesh</code>, which is a set of <code class="language-plaintext highlighter-rouge">NaviTriangles</code> consisting of three <code class="language-plaintext highlighter-rouge">NaviEdges</code> built from two <code class="language-plaintext highlighter-rouge">NaviPoints</code>. The generation process happens in the <code class="language-plaintext highlighter-rouge">NaviCDT</code> class (CDT stands for Constrained Delaunay Triangulation). <a href="https://gwlucastrig.github.io/TinfourDocs/DelaunayIntroCDT/index.html">Here is an article</a> about this technique in case you are interested to learn more.</p>
 
-<p>When we initialize a game region we create a region-sized rectangle consisting of two triangles. Then we add cell information to <code class="language-plaintext highlighter-rouge">ModifyMeshPatch</code> using <code class="language-plaintext highlighter-rouge">AddNavigationDataToRegion()</code>, which we then use to add points to our NaviMesh by breaking our triangles into smaller <code class="language-plaintext highlighter-rouge">SplitTriangles</code>. Afterwards these points are connected by an edge that splits other edges through <code class="language-plaintext highlighter-rouge">SplitEdge()</code>. After adding all edges we mark triangles with <code class="language-plaintext highlighter-rouge">MarkupMesh()</code>. We then apply the following <code class="language-plaintext highlighter-rouge">PathFlags</code> as necessary:</p>
+<p>When we initialize a game region, we create a region-sized rectangle consisting of two triangles. Then we add cell information to <code class="language-plaintext highlighter-rouge">ModifyMeshPatch</code> using <code class="language-plaintext highlighter-rouge">AddNavigationDataToRegion()</code>, which we then use to add points to our NaviMesh by breaking our triangles into smaller <code class="language-plaintext highlighter-rouge">SplitTriangles</code>. Afterwards these points are connected by an edge that splits other edges through <code class="language-plaintext highlighter-rouge">SplitEdge()</code>. After adding all edges, we mark triangles with <code class="language-plaintext highlighter-rouge">MarkupMesh()</code>. We then apply the following <code class="language-plaintext highlighter-rouge">PathFlags</code> as necessary:</p>
 
 <ul>
   <li>
@@ -237,7 +237,7 @@ Region – MetaGames – GameModes – States
   </li>
 </ul>
 
-<p>By knowing the coordinates of a point we can determine which triangle it is in, and this way the game understands whether you can walk, fly, use abilities, or aim in this point.</p>
+<p>By knowing the coordinates of a point we can determine what triangle it is in, and this way the game understands whether you can walk, fly, use abilities, or aim in this point.</p>
 
 <p>Here is an animation of how triangles are broken down for the <code class="language-plaintext highlighter-rouge">NPEAvengersTowerHUBRegion</code>:</p>
 
@@ -246,7 +246,7 @@ Region – MetaGames – GameModes – States
 <p>(Note: P=100 means that 100 NaviPoints were added to the NaviMesh.)</p>
 </center>
 
-<p>If we filter the triangles and show only those that contain the Walk PathFlag we get an outline of the Avengers Tower:</p>
+<p>If we filter the triangles and show only those that contain the Walk PathFlag, we get an outline of the Avengers Tower:</p>
 
 <p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/navimesh.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/navimesh.png" alt="Walkable Triangles" /></a></p>
 
