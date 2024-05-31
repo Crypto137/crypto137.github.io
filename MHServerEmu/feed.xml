@@ -1,4 +1,148 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2024-05-01T13:39:43+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: April 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/04/30/progress-report-april-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: April 2024" /><published>2024-04-30T19:00:00+03:00</published><updated>2024-04-30T19:00:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/04/30/progress-report-april-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/04/30/progress-report-april-2024.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2024-04/header.jpg" alt="MHServerEmu Progress Report - March 2024" /></p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2024-05-31T19:19:42+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: May 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/05/31/progress-report-may-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: May 2024" /><published>2024-05-31T19:00:00+03:00</published><updated>2024-05-31T19:00:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/05/31/progress-report-may-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/05/31/progress-report-may-2024.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2024-05/header.jpg" alt="MHServerEmu Progress Report - May 2024" /></p>
+
+<p>Dread it, run from it, MHServerEmu Progress Report arrives all the same.</p>
+
+<h2 id="back-in-time">Back in Time</h2>
+
+<p>This month there has been an unexpected breakthrough. As I was finishing combing through the client’s serialization routines we talked about in the <a href="/MHServerEmu/blog/2024/04/30/progress-report-april-2024.html">previous report</a>, I came to a realization just how little is actually needed to get in-game in some form. So I had an idea: what if we had a heavily stripped down version of the server, a minimum viable product with as much version-specific functionality removed as possible? In theory, this would allow us to get in-game using pretty much any version of the game client, which could be useful for various reasons. I decided to test this idea in practice by taking a build of version 1.10, dating back to the game’s original launch in June 2013,  and seeing if this turns out as simple as I thought. If I could get 1.10 running, any version from that all the way to 1.53 would be feasible.</p>
+
+<p>I started by taking just the <code class="language-plaintext highlighter-rouge">MHServerEmu.Core</code> library, which handles aspects such as low level serialization and networking, and did a new lightweight server implementation with it. To my surprise, after just a couple hours of work on a single evening, I was in-game.</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-absolute-win.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-absolute-win.jpg" alt="I see this as an absolute win." /></a>
+<p style="font-style: italic;">I see this as an absolute win.</p>
+</center>
+
+<p>My hypothesis turned out to be correct: not only all post-launch versions of the game are fundamentally very similar, but there is only one thing that can cause the process of putting a player into a game to fail - not having a valid name specified for the player. The only other little thing that needed fixing was the fact that older versions of the game do not allow entities with zero health to move around, but with just a little bit of extra work I was able to solve this.</p>
+
+<p>One thing that is now possible is making use of some of the internal builds we were able to recover from Steam. These builds have all console commands unlocked, some of which can be used to get a better understanding of how the game works under the hood. For example, there is a number of visualization features for various aspects of the navi system, including mesh triangulation, pathfinding, entity bounds, and much more. Here is Avengers Tower with debug visualization for navimesh, collision shapes, physics sweeps, and pathfinding.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-navi-debug.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-navi-debug.jpg" alt="Navi Debug Mode" /></a></p>
+
+<p>In addition to that, we can now explore some of the content that was never finished and later ended up being removed from the client. Two major examples of such content are the Savage Land patrol zone, also referred to as United Tribes in the game files, and the Thanos raid that was going to be centered around Knowhere. Both of them were <a href="https://www.ign.com/articles/2015/10/12/marvel-heroes-2016-announced-secret-invasion-story-coming">mentioned by Gazillion when promoting the Marvel Heroes 2016 rebrand</a>, and early versions of them are present in version 1.48, also known as the last pre-BUE version. The screenshots below represent this content the way it was in December 2016, a little less than a year before the game’s shutdown.</p>
+
+<p>Savage Land Siege Patrol / United Tribes is the one closer to being finished. Although it is referred to as a “patrol zone”, apparently it was going to be more of its own thing, featuring some form of tower defense gameplay. The region layout present in the client resembles three-lane MOBA level design, but with additional twists and turns reminiscent of tower defense games.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-united-tribes-map.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-united-tribes-map.jpg" alt="United Tribes Map" /></a></p>
+
+<p>Players start at the base where they can go down one of three lanes.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-united-tribes-base.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-united-tribes-base.jpg" alt="United Tribes Base" /></a></p>
+
+<p>Here is what the middle of the map looks like.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-united-tribes-mid.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-united-tribes-mid.jpg" alt="United Tribes Mid" /></a></p>
+
+<p>And on the opposite side of the map there is what appears to be an unfinished boss arena that uses the Red Onslaught’s model from the Axis raid as a placeholder.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-united-tribes-boss.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-united-tribes-boss.jpg" alt="United Tribes Boss" /></a></p>
+
+<p>On the cosmic side of things we have the Thanos raid. As far as we can tell, it was going to feature Knowhere as a new hub region, similar to Genosha that accompanied the Axis raid, and this same hub was going to be the starting area of the raid itself. This hub features special camera settings, making it rotate around the center as you move on the outer ring.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-knowhere.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-knowhere.jpg" alt="Knowhere Hub" /></a></p>
+
+<p>The raid itself was planned to include eight areas (the descriptions are mostly speculations based on file names and layouts):</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">ThanosRaidPart1Area</code>, containing four subareas - <code class="language-plaintext highlighter-rouge">Knowhere_Spoke_A</code>, <code class="language-plaintext highlighter-rouge">Knowhere_Spoke_B</code>, <code class="language-plaintext highlighter-rouge">Knowhere_Spoke_C</code>, and <code class="language-plaintext highlighter-rouge">Knowhere_Spoke_D</code>. <code class="language-plaintext highlighter-rouge">Knowhere_Spoke_A</code> is the only section of the raid that features mostly completed environment artwork. All other areas have only greyboxed layouts that occasionally reuse existing assets.</li>
+</ul>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-thanos-raid-spoke-a.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-thanos-raid-spoke-a.jpg" alt="Thanos Raid Spoke A" /></a></p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ThanosRaidPart3AreaBlackDwarf</code> (also referred to as <code class="language-plaintext highlighter-rouge">Knowhere_Hub_Part2_BlackDwarf</code> in the cell names), which appears to be an arena where players would have fought Black Dwarf.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ThanosRaidPart4AreaTransportBay</code> (<code class="language-plaintext highlighter-rouge">Knowhere_Transport_Bay_A</code>) looks like a section where players were supposed to fight their way through to a spaceship.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ThanosRaidPart5AreaShipCombat</code> is some kind of encounter where players were supposed to defend their spaceship acquired in the previous area.</p>
+  </li>
+  <li>
+    <p>In <code class="language-plaintext highlighter-rouge">ThanosRaidPart6AreaSupergiant</code> player would board Thanos’ flagship, Sanctuary II, and fight Supergiant. In the beginning of this area there is what looks like the debris of the ship players acquired and defended in previous areas.</p>
+  </li>
+  <li>
+    <p>The next area is called <code class="language-plaintext highlighter-rouge">ThanosRaidPart7AreaGauntlet</code>, and it appears to be an encounter where the raid would split into two teams and fight their way through Sanctuary II in series of three rooms for each team.</p>
+  </li>
+  <li>
+    <p>It is followed by <code class="language-plaintext highlighter-rouge">ThanosRaidPart8AreaCorvusProxima</code> , the bridge of Sanctuary II, where players would have fought Corvus Glaive and Proxima Midnight.</p>
+  </li>
+  <li>
+    <p>The same layout is reused for <code class="language-plaintext highlighter-rouge">ThanosRaidPart9AreaThanos</code>, and supposedly this is where the fight with Thanos himself was going to happen.</p>
+  </li>
+</ul>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-thanos-arena.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-thanos-arena.jpg" alt="Thanos Raid Thanos Arena" /></a></p>
+
+<p>One other version we are now able to examine is 1.53, which is the version of the game that was on the test center when the game was shut down. It features:</p>
+
+<ul>
+  <li>
+    <p>The costume closet system, which would turn costumes into options you could unlock and select in a separate panel, rather than equippable items.</p>
+  </li>
+  <li>
+    <p>Playable Spider-Woman.</p>
+  </li>
+  <li>
+    <p>An unfinished version of the playable Gladiator Thor. I mean Unworthy Thor. Actually, he is also referred to as just “Odinson”. Whatever his name was going to be, this was going to be an alternative, distinctly Mjolnir-less, version of Thor as a completely separate hero.</p>
+  </li>
+  <li>
+    <p><a href="https://www.youtube.com/watch?v=Jop6iN1bO1Q">Apocalypse terminal from the console version of the game.</a></p>
+  </li>
+  <li>
+    <p>Omega items, which were going to be some form of equipment set system with bonuses for equipping multiple items from the same set.</p>
+  </li>
+  <li>
+    <p>A number of costumes for various heroes, including Apocalypse-themed costumes for Psylocke, Magik, Jean Grey, and Storm, costumes based on the Thor Ragnarok film for Thor, Loki, and Hulk, and other costumes not directly related to a specific event.</p>
+  </li>
+</ul>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-unworthy-thor.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-05/mini-screenshot-unworthy-thor.jpg" alt="Unworthy Gladiator Thor Odinson" /></a></p>
+
+<p>One issue with this version is that its newest build, <code class="language-plaintext highlighter-rouge">1.53.0.203</code> from November 8th 2017, does not contain the assets for all the new content, such as new costumes. If you want to get the most content, you have to go back to at least <code class="language-plaintext highlighter-rouge">1.53.0.62</code> from two weeks prior to that, with all the extra bugs that entails. Even the earlier build though lacks the assets for some of the new regions, such as a new event terminal referred to as Hel Unleashed / Hela Palace, as well as a five-man version of the Muspelheim raid, both of which appear to had been planned as Thor Ragnarok tie-ins. While we do still plan to support version 1.53, as it is technically very similar to 1.52 we are currently focusing on right now, the definitive post-BUE version of Marvel Heroes is most likely going to be some kind of modded amalgamation of multiple versions.</p>
+
+<p>The biggest takeaway from this development though is that it has definitively proven the viability of restoring pretty much any version of the game we have the client for. Just booting any version of the game now takes literally minutes (except for beta builds that have some additional jank that still needs to be figured out). It would require some effort to go as far back as 1.10, but adapting our 1.52 work for both 1.48 and 1.53 is most likely going to be significantly less difficult than we expected. As for the mini-emulator we have been using, we plan to share its source code relatively soon, once it is in a slightly more polished and user-friendly state.</p>
+
+<h2 id="the-road-to-area-of-interest">The Road to Area of Interest</h2>
+
+<p>Back in the realm of version 1.52 some significant backend progress has been achieved this month. The next major obstacle we need to overcome to get the game to a more playable state is implementing a proper area of interest system, and for that we had some cleaning up to do.</p>
+
+<p>An area of interest is a server-side representation of what a particular client is aware of. When something changes in the game state (for example, your health goes up or down), only the clients that are interested in the affected entities should be notified. To find the interested clients, we need to be able to iterate connected players and check each of their individual areas of interest. However, in our previous temporary implementation of handling asynchronous network events a player could join or leave the game at arbitrary times, causing the iteration process to fail.</p>
+
+<p>So one aspect that needed to be fixed is putting aside a specific point in the main game loop when new players could be added and removed. Whenever asynchronous events would happen, they would simply enqueue players to be added or removed during the next update. There is code for such behavior in the client, and we modeled our implementation after it. Same as Gazillion, we use a double buffer style approach: we have two instances of each queue, and when it is time to process joining / leaving players, the only thing we do in a lock is swap pointers to these two instances. While we process players in the instance we got, the other instance continues being filled asynchronously with players we are going to process in the next update. In the end this protects the game thread from asynchronous multithreaded weirdness and allows us to safely iterate players within the main loop.</p>
+
+<p>One unfortunate side effect of this implementation was that it broke persistent player data saving. To understand how this happened we need to look at the bigger picture. Here is a rough overview of the server achitecture the game expects based on our observations:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-05/player-manager.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-05/player-manager.png" alt="Player Manager" /></a></p>
+
+<p>The client connects directly only to the frontend server (FES). FES then relays client messages to the player manager, which distributes players across various game instances hosted by game instance servers (GIS). Because the player manager is aware where each player is, it can relay messages received from the frontend further down to the game instance where they belong. The player manager is the ultimate overseer of the entire game, and it would make sense for it to be the one interacting with the database. For those familiar with Diablo and other Blizzard games, the role of the player manager there would be handled by Battle.net.</p>
+
+<p>We currently follow this structure pretty closely, but with some deviations. We have only a single server, and game instances are managed directly by the player manager without a separate GIS, but the overall flow is the same. So when a player disconnects, it raises an asynchronous event on the frontend server, that is then relayed to the player manager and handled by it. This handling includes removing the disconnected player from the game instance they were in and saving their data. However, now that the processing of joining and leaving players is deferred to a specific point in time, if you save player data to the database straight away, you are going to save an outdated copy of it, because the game instance most likely will have to wait until the next game frame to update the database model that is written. To fix this, we had to come up with a mechanism that also defers database writes until the game instance finishes processing leaving player. Added to the mix is also a possible case of multiple clients attempting to use the same account. Multithreading is fun!</p>
+
+<p>With that out of the way, the next thing that needed to be done was cleaning up our entity management system and implementing inventories. One issue we had still hanging from the days of working with hardcoded packets was that player and avatar entities existed outside of the entity manager, which made it impossible for them to interact with other systems, such as areas of interest that we need to implement. However, if we were to just mix players and avatars with all the crates, cars and Maggia goons spawning all over the world, it would make it somewhat difficult to clean up when a player leaves a game. This is where inventories come in.</p>
+
+<p>When most people think of an inventory, they probably imagine a grid full of epic loot. Marvel Heroes takes a more generalized approch: any entity can be in an inventory of any other entity. So all of your inactive avatars actually exist in the <code class="language-plaintext highlighter-rouge">PlayerAvatarLibrary</code> inventory. The avatar you are currently playing as gets put in the <code class="language-plaintext highlighter-rouge">PlayerAvatarInPlay</code> inventory. All of your team-ups exist in the <code class="language-plaintext highlighter-rouge">PlayerTeamUpLibrary</code> inventory. Same goes for summons that are contained in the <code class="language-plaintext highlighter-rouge">AgentSummonedEntities</code> inventory. Things you would expect to be stored in an inventory, such as equipment, is also included. To summarize, the inventory system in the game actually represents ownership relations between entities.</p>
+
+<p>So by implementing the inventory system we could solve the problem of cleaning up all the various entities related to a player simply by recursively iterating all of their owned entities. And this is exactly what I did: we now have all the basic logic needed for adding, moving, and removing entities within inventories, as well as a lot of validation code mirroring the client implementation of the system. There is still some work to do before items you all know and love begin showing up in various inventory grids in the UI, but the implemented functionality is enough to take care of avatars, as well as  team-ups, who now show up as unlocked in latest nightly builds.</p>
+
+<p>With all of this cleanup and refactoring we now reach a point where we can work on properly implementing the area of interest system, which is going to be the foundation of all client-server communication going forward. Once that is done, we are most likely going to enter another period of explosive progress, similar to the one we had in March when we got the game database fully working.</p>
+
+<h2 id="behaviorism-and-us">Behaviorism and Us</h2>
+
+<p>Before we wrap things up, here is also a quick update on what AlexBond has been up to. While I have been focusing on the more foundational aspects of the server, he has been digging into a system that is going to become rather important later on - behavior, also known as AI.</p>
+
+<p>We are most likely going to go into more details on this in a future report, but here is an overview of what it looks like. Behavior affects anything that can do anything on its own: one obvious example of this is enemies, but there are also team-ups, pets, projectiles, and even orbs and boons that drop from various sources. It is implemented as a finite state machine with fourteen possible states: <code class="language-plaintext highlighter-rouge">Delay</code>, <code class="language-plaintext highlighter-rouge">Despawn</code>, <code class="language-plaintext highlighter-rouge">Flank</code>, <code class="language-plaintext highlighter-rouge">Flee</code>, <code class="language-plaintext highlighter-rouge">Flock</code>, <code class="language-plaintext highlighter-rouge">Interact</code>, <code class="language-plaintext highlighter-rouge">MoveTo</code>, <code class="language-plaintext highlighter-rouge">Orbit</code>, <code class="language-plaintext highlighter-rouge">Rotate</code>, <code class="language-plaintext highlighter-rouge">SelectEntity</code>, <code class="language-plaintext highlighter-rouge">Teleport</code>, <code class="language-plaintext highlighter-rouge">TriggerSpawners</code>, <code class="language-plaintext highlighter-rouge">UseAffixPower</code>, <code class="language-plaintext highlighter-rouge">UsePower</code>, and <code class="language-plaintext highlighter-rouge">Wander</code>. Transitions between these states are controlled by various <em>procedural profiles</em>, of which there are over a hundred in version 1.52. Some profiles are more generic, such as <code class="language-plaintext highlighter-rouge">ProceduralProfileBasicMeleePrototype</code>, while others are very specific, like <code class="language-plaintext highlighter-rouge">ProceduralProfileDrDoomPhase2Prototype</code>. The data for procedural profiles, such as what powers to use and how often, is defined in prototypes contained in the game database.</p>
+
+<p>Surprisingly enough, the client contains not only all of the data, but also the vast majority of the code for procedural profiles. As far as we can tell, the main reason for this is that the AI system was also utilized by bots designed to stress-test servers with artificial load. While the full functionality for this feature is removed in shipping builds, there are enough traces of it for us to reverse engineer.</p>
+
+<p>Over the course of May Alex has reimplemented 114 procedural profiles, and is now working on states. Once some more of the foundational systems are working, such as areas of interest and locomotion, this should bring some more life back to the game. It is not going to be “playable”, because we are most likely not going to have a working power system implementation for quite some time, but it should in theory make things like having a team-up or pet follow you in the game possible.</p>
+
+<hr />
+
+<p>And with that the third and final progress report of this spring is over. See you in the summer!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">MHServerEmu Progress Report: April 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/04/30/progress-report-april-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: April 2024" /><published>2024-04-30T19:00:00+03:00</published><updated>2024-04-30T19:00:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/04/30/progress-report-april-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/04/30/progress-report-april-2024.html"><![CDATA[<!--more-->
+
+<p><img src="/MHServerEmu/assets/blog/progress-report/2024-04/header.jpg" alt="MHServerEmu Progress Report - April 2024" /></p>
 
 <p>Another month has passed, and we have some more updates to share regarding the development of MHServerEmu.</p>
 
