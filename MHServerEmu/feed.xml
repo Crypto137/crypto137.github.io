@@ -1,4 +1,179 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2024-06-30T04:27:04+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: June 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/06/30/progress-report-june-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: June 2024" /><published>2024-06-30T04:20:00+03:00</published><updated>2024-06-30T04:20:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/06/30/progress-report-june-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/06/30/progress-report-june-2024.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2024-06/header.jpg" alt="MHServerEmu Progress Report - June 2024" /></p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2024-07-31T22:32:24+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: July 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/07/31/progress-report-july-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: July 2024" /><published>2024-07-31T22:30:00+03:00</published><updated>2024-07-31T22:30:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/07/31/progress-report-july-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/07/31/progress-report-july-2024.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2024-07/header.jpg" alt="MHServerEmu Progress Report - July 2024" /></p>
+
+<p>We have a lot of exciting updates to share. It has been one year since this project started, and this month <em>combat</em> has returned to Marvel Heroes, which I would dare to call our biggest leap forward since we first got in-game in July 2023.</p>
+
+<h2 id="you-got-the-power">You Got the Power</h2>
+
+<p>We have laid the foundation for one of the most important and complex systems of Marvel Heroes - <em>powers</em>. From a certain perspective, it would not be an exaggeration to call it <em>the</em> most complex system in the entire game because of its deep interconnection with other systems and just the sheer amount of stuff it involves. Covering all of it is outside the scope of a single report, but I will give a brief overview of the work that has been done so far and what is left to do.</p>
+
+<p>One important thing to note is that prior to this month we barely had any power-related functionality implemented server-side. The fact that you could “use” a lot of powers before was just the magic of client-side prediction, and the server was almost completely unaware of what was actually happening.</p>
+
+<p>So where do we even begin? First of all, there are many different kinds of powers. Powers are classified by categories: <code class="language-plaintext highlighter-rouge">NormalPower</code>, <code class="language-plaintext highlighter-rouge">ComboEffect</code>, <code class="language-plaintext highlighter-rouge">EmotePower</code>, <code class="language-plaintext highlighter-rouge">GameFunctionPower</code>, <code class="language-plaintext highlighter-rouge">HiddenPassivePower</code>, <code class="language-plaintext highlighter-rouge">HotspotEffect</code>, <code class="language-plaintext highlighter-rouge">ItemPower</code>, <code class="language-plaintext highlighter-rouge">MissileEffect</code>, <code class="language-plaintext highlighter-rouge">ProcEffect</code>, <code class="language-plaintext highlighter-rouge">ThrowablePower</code>, and <code class="language-plaintext highlighter-rouge">ThrowableCancelPower</code>. Powers can have various targeting shapes: <code class="language-plaintext highlighter-rouge">ArcArea</code>, <code class="language-plaintext highlighter-rouge">BeamSweep</code>, <code class="language-plaintext highlighter-rouge">CapsuleArea</code>, <code class="language-plaintext highlighter-rouge">CircleArea</code>, <code class="language-plaintext highlighter-rouge">RingArea</code>, <code class="language-plaintext highlighter-rouge">Self</code>, <code class="language-plaintext highlighter-rouge">TeamUp</code>, <code class="language-plaintext highlighter-rouge">SingleTarget</code>, <code class="language-plaintext highlighter-rouge">SingleTargetOwner</code>, <code class="language-plaintext highlighter-rouge">SingleTargetRandom</code>, <code class="language-plaintext highlighter-rouge">SkillShot</code>, <code class="language-plaintext highlighter-rouge">SkillShotAlongGround</code>, or <code class="language-plaintext highlighter-rouge">Wedge</code>. A power’s targeting style can have various flags applied to it, such as <code class="language-plaintext highlighter-rouge">AOESelfCentered</code>, <code class="language-plaintext highlighter-rouge">NeedsTarget</code>, <code class="language-plaintext highlighter-rouge">TurnsToFaceTarget</code>, <code class="language-plaintext highlighter-rouge">AlwaysTargetMousePos</code>, and more. This list can continue on and on, but the point is that there is <em>a lot</em> of factors to consider here, which is why our reimplementation of the <code class="language-plaintext highlighter-rouge">Power</code> class is already at over 6000 lines of code, and it continues to grow.</p>
+
+<p>But all of that is just static data defined by game designers, and powers are dynamic beasts that live in runtime. Before a power can be used it needs to be <em>assigned</em> to a world entity’s <code class="language-plaintext highlighter-rouge">PowerCollection</code>. The assignment process includes the creation of an instance of the <code class="language-plaintext highlighter-rouge">Power</code> class that is in many ways not unlike an entity: it has its own <code class="language-plaintext highlighter-rouge">PropertyCollection</code>, as well as various other pieces of state. When a power is assigned it gets passed a set of information used for scaling referred to as <em>power index properties</em>: power rank, character level, combat level, item level, and item variation. This is one of the places where we can see that BUE was not as thorough as it may appear: although the update “removed” power ranks, they still exist internally, with most powers instead being set to rank 0 or 1 and rebalanced accordingly.</p>
+
+<p>With the power assigned and initialized it can now be used. Every time you use a power it goes through a pipeline consisting of four main stages:</p>
+
+<ul>
+  <li>
+    <p><strong>Activation</strong>: this is when the game checks if you can use the power (you have enough resources, your target is valid if the power needs one, etc.), starts the animation, and schedules a <em>power application</em> for when the contact frame is supposed to happen. Although the server does not actually play animations, it still needs to know how long they are, taking into account variables such as attack speed modifiers. In many cases it is possible to cancel activation before the animation reaches its contact frame.</p>
+  </li>
+  <li>
+    <p><strong>Power Application</strong>: at the contact frame of the animation we reach the point of no return, which is when the power can actually begin doing something. At this moment the properties of the power and its owner are snapshotted and recorded into an instance of the <code class="language-plaintext highlighter-rouge">PowerPayload</code> class. Depending on the power, this payload may either get processed as soon as it is created, or it can be scheduled to be processed later. At the time of writing we do not have delayed processing implemented yet, which is why, for example, throwable objects deal damage instantly rather than when they actually reach their target destination. The correct way of doing this involves calculating the time the throwable object is going to spend in the air and delaying the processing of the payload by that time.</p>
+  </li>
+  <li>
+    <p><strong>Payload Processing</strong>: this is where the fun begins. The snapshot of the power and its owner recorded in the payload is processed, and the <em>results</em> are calculated, which include damage, healing, and conditions (buffs and/or debuffs) that need to be applied to the target. Depending on the calculations, various result flags may be set, such as critical strike and dodge.</p>
+  </li>
+  <li>
+    <p><strong>Application of Results</strong>: the results of the paylod calculations are applied to the target. This involves adjusting the health of the target, potentially killing it, and applying conditions to it. Clients also get sent a copy of the results to display damage numbers and additional hit visual effects.</p>
+  </li>
+</ul>
+
+<p>At various points in this process additional <em>power events</em> may get triggered. In total there are 30 event types that can trigger 36 types of actions. Some of these actions are very specific, like <code class="language-plaintext highlighter-rouge">BodySlide</code>, <code class="language-plaintext highlighter-rouge">SwitchAvatar</code>, and <code class="language-plaintext highlighter-rouge">PetItemDonate</code>, but others are more general purpose, such as <code class="language-plaintext highlighter-rouge">UsePower</code>, <code class="language-plaintext highlighter-rouge">EndPower</code>, and <code class="language-plaintext highlighter-rouge">CooldownStart</code>. One of the most common use cases for power events is the activation of <em>combo powers</em>: when a power needs to do more than one thing, like moving your character and dealing AoE damage around your destination, this is usually achieved by having two different powers, with one triggering the other as a combo.</p>
+
+<p>While all kinds of entities can use powers, avatars are a very special case, because they are controlled by players connected remotely. One example of special treatment in this regard is the concept of <em>continuous powers</em>. You may recall how in our earlier iteration of “combat” that you can still see in stable builds most powers would deal damage only on the initial activation, with no effect if you held the button down or pressed it frequently enough. The reason for this is that the game classifies a lot of powers as continuous based on various criteria, such as animation length, category, override flags, and more. If a power is continuous, activations after the initial one are not communicated between the client and server: the server just assumes the client is still holding the button down and continuously reactivates it until it receives a cancellation message. This requires the server to be able to run the entire power activation process on its own in parallel to the client, which was not possible previously with hacks, but can now be done.</p>
+
+<p>Another example of avatar-specific behavior is the priority queue system. The basic idea of it is that if a player input cannot be acted on immediately because another power is already being used, this input is put into a very small queue with a size of one or two commands. If there is a new command that is different from the rest of commands that have been issued recently, such as when you try to activate a defensive power inbetween spamming regular attacks, this different command takes priority so it doesn’t get lost. This system works almost exactly the same as, for example, Diablo III, and if you are interested in this topic I strongly recommend watching the talk <a href="https://gdcvault.com/play/1017794/Through-the-Grinder-Refining-Diablo">Through the Grinder: Refining Diablo III’s Game Systems by Wyatt Cheng</a>. Not only will you learn interesting stuff, you will also discover Wyatt’s origin story before he became infamously known as the “do you guys not have phones” guy. Currently we do not have command queueing implemented server side, which is why some of your inputs may occasionally get lost in the heat of battle, especially with higher latency.</p>
+
+<p>So far we have implemented a lot of the foundation, which allows most powers that deal direct damage to enemies to function, but there is still a lot of work left to do, including:</p>
+
+<ul>
+  <li>
+    <p>Various additional aspects of payload processing, including taking the target’s defensive properties into account, paying resource costs, and more. The current implementation is a very simplified one based on formulas the client uses to calculate tooltip damage.</p>
+  </li>
+  <li>
+    <p>Hidden damage scaling mechanics: dynamic combat level (DCL) and scaling player damage output based on the total number of players in proximity.</p>
+  </li>
+  <li>
+    <p>Implementations for the rest of power event triggers and actions.</p>
+  </li>
+  <li>
+    <p>Avatar power activation priority queue.</p>
+  </li>
+  <li>
+    <p>Condition (buff and debuff) application and removal, including those that deal damage over time (DoTs).</p>
+  </li>
+  <li>
+    <p>Hotspot powers. Hotspots are zones that apply certain effects when entities stand in them, such as fire that deals damage when you stand in it.</p>
+  </li>
+  <li>
+    <p>Procs.</p>
+  </li>
+  <li>
+    <p>Summon powers.</p>
+  </li>
+</ul>
+
+<p>For now though we have enough of this system working to have the game feel like a real game again, especially when combined with the AI implementation by AlexBond.</p>
+
+<h2 id="loot-tables-for-dummies">Loot Tables for Dummies</h2>
+
+<p>While it is nice to be able to smash things and beat bad guys, the core thing that makes you do it again and again in games like these is the loot. Although we did have a placeholder system put in place last month, I felt this aspect started falling behind, especially with how authentic the rest of the game is now looking.</p>
+
+<p>We are extremely lucky to have all the original loot tables in the client. The underlying loot system is very complex, but this month I have made significant progress in untangling it. Although items still lack affixes and stats, their rarities and base types should now be accurate, making the lootsplosions from defeating bosses way more satisfying. So how does it all work?</p>
+
+<p>Although they are called loot “tables”, they are actually tree structures consisting of <code class="language-plaintext highlighter-rouge">LootNodePrototype</code> instances. Each node can be either a <code class="language-plaintext highlighter-rouge">LootTablePrototype</code> or a <code class="language-plaintext highlighter-rouge">LootDropPrototype</code>. Here is what a typical “loot table” looks like:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-07/loot-table.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-07/loot-table.png" alt="Loot Tables" /></a></p>
+
+<p>When you want to use a loot table, you recursively iterate through the nodes of this tree, with each “table” representing a branch and “drops” representing end points that get recorded (more on that later). Visiting a node is referred to as <em>selecting</em> it, and activating the node is called <em>rolling</em>.</p>
+
+<p>When you select a loot table node, it gets rolled one or more times, with each roll determining branches to go down to. When rolling loot tables the game uses the concept of <em>nodrop</em> similar to <em>Diablo II</em>: rather than specifying the drop chance of something, instead each table node has a <em>nodrop chance</em> defined that determines whether or not the table will be skipped entirely. So a 1% drop chance is represented as a 99% nodrop chance. If the roll passes this nodrop chance check, branches of the table are picked using one of three methods:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">PickWeight</code>: picks one of the branch nodes randomly based on their defined weight.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">PickWeightTryAll</code>: excludes branch nodes randomly based on their weight until only one remains, which gets picked.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">PickAll</code>: picks all branch nodes.</p>
+  </li>
+</ul>
+
+<p>Picked nodes are selected and rolled, and this process continues recursively until it reaches a loot drop node.</p>
+
+<p>In total there are 17 different types of loot drop nodes representing various things that can “drop”. The most obvious and widely-used one is <code class="language-plaintext highlighter-rouge">LootDropItemPrototype</code> that represents an item dropping. There is also <code class="language-plaintext highlighter-rouge">LootDropAgentPrototype</code> used for spawning entities, like health and experience orbs, that are actually implemented as AI-controlled agent entities rather than items. But just like it was with inventories, the definition of a “drop” is quite broad here: there are drop nodes such as <code class="language-plaintext highlighter-rouge">LootDropPlayVisualEffectPrototype</code>, <code class="language-plaintext highlighter-rouge">LootDropChatMessagePrototype</code>, and <code class="language-plaintext highlighter-rouge">LootDropBannerMessagePrototype</code> that are more like actions triggered by rolling rather than representations of physical things that you can pick up.</p>
+
+<p>As you navigate a loot tree and reach various drop nodes, you need to record your journey to make use of it later. For this the game uses an abstract <code class="language-plaintext highlighter-rouge">IItemResolver</code> interface class the gets implemented by various systems that need to interact with loot tables. Successfully rolled drop nodes are “pushed” onto the resolver, and the accumulated data from the resolver is then used to spawn rolled items in the world, add them to an inventory, or just output the results as text for testing.</p>
+
+<p>One last essential piece of the loot table puzzle are <em>loot roll modifiers</em>. When you interact with a loot table tree you also pass to it an instance of <code class="language-plaintext highlighter-rouge">LootRollSettings</code> that contains the context, from obvious things, such as level and difficulty tier, to more esoteric factors, such as the current day of the week. Each node in the tree can then have modifiers that process and/or override these settings. One of the simplest examples would be filtering drops based on level range. But you can also, for instance, override the current avatar and always drop items for somebody else. Or you could have the rare item find stat apply to an arbitrary selection of items. When modifiers are applied to a drop node they affect only that drop node, but when they are applied to a table node, the affect all branches of that table. This is how, for example, eternity splinters drops are controlled: splinters have their own branches in common loot tables with applied modifiers.</p>
+
+<p>And with all of that we have basic loot table rolling working. We still have work to do, including implementing all the special drop types, additional modifiers, and some more drop processing, such as taking item quality bonuses into account and applying affixes to items, but the foundation is now in place. If only we could have our loot persist when we transfer between regions and log out…</p>
+
+<h2 id="the-barrel-made-me-do-it">The Barrel Made Me Do It</h2>
+
+<p><em>AlexBond is back yet again this month to talk about AI profile overriding.</em></p>
+
+<hr />
+
+<p>Hey everyone, this is AlexBond. Let the combat begin! In this report I would like to share how I enabled AI and brought all the enemies in the game to life.</p>
+
+<p>This month there were a lot of major updates: enemies and bosses now attack and deal damage, and the game is really starting to come to live. But let’s talk about how it all works.</p>
+
+<p>Enemy movement uses the <code class="language-plaintext highlighter-rouge">AIController</code> class that I already covered in previous reports. This time I would I would like to talk about <code class="language-plaintext highlighter-rouge">AIOverride</code> and how it is used.</p>
+
+<h3 id="ai-override">AI Override</h3>
+
+<p>An agent’s prototype generally specifies its AI profile that defines its behavior. All attack-based AI profiles (<code class="language-plaintext highlighter-rouge">ProceduralProfileWithAttackPrototype</code>) function in two modes:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">DefaultSensory</code> - scanning mode (based on <code class="language-plaintext highlighter-rouge">BehaviorSensorySystem</code>)</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">HandleContext</code> - action mode</p>
+  </li>
+</ul>
+
+<p>Scanning involves searching for a target. If no target is found using <code class="language-plaintext highlighter-rouge">SelectTargetEntity()</code>, the AI profile is overriden with a <code class="language-plaintext highlighter-rouge">NoTargetOverrideProfile</code>. Usually it is <code class="language-plaintext highlighter-rouge">ProceduralProfileDefaultActiveOverridePrototype</code> that makes the agent wander around (<code class="language-plaintext highlighter-rouge">WanderInPlace</code>) or return to its spawn location (<code class="language-plaintext highlighter-rouge">Wander</code>). While doing so it continues scanning its surroundings, and if it finds an enemy, it switches to the attack profile.</p>
+
+<p>But it gets more complicated. Enemies created via a <code class="language-plaintext highlighter-rouge">PopulationObject</code> contain an <code class="language-plaintext highlighter-rouge">EntitySelector</code>, which has another AI override called <code class="language-plaintext highlighter-rouge">DefaultBrainOnSimulated</code> that uses <code class="language-plaintext highlighter-rouge">ProceduralProfileSenseOnly</code></p>
+
+<p>The basic idea of this profile is that instead of wandering or attacking, it simply plays an idle animation (such as NPCs talking to each other), and when a player enters its scanning radius, it switches to one of the talking profiles. Generally it picks a random profile from the <code class="language-plaintext highlighter-rouge">AIOverrides</code> list:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-07/ai-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-07/ai-1.png" alt="AI 1" style="max-height: 400px;" /></a>
+</center>
+
+<p>All of these switches are controlled by the <code class="language-plaintext highlighter-rouge">ProcessEntityAction()</code> function.</p>
+
+<p>So when you see an NPC talking or calling you, this happens via complex AI profile switching.</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-07/ai-2.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-07/ai-2.jpg" alt="AI 2" style="max-height: 400px;" /></a>
+</center>
+
+<p>This is how previously silent NPCs learned how to speak.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-07/ai-3.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-07/ai-3.jpg" alt="AI 3" /></a></p>
+
+<p>As for combat, Crypto did a lot of work here by implementing the power system. I assisted with implementing <code class="language-plaintext highlighter-rouge">MissilePower</code>, since it involves AI, and I am quite familiar with this topic.</p>
+
+<p>This game has so many AI profiles, and it is hard to see them at first glance. For example, drops lying on the ground, such as orbs, are not pulled by some kind of magnetic force. Instead, they all have follow target AI profiles, with your avatar being that target. Every moving entity in the game is “alive”. This includes projectiles, such as Captain America’s shield, Thor’s hammer, or Iron Man’s micro-missiles - all of them are moved using AI profiles. But it gets more interesting!</p>
+
+<p>You may remember bosses or other powerful enemies picking objects up and throwing them at you. You think this is because the boss’s AI is so smart? Wrong answer! Actually, throwable objects themselves have brains!</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-07/ai-4.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-07/ai-4.jpg" alt="AI 4" /></a></p>
+
+<p>Yes, I am not joking, every single one of Mr. Hyde’s barrels has its own brain!</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-07/ai-5.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-07/ai-5.png" alt="AI 5" style="max-height: 400px;" /></a>
+</center>
+
+<p>Every 10 seconds the barrel, just like Emma Frost, attempts to take control of its owner, Mr. Hyde, and override his AI behavior profile. And the boss takes orders from this barrel, picks it up, and throws it at the avatar. Entities that act like this have their own class - <code class="language-plaintext highlighter-rouge">ThrowableSmartProp</code>.</p>
+
+<p>There are not too many of them in the game, and they still do not function completely right, but now you know that when the Hulk boss in Holo-Sim picks up a car, he was forced to do so by the car itself!</p>
+
+<p>Overriding AI profiles is a complicated process, and I am still working on it. For instance, timing the activation of the appropriate AI profile when an entity enters the world and/or starts being simulated still has a lot issues, which is why some of the idle animations got replaced with wandering. In the future we will come back and fix these issues. For now I am working on missions, which also involves some AI overriding and idle animation playaback via <code class="language-plaintext highlighter-rouge">MissionActionEntityPerformPower()</code>, but this is a story for another report. That’s it for now, have fun playing, and until the next report!</p>
+
+<hr />
+
+<p>Back to work now. See you in August!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">MHServerEmu Progress Report: June 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/06/30/progress-report-june-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: June 2024" /><published>2024-06-30T04:20:00+03:00</published><updated>2024-06-30T04:20:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/06/30/progress-report-june-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/06/30/progress-report-june-2024.html"><![CDATA[<!--more-->
+
+<p><img src="/MHServerEmu/assets/blog/progress-report/2024-06/header.jpg" alt="MHServerEmu Progress Report - June 2024" /></p>
 
 <p>June has been jam-packed full of developments, and we have a lot to cover.</p>
 
