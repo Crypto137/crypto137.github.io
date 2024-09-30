@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: September 2024 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: September 2024" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2024/09/30/progress-report-september-2024.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2024/09/30/progress-report-september-2024.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-09-30T14:35:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: September 2024" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-09-30T14:35:00+03:00","datePublished":"2024-09-30T14:35:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: September 2024","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2024/09/30/progress-report-september-2024.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2024/09/30/progress-report-september-2024.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: September 2024</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2024-09-30T14:35:00+03:00" itemprop="datePublished">Sep 30, 2024
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2024-09/header.jpg" alt="MHServerEmu Progress Report - September 2024" /></p>
+
+<p>You know the drill, it’s progress report time.</p>
+
+<h2 id="wtb-godly-plate-of-the-whale">WTB Godly Plate of the Whale</h2>
+
+<p>This month we released our third stable version, <a href="https://github.com/Crypto137/MHServerEmu/releases/tag/0.3.0">0.3.0</a>, and immediately I started working on features for 0.4.0, which is currently planned for early December.</p>
+
+<p>The first thing on my “to do” list was implementing item affix generation. When I did the loot table implementation <a href="/MHServerEmu/blog/2024/07/31/progress-report-july-2024.html">back in July</a>, I already knew that it would not be difficult to get working with what we already had. However, I wanted to wait until we had persistence working: there is no worse feeling in a loot game than getting a good drop and knowing you are going to lose it as soon as you log out.</p>
+
+<p>Here is an overview of how affix generation works. After the <code class="language-plaintext highlighter-rouge">ItemResolver</code> goes through a loot table, you end up with an <code class="language-plaintext highlighter-rouge">ItemSpec</code> that has the item’s base type, quality, and level, but no affixes. This <code class="language-plaintext highlighter-rouge">ItemSpec</code> is passed to a function called <code class="language-plaintext highlighter-rouge">LootUtilities.UpdateAffixes()</code> that does the real magic.</p>
+
+<p>Based mainly on the item’s base type and level, the game rolls a number of <em>category</em> affixes and <em>position</em> affixes. Categories are data-defined pools, which are primarily used for “white” affixes you see on gear, like damage rating and health. Affix positions are hardcoded into the game, and they include what you expect from games in this genre, as well as more special things:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Prefix</th>
+      <th>Suffix</th>
+      <th>Visual</th>
+      <th>Ultimate</th>
+      <th>Cosmic</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Unique</strong></td>
+      <td><strong>Blessing</strong></td>
+      <td><strong>Runeword</strong></td>
+      <td><strong>TeamUp</strong></td>
+      <td><strong>MetaData</strong></td>
+    </tr>
+    <tr>
+      <td><strong>PetTech1</strong></td>
+      <td><strong>PetTech2</strong></td>
+      <td><strong>PetTech3</strong></td>
+      <td><strong>PetTech4</strong></td>
+      <td><strong>PetTech5</strong></td>
+    </tr>
+    <tr>
+      <td><strong>RegionAffix</strong></td>
+      <td><strong>Socket1</strong></td>
+      <td><strong>Socket2</strong></td>
+      <td><strong>Socket3</strong></td>
+      <td><strong>None</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>For each affix roll a pool is formed based on various filters, including compatibility with the base type, keywords, categories, and the region the affix is being rolled in. An affix is then picked from this pool, checking for duplicates that are already attached to this <code class="language-plaintext highlighter-rouge">ItemSpec</code> if needed. Some affixes also require an additional parameter, referred to as its <em>scope</em>: the most typical example of this are affixes that affect specific powers or groups of powers. For an affix like <code class="language-plaintext highlighter-rouge">+3 to Repulsor Barrage</code> the scope would be a reference to the prototype for the <code class="language-plaintext highlighter-rouge">Repulsor Barrage</code> power, while for <code class="language-plaintext highlighter-rouge">+10% Area Power Damage</code> it would be a reference to the prototype for the <code class="language-plaintext highlighter-rouge">Area</code> keyword. The scope system is a good example of how surface-level many BUE changes actually were: although power ranks were “removed”, the entire backend for them still exists and is in use, with all powers simply being set to rank 1 and rebalanced accordingly.</p>
+
+<p>With affixes picked and added to the <code class="language-plaintext highlighter-rouge">ItemSpec</code>, it is now time to apply it to an <code class="language-plaintext highlighter-rouge">Item</code> entity instance. This is when the actual rolling of values happens. The funny thing about this process is that it is done in parallel by the server and the client: rather than sending a fully rolled item, the server sends the client a serialized <code class="language-plaintext highlighter-rouge">ItemSpec</code> that also contains a seed for the random number generator, and because the input data and the algorithm are the same between the two of them, they both generate the same item independently from one another. While this means we have all the logic for the rolling process client-side, any deviation from it also causes desynchronization issues. In addition to that, you can’t modify most of the static item data, such as affix ranges, server-side without also having to change the client.</p>
+
+<p>In addition to randomly picked affixes, the prototypes for base types can also have <em>built-in affixes</em>, and <em>built-in properties</em>. The vast majority of fixed stat items you see in the game, like uniques and artifacts, are implemented using built-in properties. The core difference between them is that affix properties are attached to the item as child property collections and can be removed, while built-in properties are written right into the item’s property collection.</p>
+
+<p>Implementing built-in properties initially caused unexpected game instances crashes. Turns out, the data contains mistakes made by designers, and in some cases minimum and maximum ranges are mixed up. Generally it’s negative decimal numbers, like <code class="language-plaintext highlighter-rouge">-0.1</code> and <code class="language-plaintext highlighter-rouge">-0.2</code>, but there are also cases that look like this:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/unique-range.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/unique-range.png" alt="Unique Range" /></a></p>
+
+<p>Here is the default implementation of <code class="language-plaintext highlighter-rouge">Math.Clamp()</code> in C#:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="kt">int</span> <span class="nf">Clamp</span><span class="p">(</span><span class="kt">int</span> <span class="k">value</span><span class="p">,</span> <span class="kt">int</span> <span class="n">min</span><span class="p">,</span> <span class="kt">int</span> <span class="n">max</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">min</span> <span class="p">&gt;</span> <span class="n">max</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nf">ThrowMinMaxException</span><span class="p">(</span><span class="n">min</span><span class="p">,</span> <span class="n">max</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="k">value</span> <span class="p">&lt;</span> <span class="n">min</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">min</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="k">value</span> <span class="p">&gt;</span> <span class="n">max</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">max</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="k">value</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>So when you try to clamp a value to a mixed up range like this, an exception is thrown, which leads to a crash. We cannot fix the issue with the data without also modifying the client, so what we have to do here is remove this check and process malformed data in the same way as the client, or we are going to get different rolls server-side and end up with desync issues.</p>
+
+<p>With affixes actually rolling and applying, it was now time to take another look at combat calculations. The version of the game we are currently working on uses a form of level scaling called dynamic combat level (DCL). Surprisingly enough, it is actually not that complicated compared to most other systems in this game: all damage players deal to mobs and receive from mobs is scaled as if the mob was the same level as the player (with upper and lower bounds for this scaling defined by the region). Enemy health never actually changes, and the illusion of enemies scaling up or down to player level is created by sending fake damage numbers to the client. So if you would deal <code class="language-plaintext highlighter-rouge">100</code>  damage to a target of your level, it gets scaled to <code class="language-plaintext highlighter-rouge">1000</code> to match the target’s higher level, but the client receives and displays the number <code class="language-plaintext highlighter-rouge">100</code>.</p>
+
+<p>It would not be Marvel Heroes if there was no jank at all though. When the DCL system was initially being implemented, it was made in a way where it could be turned off. For this reason all mobs in the game have two health curves: the default one and the “new” DCL one. The main difference between them is that while default curves have separate baseline scaling for regular mobs and bosses, the new DCL curves are unified, and the difference is achieved by applying external health multipliers. In the vast majority of cases this multiplier comes from the mob’s rank (<code class="language-plaintext highlighter-rouge">Popcorn</code>, <code class="language-plaintext highlighter-rouge">Champion</code>, <code class="language-plaintext highlighter-rouge">Elite</code>, <code class="language-plaintext highlighter-rouge">MiniBoss</code>, <code class="language-plaintext highlighter-rouge">Boss</code>), but sometimes it is baked into the mob’s prototype itself. This was the reason why some mobs, like Doop, were nearly unkillable before: they were using their default health curves that had baseline scaling <em>and</em> they also had a crazy high multiplier bonus that was applied on top of that.</p>
+
+<p>With players having items with stats, the DCL system being fully implemented, and characters using proper health curves with multipliers applied to them, everything in the game now has a much more authentic feel to it, with proper contrast between weaker popcorn mobs and tougher elites. There is still lots and lots of work to do on this front, but I feel we are in a much better place balance-wise now.</p>
+
+<h2 id="and-this-is-to-go-even-further-beyond">And This… Is to Go Even Further Beyond!</h2>
+
+<p>As MHServerEmu matures and more features are implemented, the workload the server has to do increases. Even 0.3.0 with its basic combat and loot generation already starts coming apart at the seams with high enough load, and with missions and metagames coming in 0.4.0, this month I decided it was time to take a good look at what we can do to optimize the server.</p>
+
+<h3 id="round-1-memory-management">Round 1: Memory Management</h3>
+
+<p>The core difference between our server implementation and the original game is that MHServerEmu is written in C#, which compiles to bytecode and has automatic memory management, while the client is C++ compiled to native code with manual memory management. The biggest advantage of using C# for this project is that it’s great for rapid iteration with fast build times and features like hot reload, and more often than not <em>it just works</em>. However, there is an inherent loss of control compared to C++, the most critical one being how memory is managed.</p>
+
+<p>Both languages use the concepts of the stack and the heap for managing memory. I will not go into too much detail on this, as there are countless other resources that go as deep into this as you will ever want and do a much better job at it than I can, but here is the gist of it:</p>
+
+<ul>
+  <li>
+    <p>Stack-allocated data is cleared automatically when you leave the block of code that contains the allocation. Working with the stack is very fast, but it has relatively small size (1 MB by default in C#), and if you exceed this limit, you will get the infamous stack overflow error. So generally you want to use this for temporary data with short lifespans.</p>
+  </li>
+  <li>
+    <p>Anything allocated on the heap needs to be cleaned up at some point. In C++ this can be done in various ways, while C# does it automatically using its <em>garbage collector</em> (GC). Working with the heap is much slower than the stack, but it can handle significantly larger volumes of data with longer lifespans.</p>
+  </li>
+  <li>
+    <p>In C++ pretty much everything can be allocated either on the stack or on the heap. C# restricts this by dividing types into <em>value types</em> and <em>reference types</em>: there are exceptions and edge cases, but the general idea is that reference types cannot be allocated on the stack, and there are cases when value types have to be wrapped in reference types, which forces them to be allocated on the heap. This wrapping process is called <em>boxing</em>.</p>
+  </li>
+</ul>
+
+<p>As a result of this, in C++ if you are not careful with your memory management, you will end up continuously allocating more memory than you free, eventually completely running out of it. This is what is commonly referred to as a <em>memory leak</em>. In languages like C# it’s a lot harder to get a memory leak like this, but it’s still very easy to unintentionally end up doing too many heap allocations, increasing <em>garbage collection pressure</em>, which manifests as unpredictable stuttering, as the garbage collector periodically suspends all threads to do its work. This is made worse by the fact that C# has limited tools for stack allocations, and some features end up allocating garbage behind the scenes.</p>
+
+<p>While Marvel Heroes has a relatively loose simulation time step of 50 ms, there is also a lot of stuff going on, so the amount of garbage you generate can get very out of hand very fast. Here are some examples of the issues I have recently identified and fixed.</p>
+
+<h4 id="arrays">Arrays</h4>
+
+<p>By default arrays in C# are reference types. This means when you create a new array like this…</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">byte</span><span class="p">[]</span> <span class="n">buffer</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="p">[</span><span class="m">1024</span><span class="p">];</span>
+</code></pre></div></div>
+
+<p>…you are allocating 1024 bytes on the heap that the garbage collector will have to reclaim at some point. This is not too bad when it’s done every once in a while, but what if you are doing this tens of thousands of time per second?</p>
+
+<p>As I was profiling our memory allocations, I discovered that we had literally millions of <code class="language-plaintext highlighter-rouge">double[]</code> allocations happening every minute. The culprit wasn’t even our own code: we are using a third party library that implements <a href="https://www.cs.cmu.edu/~quake/robust.html">fast robust predicates for computational geometry</a>, which is a way of quickly testing floating point values with a high degree of accuracy. The original implementation is written in C, and instead of adapting it to C# ourselves, we used <a href="https://github.com/modios/robust-predicates">an existing port</a>.</p>
+
+<p>However, as I looked at the code, I started seeing parts like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">double</span><span class="p">[]</span> <span class="n">finswap</span><span class="p">;</span>
+<span class="kt">double</span><span class="p">[]</span> <span class="n">temp16a</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="m">16</span><span class="p">];</span>
+<span class="kt">double</span><span class="p">[]</span> <span class="n">temp32a</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="m">32</span><span class="p">];</span>
+<span class="kt">double</span><span class="p">[]</span> <span class="n">temp16b</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="m">16</span><span class="p">];</span>
+<span class="kt">double</span><span class="p">[]</span> <span class="n">temp32b</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="m">32</span><span class="p">];</span>
+<span class="kt">double</span><span class="p">[]</span> <span class="n">temp16c</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="m">16</span><span class="p">];</span>
+<span class="kt">double</span><span class="p">[]</span> <span class="n">temp48</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="m">48</span><span class="p">];</span>
+<span class="kt">double</span><span class="p">[]</span> <span class="n">axtbc</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="m">8</span><span class="p">];</span>
+</code></pre></div></div>
+
+<p>These tests are used extensively in the game for updating the navi system, which can happen millions of times in just a few minutes of playing. Thankfully, this is temporary data that gets thrown away as soon the function finishes, so we can make use of one of the optimization tools available in C# - <code class="language-plaintext highlighter-rouge">Span&lt;T&gt;</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Span</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">&gt;</span> <span class="n">finswap</span> <span class="p">=</span> <span class="k">stackalloc</span> <span class="kt">double</span><span class="p">[</span><span class="m">0</span><span class="p">];</span>
+<span class="n">Span</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">&gt;</span> <span class="n">temp16a</span> <span class="p">=</span> <span class="k">stackalloc</span> <span class="kt">double</span><span class="p">[</span><span class="m">16</span><span class="p">];</span>
+<span class="n">Span</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">&gt;</span> <span class="n">temp32a</span> <span class="p">=</span> <span class="k">stackalloc</span> <span class="kt">double</span><span class="p">[</span><span class="m">32</span><span class="p">];</span>
+<span class="n">Span</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">&gt;</span> <span class="n">temp16b</span> <span class="p">=</span> <span class="k">stackalloc</span> <span class="kt">double</span><span class="p">[</span><span class="m">16</span><span class="p">];</span>
+<span class="n">Span</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">&gt;</span> <span class="n">temp32b</span> <span class="p">=</span> <span class="k">stackalloc</span> <span class="kt">double</span><span class="p">[</span><span class="m">32</span><span class="p">];</span>
+<span class="n">Span</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">&gt;</span> <span class="n">temp16c</span> <span class="p">=</span> <span class="k">stackalloc</span> <span class="kt">double</span><span class="p">[</span><span class="m">16</span><span class="p">];</span>
+<span class="n">Span</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">&gt;</span> <span class="n">temp48</span> <span class="p">=</span> <span class="k">stackalloc</span> <span class="kt">double</span><span class="p">[</span><span class="m">48</span><span class="p">];</span>
+<span class="n">Span</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">&gt;</span> <span class="n">axtbc</span> <span class="p">=</span> <span class="k">stackalloc</span> <span class="kt">double</span><span class="p">[</span><span class="m">8</span><span class="p">];</span>
+</code></pre></div></div>
+
+<p>Doing it this way we break the “rules” of C# arrays a bit and allocate them on the stack. Behind the scenes this is actually a way of writing unsafe code that looks like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">double</span><span class="p">*</span> <span class="n">temp16aPtr</span> <span class="p">=</span> <span class="k">stackalloc</span> <span class="kt">double</span><span class="p">[</span><span class="m">16</span><span class="p">];</span>
+<span class="n">Span</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">&gt;</span> <span class="n">temp16a</span> <span class="p">=</span> <span class="k">new</span><span class="p">(</span><span class="n">temp16aPtr</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Spans are essentially highly limited pointers that allow us to use some C# features that had been traditionally restricted to unsafe code, such as the stackalloc keyword. They are very useful for situations like this, although with an external library it may be worth rewriting it in fully unsafe code to get more performance out of it in the future. Our span-based fork of this robust predicates implementation is available on <a href="https://github.com/Crypto137/robust-predicates">GitHub</a> for everyone to use.</p>
+
+<p>Replacing arrays with spans works for smaller arrays, but what about those that can potentially exceed the 1 MB stack limit or need to persist for longer periods of time? The best example of this are <code class="language-plaintext highlighter-rouge">byte[]</code> buffers used for serializing network messages and player data. This is where another useful optimization tool comes in: <code class="language-plaintext highlighter-rouge">ArrayPool&lt;T&gt;</code>. Instead of allocating a new buffer each time like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">size</span> <span class="p">=</span> <span class="n">packet</span><span class="p">.</span><span class="n">SerializedSize</span><span class="p">;</span>
+<span class="kt">byte</span> <span class="n">buffer</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="p">[</span><span class="n">size</span><span class="p">];</span>
+<span class="n">packet</span><span class="p">.</span><span class="nf">Serialize</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span>
+<span class="nf">Send</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>We can “rent” and later reuse the same buffers:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">size</span> <span class="p">=</span> <span class="n">packet</span><span class="p">.</span><span class="n">SerializedSize</span><span class="p">;</span>
+<span class="kt">byte</span> <span class="n">buffer</span> <span class="p">=</span> <span class="n">ArrayPool</span><span class="p">&lt;</span><span class="kt">byte</span><span class="p">&gt;.</span><span class="n">Shared</span><span class="p">.</span><span class="nf">Rent</span><span class="p">(</span><span class="n">size</span><span class="p">);</span>
+<span class="n">packet</span><span class="p">.</span><span class="nf">Serialize</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span>
+<span class="nf">Send</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="n">size</span><span class="p">);</span>
+<span class="n">ArrayPool</span><span class="p">&lt;</span><span class="kt">byte</span><span class="p">&gt;.</span><span class="n">Shared</span><span class="p">.</span><span class="nf">Return</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>There are certain limitations to using <code class="language-plaintext highlighter-rouge">ArrayPool&lt;T&gt;</code>: for example, you will most likely get a buffer larger than what you requested, and you will have to handle this yourself. However, it works very well for cases like high-volume packet serialization.</p>
+
+<p>This was a very simple example where integrating pooling was just two lines of code. Unfortunately, things are not always this easy. For client compatibility reasons we are using <code class="language-plaintext highlighter-rouge">protobuf-csharp-port</code>, a legacy C# implementation of Google’s Protocol Buffers (protobufs) that was last updated in 2015. Gazillion utilized certain protobuf encoding functions directly for their custom archive format, which is used for high-frequency messages, like entity creation, locomotion updates, and power activations.</p>
+
+<p>These encoding functions can be accessed in <code class="language-plaintext highlighter-rouge">protobuf-csharp-port</code> using the <code class="language-plaintext highlighter-rouge">CodedOutputStream</code> class. <code class="language-plaintext highlighter-rouge">CodedOutputStream</code> is a wrapper for various <code class="language-plaintext highlighter-rouge">Stream</code> implementations, like a protobuf-specific version of <code class="language-plaintext highlighter-rouge">BinaryWriter</code>. You can create <code class="language-plaintext highlighter-rouge">CodedOutputStream</code> instances using various overloads of the <code class="language-plaintext highlighter-rouge">CreateInstance()</code> factory method, but there is a problem: you can provide your own fixed-size buffer to write to directly, or you can provide a stream and specify the size of the write buffer. However, the constructor for <code class="language-plaintext highlighter-rouge">CodedOutputStream</code> is <code class="language-plaintext highlighter-rouge">private</code>, and there is no <code class="language-plaintext highlighter-rouge">CreateInstance()</code> overload that accepts both a stream and a buffer:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="nf">CodedOutputStream</span><span class="p">(</span><span class="n">Stream</span> <span class="n">output</span><span class="p">,</span> <span class="kt">byte</span><span class="p">[]</span> <span class="n">buffer</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="n">output</span> <span class="p">=</span> <span class="n">output</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="n">buffer</span> <span class="p">=</span> <span class="n">buffer</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="n">position</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="n">limit</span> <span class="p">=</span> <span class="n">buffer</span><span class="p">.</span><span class="n">Length</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">public</span> <span class="k">static</span> <span class="n">CodedOutputStream</span> <span class="nf">CreateInstance</span><span class="p">(</span><span class="n">Stream</span> <span class="n">output</span><span class="p">,</span> <span class="kt">int</span> <span class="n">bufferSize</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nf">CodedOutputStream</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="k">new</span> <span class="kt">byte</span><span class="p">[</span><span class="n">bufferSize</span><span class="p">]);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The “normal” thing to do here would be either to accept that we will waste allocations on this, or to just bite bullet and start modifying <code class="language-plaintext highlighter-rouge">protobuf-csharp-port</code> for our needs.  However, I am stubborn, and I felt like doing the latter would be like opening the Pandora’s box: we may end up doing it at some point, but now was not the right time. Modern problems require modern solutions, and here is the one I came up with:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">CodedOutputStreamEx</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">readonly</span> <span class="n">Func</span><span class="p">&lt;</span><span class="n">Stream</span><span class="p">,</span> <span class="kt">byte</span><span class="p">[],</span> <span class="n">CodedOutputStream</span><span class="p">&gt;</span> <span class="n">CreateInstanceDelegate</span><span class="p">;</span>
+
+    <span class="k">static</span> <span class="nf">CodedOutputStreamEx</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">Type</span><span class="p">[]</span> <span class="n">argTypes</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Type</span><span class="p">[]</span> <span class="p">{</span> <span class="k">typeof</span><span class="p">(</span><span class="n">Stream</span><span class="p">),</span> <span class="k">typeof</span><span class="p">(</span><span class="kt">byte</span><span class="p">[])</span> <span class="p">};</span>
+
+        <span class="n">DynamicMethod</span> <span class="n">dm</span> <span class="p">=</span> <span class="k">new</span><span class="p">(</span><span class="s">"CreateInstance"</span><span class="p">,</span> <span class="k">typeof</span><span class="p">(</span><span class="n">CodedOutputStream</span><span class="p">),</span> <span class="n">argTypes</span><span class="p">);</span>
+        <span class="n">ILGenerator</span> <span class="n">il</span> <span class="p">=</span> <span class="n">dm</span><span class="p">.</span><span class="nf">GetILGenerator</span><span class="p">();</span>
+
+        <span class="n">il</span><span class="p">.</span><span class="nf">Emit</span><span class="p">(</span><span class="n">OpCodes</span><span class="p">.</span><span class="n">Ldarg_0</span><span class="p">);</span>
+        <span class="n">il</span><span class="p">.</span><span class="nf">Emit</span><span class="p">(</span><span class="n">OpCodes</span><span class="p">.</span><span class="n">Ldarg_1</span><span class="p">);</span>
+        <span class="n">il</span><span class="p">.</span><span class="nf">Emit</span><span class="p">(</span><span class="n">OpCodes</span><span class="p">.</span><span class="n">Newobj</span><span class="p">,</span> <span class="k">typeof</span><span class="p">(</span><span class="n">CodedOutputStream</span><span class="p">).</span><span class="nf">GetConstructor</span><span class="p">(</span><span class="n">BindingFlags</span><span class="p">.</span><span class="n">NonPublic</span> <span class="p">|</span> <span class="n">BindingFlags</span><span class="p">.</span><span class="n">Instance</span><span class="p">,</span> <span class="n">argTypes</span><span class="p">));</span>
+        <span class="n">il</span><span class="p">.</span><span class="nf">Emit</span><span class="p">(</span><span class="n">OpCodes</span><span class="p">.</span><span class="n">Ret</span><span class="p">);</span>
+
+        <span class="n">CreateInstanceDelegate</span> <span class="p">=</span> <span class="n">dm</span><span class="p">.</span><span class="n">CreateDelegate</span><span class="p">&lt;</span><span class="n">Func</span><span class="p">&lt;</span><span class="n">Stream</span><span class="p">,</span> <span class="kt">byte</span><span class="p">[],</span> <span class="n">CodedOutputStream</span><span class="p">&gt;&gt;();</span>
+    <span class="p">}</span>
+
+    <span class="p">[</span><span class="nf">MethodImpl</span><span class="p">(</span><span class="n">MethodImplOptions</span><span class="p">.</span><span class="n">AggressiveInlining</span><span class="p">)]</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="n">CodedOutputStream</span> <span class="nf">CreateInstance</span><span class="p">(</span><span class="n">Stream</span> <span class="n">stream</span><span class="p">,</span> <span class="kt">byte</span><span class="p">[]</span> <span class="n">buffer</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="nf">CreateInstanceDelegate</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">buffer</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Here we are using <code class="language-plaintext highlighter-rouge">System.Reflection.Emit</code> to pretty much generate a new <code class="language-plaintext highlighter-rouge">CodedOutputStream.CreateInstance()</code> overload at runtime, which we then access via a cached delegate. Is it an overengineered hack? Yes. Does it work? Also yes.</p>
+
+<p>With these targeted applications of <code class="language-plaintext highlighter-rouge">Span&lt;T&gt;</code> and <code class="language-plaintext highlighter-rouge">ArrayPool&lt;T&gt;</code> we were able to get arrays under control and eliminate literally millions of unnecessary heap allocations. Nevertheless, this was just one stop in my optimization journey.</p>
+
+<h4 id="boxing">Boxing</h4>
+
+<p>Boxing is what occurs in C# when a value type is cast to a reference type. Here is the simplest example of this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="k">value</span> <span class="p">=</span> <span class="m">5</span><span class="p">;</span>
+<span class="kt">object</span> <span class="n">boxedValue</span> <span class="p">=</span> <span class="p">(</span><span class="kt">object</span><span class="p">)</span><span class="k">value</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>Because <code class="language-plaintext highlighter-rouge">int</code> is a value type and <code class="language-plaintext highlighter-rouge">object</code> is a reference type, and reference types cannot exist on the stack in C#, this conversion requires allocating an object instance on the heap that will contain our <code class="language-plaintext highlighter-rouge">value</code>.</p>
+
+<p>In a simple example like this boxing is clear to see if you know about value and reference types, but some of the “automagical” features C# provides can cause unintentional boxing and heap allocations. One common pitfall for this are interfaces: interfaces are inherently reference types, so when a <code class="language-plaintext highlighter-rouge">struct</code>, a value type, implements an interface like <code class="language-plaintext highlighter-rouge">IEnumerator</code>, and is then cast to an instance of this interface, it will end up being boxed.</p>
+
+<p>Here is an example of a very simplified wrapper class that implements the <code class="language-plaintext highlighter-rouge">IEnumerable</code> interface:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">PowerCollection</span> <span class="p">:</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">Power</span><span class="p">&gt;</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Power</span><span class="p">&gt;</span> <span class="n">_powers</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="n">IEnumerator</span><span class="p">&lt;</span><span class="n">Power</span><span class="p">&gt;</span> <span class="nf">GetEnumerator</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">_powers</span><span class="p">.</span><span class="nf">GetEnumerator</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Legacy non-generic version of GetEnumerator() required by IEnumerable here</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>When you have it like this, you can very conveniently iterate all <code class="language-plaintext highlighter-rouge">Power</code> instances in your <code class="language-plaintext highlighter-rouge">PowerCollection</code> in a <code class="language-plaintext highlighter-rouge">foreach</code> loop:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">foreach</span> <span class="p">(</span><span class="n">Power</span> <span class="n">power</span> <span class="k">in</span> <span class="n">PowerCollection</span><span class="p">)</span>
+    <span class="n">power</span><span class="p">.</span><span class="nf">EndPower</span><span class="p">();</span>
+</code></pre></div></div>
+
+<p>Here is a problem though: <code class="language-plaintext highlighter-rouge">List&lt;T&gt;</code> uses a struct-based enumerator to avoid heap allocations, but when you iterate like this, here is what is actually happening behind the scenes:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="p">(</span><span class="n">IEnumerator</span> <span class="n">enumerator</span> <span class="p">=</span> <span class="n">PowerCollection</span><span class="p">.</span><span class="nf">GetEnumerator</span><span class="p">())</span>
+<span class="p">{</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">enumerator</span><span class="p">.</span><span class="nf">MoveNext</span><span class="p">())</span>
+    <span class="p">{</span>
+        <span class="n">Power</span> <span class="n">power</span> <span class="p">=</span> <span class="n">enumerator</span><span class="p">.</span><span class="n">Current</span><span class="p">;</span>
+        <span class="n">power</span><span class="p">.</span><span class="nf">EndPower</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>As a result, your <code class="language-plaintext highlighter-rouge">List&lt;T&gt;.Enumerator</code> struct is cast to <code class="language-plaintext highlighter-rouge">IEnumerator</code> and boxed. You end up doing completely unnecessary heap allocations out of nowhere, and if you are iterating hundreds or even thousands of times per second, it can really add up.</p>
+
+<p>The solution is to add a separate <code class="language-plaintext highlighter-rouge">GetEnumerator()</code> implementation for your wrapper classes that returns a concrete enumerator type:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">PowerCollection</span> <span class="p">:</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">Power</span><span class="p">&gt;</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Power</span><span class="p">&gt;</span> <span class="n">_powers</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Power</span><span class="p">&gt;.</span><span class="n">Enumerator</span> <span class="nf">GetEnumerator</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">_powers</span><span class="p">.</span><span class="nf">GetEnumerator</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="n">IEnumerator</span><span class="p">&lt;</span><span class="n">Power</span><span class="p">&gt;</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">Power</span><span class="p">&gt;.</span><span class="nf">GetEnumerator</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">return</span> <span class="n">_powers</span><span class="p">.</span><span class="nf">GetEnumerator</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Legacy non-generic version of GetEnumerator() required by IEnumerable here</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This way you avoid boxing when doing a simple <code class="language-plaintext highlighter-rouge">foreach</code> iteration, but also still have access to various <code class="language-plaintext highlighter-rouge">IEnumerable</code> extension methods, like <code class="language-plaintext highlighter-rouge">Select()</code> and <code class="language-plaintext highlighter-rouge">Where()</code>.</p>
+
+<h4 id="yield-return">yield return</h4>
+
+<p>Related to iteration and boxing is another source of garbage: <code class="language-plaintext highlighter-rouge">yield return</code>. Looking again at the example above, it can also be implemented like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">PowerCollection</span> <span class="p">:</span> <span class="n">IEnumerable</span><span class="p">&lt;</span><span class="n">Power</span><span class="p">&gt;</span>
+<span class="p">{</span>
+    <span class="k">private</span> <span class="n">List</span><span class="p">&lt;</span><span class="n">Power</span><span class="p">&gt;</span> <span class="n">_powers</span><span class="p">;</span>
+
+    <span class="k">public</span> <span class="n">IEnumerator</span><span class="p">&lt;</span><span class="n">Power</span><span class="p">&gt;</span> <span class="nf">GetEnumerator</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="n">Power</span> <span class="n">power</span> <span class="k">in</span> <span class="n">_powers</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="k">return</span> <span class="n">power</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Legacy non-generic version of GetEnumerator() required by IEnumerable here</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This is a quick and dirty way of implementing an iterator, which can be great for getting complex filtered iteration up and running. However, behind the scenes this actually creates a state machine object that causes more heap allocations. So to optimize this I went back and replaced some of our <code class="language-plaintext highlighter-rouge">yield return</code> filtered iteration implementations with struct-based <code class="language-plaintext highlighter-rouge">IEnumerator</code> implementations. It is a more verbose way of doing things, but it prevents more unnecessary garbage.</p>
+
+<h4 id="delegates">Delegates</h4>
+
+<p>Delegates in C# are objects that encapsulate function pointers. They are reference types, which means more heap allocations. And sometimes they happen when you do not expect it.</p>
+
+<p>A good of example of this is one of the iteration methods of <code class="language-plaintext highlighter-rouge">PropertyCollection</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">PropertyList</span><span class="p">.</span><span class="n">Iterator</span> <span class="nf">IteratePropertyRange</span><span class="p">(</span><span class="n">PropertyEnumFilter</span><span class="p">.</span><span class="n">Func</span> <span class="n">filterFunc</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">_aggregateList</span><span class="p">.</span><span class="nf">IteratePropertyRange</span><span class="p">(</span><span class="n">filterFunc</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This takes a filter delegate defined in the <code class="language-plaintext highlighter-rouge">PropertyEnumFilter</code> static class as an argument:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">PropertyEnumFilter</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">delegate</span> <span class="kt">bool</span> <span class="nf">Func</span><span class="p">(</span><span class="n">PropertyEnum</span> <span class="n">propertyEnum</span><span class="p">);</span>
+
+    <span class="c1">// A filter function that skips properties that don't have a valid aggregation method</span>
+    <span class="k">public</span> <span class="k">static</span> <span class="kt">bool</span> <span class="nf">Agg</span><span class="p">(</span><span class="n">PropertyEnum</span> <span class="n">propertyEnum</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">PropertyInfo</span> <span class="n">info</span> <span class="p">=</span> <span class="n">GameDatabase</span><span class="p">.</span><span class="n">PropertyInfoTable</span><span class="p">.</span><span class="nf">LookupPropertyInfo</span><span class="p">(</span><span class="n">propertyEnum</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">info</span><span class="p">.</span><span class="n">Prototype</span><span class="p">.</span><span class="n">AggMethod</span> <span class="p">!=</span> <span class="n">AggregationMethod</span><span class="p">.</span><span class="n">None</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The most intuitive way of using it looks like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">kvp</span> <span class="k">in</span> <span class="n">Properties</span><span class="p">.</span><span class="nf">IteratePropertyRange</span><span class="p">(</span><span class="n">PropertyEnumFilter</span><span class="p">.</span><span class="n">Agg</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="c1">// Do something with properties</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>But here is yet another pitfall: this</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PropertyEnumFilter</span><span class="p">.</span><span class="n">Func</span> <span class="n">aggFunc</span> <span class="p">=</span> <span class="n">PropertyEnumFilter</span><span class="p">.</span><span class="n">Agg</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>is actually a short way of writing this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">PropertyEnumFilter</span><span class="p">.</span><span class="n">Func</span> <span class="n">aggFunc</span> <span class="p">=</span> <span class="k">new</span><span class="p">(</span><span class="n">PropertyEnumFilter</span><span class="p">.</span><span class="n">Agg</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>So every time you pass a function as an argument, you end up instantiating an extra delegate. The garbage-free way of doing this actually looks like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">PropertyEnumFilter</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">delegate</span> <span class="kt">bool</span> <span class="nf">Func</span><span class="p">(</span><span class="n">PropertyEnum</span> <span class="n">propertyEnum</span><span class="p">);</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="n">Func</span> <span class="n">AggFunc</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="n">Agg</span><span class="p">;</span>
+
+    <span class="c1">// A filter function that skips properties that don't have a valid aggregation method</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="kt">bool</span> <span class="nf">Agg</span><span class="p">(</span><span class="n">PropertyEnum</span> <span class="n">propertyEnum</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">PropertyInfo</span> <span class="n">info</span> <span class="p">=</span> <span class="n">GameDatabase</span><span class="p">.</span><span class="n">PropertyInfoTable</span><span class="p">.</span><span class="nf">LookupPropertyInfo</span><span class="p">(</span><span class="n">propertyEnum</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">info</span><span class="p">.</span><span class="n">Prototype</span><span class="p">.</span><span class="n">AggMethod</span> <span class="p">!=</span> <span class="n">AggregationMethod</span><span class="p">.</span><span class="n">None</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Which you then use like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">kvp</span> <span class="k">in</span> <span class="n">Properties</span><span class="p">.</span><span class="nf">IteratePropertyRange</span><span class="p">(</span><span class="n">PropertyEnumFilter</span><span class="p">.</span><span class="n">AggFunc</span><span class="p">))</span>
+<span class="p">{</span>
+    <span class="c1">// Do something with properties</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This little maneuver’s gonna save us 800 000 allocations on server startup.</p>
+
+<h4 id="stack-like-pooling">Stack-like Pooling</h4>
+
+<p>Sometimes you just need a way of imitating C++’s “allocate whatever on the stack” behavior. A good example of this is <code class="language-plaintext highlighter-rouge">PropertyCollection</code>: it is a pretty heavy data structure that is occasionally used just as a way of transferring data. For instance, when you create an <code class="language-plaintext highlighter-rouge">Entity</code>, you can pass it a <code class="language-plaintext highlighter-rouge">PropertyCollection</code> as a parameter, and all properties in it will be copied to the freshly created <code class="language-plaintext highlighter-rouge">Entity</code>. This temporary <code class="language-plaintext highlighter-rouge">PropertyCollection</code> has a very short lifespan, never leaves its initial scope, and the client actually uses stack allocations for it. However, in C# “we don’t do that here”, so we need a workaround.</p>
+
+<p>The one I have implemented involves an approach similar to what is used for database connections. We define an interface for poolable objects:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">interface</span> <span class="nc">IPoolable</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">ResetForPool</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>And then we create a manager singleton:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">ObjectPoolManager</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="n">ObjectPoolManager</span> <span class="n">Instance</span> <span class="p">{</span> <span class="k">get</span><span class="p">;</span> <span class="p">}</span> <span class="p">=</span> <span class="k">new</span><span class="p">();</span>
+
+    <span class="k">private</span> <span class="nf">ObjectPoolManager</span><span class="p">()</span> <span class="p">{}</span>
+
+    <span class="k">public</span> <span class="n">T</span> <span class="n">Get</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;()</span> <span class="k">where</span> <span class="n">T</span><span class="p">:</span> <span class="n">IPoolable</span><span class="p">,</span> <span class="k">new</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="c1">// Retrieve or create a new object of type T</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="n">Return</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="n">T</span> <span class="n">instance</span><span class="p">)</span> <span class="k">where</span> <span class="n">T</span><span class="p">:</span> <span class="n">IPoolable</span><span class="p">,</span> <span class="k">new</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">instance</span><span class="p">.</span><span class="nf">Clear</span><span class="p">();</span>
+        <span class="c1">// Return a previously created object to the pool</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now we can implement two interfaces on objects that we want to use in a stack-allocated fashion:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">class</span> <span class="nc">PropertyCollection</span> <span class="p">:</span> <span class="n">IPoolable</span><span class="p">,</span> <span class="n">IDisposable</span>
+<span class="p">{</span>
+    <span class="c1">// The rest of the class</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">ResetForPool</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="nf">Clear</span><span class="p">();</span>
+    <span class="p">}</span>
+
+    <span class="k">public</span> <span class="k">void</span> <span class="nf">Dispose</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="n">ObjectPoolManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="nf">Return</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>And now we can use it like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="nn">PropertyCollection</span> <span class="n">tempProperties</span> <span class="p">=</span> <span class="n">ObjectPoolManager</span><span class="p">.</span><span class="n">Instance</span><span class="p">.</span><span class="n">Get</span><span class="p">&lt;</span><span class="n">PropertyCollection</span><span class="p">&gt;();</span>
+</code></pre></div></div>
+
+<p>When we leave the scope where we got this collection, in a very stack-like fashion our <code class="language-plaintext highlighter-rouge">PropertyCollection</code> is “disposed” thanks to the <code class="language-plaintext highlighter-rouge">using</code> keyword, which in this case returns it to the pool and clears it. This reduces the number of <code class="language-plaintext highlighter-rouge">PropertyCollection</code> allocations we need to do from hundreds of thousands to just 3 or 4 per game instance.</p>
+
+<h3 id="round-2-game-database-initialization">Round 2: Game Database Initialization</h3>
+
+<p>Hello darkness, my old friend. Those of you who have been following these reports since the beginning will remember our earlier, many months-long struggle with implementing the game database. Eventually everything got to a functional state, but I was never really happy with how well it performed. Not only did it take pretty long to start if you were preloading all prototypes (about 14.5 seconds on my machine), even when loading prototypes on demand you would occasionally get long lags when defeating certain enemies for the first time, caused by their loot tables being deserialized. So with this optimization pass I was determined to dive back into the abyss and try to make it better.</p>
+
+<h4 id="pak-files">Pak Files</h4>
+
+<p>The very first thing that happens when you start MHServerEmu is the initialization of the <code class="language-plaintext highlighter-rouge">PakFileSystem</code>. All game data files are stored in <code class="language-plaintext highlighter-rouge">.sip</code> packages that consist of a header, an entry table, and raw data for all files compressed using the <a href="https://lz4.org/">LZ4</a> algorithm. Both the client and our server implementation read the header and the entry table, and then load the compressed data for all files into RAM. When files need to be decompressed and deserialized, their data is taken from RAM rather than disk. This may seem wasteful at first, but this is actually much faster than performing file system IO operations thousands of times.</p>
+
+<p>Previously, we were loading data for each file into separate <code class="language-plaintext highlighter-rouge">byte[]</code> buffers. As I was rechecking all of our libraries after I discovered the issues with <code class="language-plaintext highlighter-rouge">RobustPredicates</code>, I noticed that our LZ4 implementation, <a href="https://github.com/MiloszKrajewski/K4os.Compression.LZ4">K4os.Compression.LZ4</a>, actually accepts <code class="language-plaintext highlighter-rouge">ReadOnlySpan&lt;T&gt;</code> and <code class="language-plaintext highlighter-rouge">Span&lt;T&gt;</code> as arguments. Before we were looking at spans as a way of doing stack allocations for arrays, but they have another use: “slicing” an array. A span is essentially just a way of representing regions of memory, and you can represent different sections of the same array as different spans.</p>
+
+<p>So I had an idea for of dealing with <code class="language-plaintext highlighter-rouge">.sip</code> packages more efficiently: rather than reading data for each file into separate buffers, we can just read everything into a single large buffer, and slice it with spans on decompression. While it wasn’t really what the file format was designed for, it was easy to implement thanks to the fact that all file entries are in the same order as their data that follows, so the total size of the data section can be easily calculated from the last entry as follows:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">numEntries</span> <span class="p">=</span> <span class="n">reader</span><span class="p">.</span><span class="nf">ReadInt32</span><span class="p">();</span>
+<span class="n">_entryDict</span><span class="p">.</span><span class="nf">EnsureCapacity</span><span class="p">(</span><span class="n">numEntries</span><span class="p">);</span>
+
+<span class="n">PakEntry</span> <span class="n">newEntry</span> <span class="p">=</span> <span class="k">default</span><span class="p">;</span>
+
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="n">numEntries</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span>
+<span class="p">{</span>
+    <span class="n">newEntry</span> <span class="p">=</span> <span class="k">new</span><span class="p">(</span><span class="n">reader</span><span class="p">);</span>
+    <span class="n">_entryDict</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="n">newEntry</span><span class="p">.</span><span class="n">FilePath</span><span class="p">,</span> <span class="n">newEntry</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="n">dataSize</span> <span class="p">=</span> <span class="n">newEntry</span><span class="p">.</span><span class="n">Offset</span> <span class="p">+</span> <span class="n">newEntry</span><span class="p">.</span><span class="n">CompressedSize</span><span class="p">;</span>
+<span class="n">_data</span> <span class="p">=</span> <span class="n">reader</span><span class="p">.</span><span class="nf">ReadBytes</span><span class="p">(</span><span class="n">dataSize</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>Doing it this way doubled the performance of this initial step, reducing the time it takes from 200 to 100 ms on my machine. The real challenge still awaits us though.</p>
+
+<h4 id="prototype-copying">Prototype Copying</h4>
+
+<p>While my initial assumption was that our performance issues were caused by overreliance on <code class="language-plaintext highlighter-rouge">System.Reflection.PropertyInfo.SetValue()</code> for assigning deserialized field values, to my surprise, it wasn’t actually that bad: even when I did some tests and tried implementing caching and eliminating boxing, it made practically no difference. However, profiling revealed the actual culprit: <code class="language-plaintext highlighter-rouge">CalligraphySerializer.CopyPrototypeFields()</code>, which is called 625 772 times when doing a full server initialization. Within it there were two issues that were absolutely killing our performance.</p>
+
+<p>The first issue was pretty straightforward: we were calling <code class="language-plaintext highlighter-rouge">GetProperties()</code> to get an array of C# <code class="language-plaintext highlighter-rouge">PropertyInfo</code> instances for the prototype type that is being copied. Not only <code class="language-plaintext highlighter-rouge">GetProperties()</code> is more costly than I thought, we were actually redoing the work of filtering non-Calligraphy fields each time. By implementing caching here, we reduced the number of <code class="language-plaintext highlighter-rouge">GetProperties()</code> calls and subsequent filtering to just 877, giving us a noticable boost.</p>
+
+<p>But the real gains were in solving the second issue, that lied within the <code class="language-plaintext highlighter-rouge">AssignPointedAtValues()</code> function called in <code class="language-plaintext highlighter-rouge">CopyPrototypeFields()</code>:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="k">static</span> <span class="k">void</span> <span class="nf">AssignPointedAtValues</span><span class="p">(</span><span class="n">Prototype</span> <span class="n">destPrototype</span><span class="p">,</span> <span class="n">Prototype</span> <span class="n">sourcePrototype</span><span class="p">,</span> <span class="n">System</span><span class="p">.</span><span class="n">Reflection</span><span class="p">.</span><span class="n">PropertyInfo</span> <span class="n">fieldInfo</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">fieldInfo</span><span class="p">.</span><span class="nf">SetValue</span><span class="p">(</span><span class="n">destPrototype</span><span class="p">,</span> <span class="n">fieldInfo</span><span class="p">.</span><span class="nf">GetValue</span><span class="p">(</span><span class="n">sourcePrototype</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This little line of naive reflection runs 7 317 481 times during full server initialization, and it used to take about 2750 out of 14500 ms it took to load all prototypes on my machine. There are much better ways of handling this, and at first I went for the most obvious one you see recommended: using expression trees to compile and cache delegates:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">CopyValue</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="k">this</span> <span class="n">PropertyInfo</span> <span class="n">propertyInfo</span><span class="p">,</span> <span class="n">T</span> <span class="n">source</span><span class="p">,</span> <span class="n">T</span> <span class="n">destination</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">CopyPropertyValueDelegateDict</span><span class="p">.</span><span class="nf">TryGetValue</span><span class="p">(</span><span class="n">propertyInfo</span><span class="p">,</span> <span class="k">out</span> <span class="n">Delegate</span> <span class="n">copyValueDelegate</span><span class="p">)</span> <span class="p">==</span> <span class="k">false</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">ParameterExpression</span> <span class="n">sourceParam</span> <span class="p">=</span> <span class="n">Expression</span><span class="p">.</span><span class="nf">Parameter</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="kt">object</span><span class="p">));</span>
+        <span class="n">ParameterExpression</span> <span class="n">destinationParam</span> <span class="p">=</span> <span class="n">Expression</span><span class="p">.</span><span class="nf">Parameter</span><span class="p">(</span><span class="k">typeof</span><span class="p">(</span><span class="kt">object</span><span class="p">));</span>
+
+        <span class="n">Type</span> <span class="n">type</span> <span class="p">=</span> <span class="n">propertyInfo</span><span class="p">.</span><span class="n">DeclaringType</span><span class="p">;</span>
+
+        <span class="n">UnaryExpression</span> <span class="n">castSourceParam</span> <span class="p">=</span> <span class="n">Expression</span><span class="p">.</span><span class="nf">Convert</span><span class="p">(</span><span class="n">sourceParam</span><span class="p">,</span> <span class="n">type</span><span class="p">);</span>
+        <span class="n">UnaryExpression</span> <span class="n">castDestinationParam</span> <span class="p">=</span> <span class="n">Expression</span><span class="p">.</span><span class="nf">Convert</span><span class="p">(</span><span class="n">destinationParam</span><span class="p">,</span> <span class="n">type</span><span class="p">);</span>
+
+        <span class="n">MethodCallExpression</span> <span class="n">getCall</span> <span class="p">=</span> <span class="n">Expression</span><span class="p">.</span><span class="nf">Call</span><span class="p">(</span><span class="n">castSourceParam</span><span class="p">,</span> <span class="n">propertyInfo</span><span class="p">.</span><span class="nf">GetGetMethod</span><span class="p">());</span>
+        <span class="n">MethodCallExpression</span> <span class="n">setCall</span> <span class="p">=</span> <span class="n">Expression</span><span class="p">.</span><span class="nf">Call</span><span class="p">(</span><span class="n">castDestinationParam</span><span class="p">,</span> <span class="n">propertyInfo</span><span class="p">.</span><span class="nf">GetSetMethod</span><span class="p">(</span><span class="k">true</span><span class="p">),</span> <span class="n">getCall</span><span class="p">);</span>
+
+        <span class="n">copyValueDelegate</span> <span class="p">=</span> <span class="n">Expression</span><span class="p">.</span><span class="n">Lambda</span><span class="p">&lt;</span><span class="n">CopyValueDelegate</span><span class="p">&gt;(</span><span class="n">setCall</span><span class="p">,</span> <span class="n">sourceParam</span><span class="p">,</span> <span class="n">destinationParam</span><span class="p">).</span><span class="nf">Compile</span><span class="p">();</span>
+        <span class="n">CopyPropertyValueDelegateDict</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="n">propertyInfo</span><span class="p">,</span> <span class="n">copyValueDelegate</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kt">var</span> <span class="n">copy</span> <span class="p">=</span> <span class="p">(</span><span class="n">CopyValueDelegate</span><span class="p">)</span><span class="n">copyValueDelegate</span><span class="p">;</span>
+    <span class="nf">copy</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">destination</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This generates and caches methods for every encountered prototype/C# property combination that are equivalent to this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">void</span> <span class="nf">CopyValue</span><span class="p">(</span><span class="n">Prototype</span> <span class="n">source</span><span class="p">,</span> <span class="n">Prototype</span> <span class="n">destination</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="p">((</span><span class="n">SomePrototype</span><span class="p">)</span><span class="n">destination</span><span class="p">).</span><span class="n">SomeProperty</span> <span class="p">=</span> <span class="p">((</span><span class="n">SomePrototype</span><span class="p">)</span><span class="n">source</span><span class="p">).</span><span class="n">SomeProperty</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This did give me a performance boost, reducing the time it took from 2750 to about 1750 ms. However, as I looked more closely at what was taking time, I realized that creating and compiling expression trees took about 1050 ms, with only 700 ms spent on the actual workload. While it was more efficient than naive reflection, it was obvious I was still missing out on performance.</p>
+
+<p>I had to descend deep into the forbidden archives of Microsoft Learn and seek the dark knowledge of <code class="language-plaintext highlighter-rouge">System.Reflection.Emit</code>. Rather than relying on an abstraction in the form of expression trees, I had to throw away what remained of my humanity and look into the abyss of Microsoft Intermediate Language (MSIL) directly. The end result looks like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">CopyValue</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="k">this</span> <span class="n">PropertyInfo</span> <span class="n">propertyInfo</span><span class="p">,</span> <span class="n">T</span> <span class="n">source</span><span class="p">,</span> <span class="n">T</span> <span class="n">destination</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">CopyPropertyValueDelegateDict</span><span class="p">.</span><span class="nf">TryGetValue</span><span class="p">(</span><span class="n">propertyInfo</span><span class="p">,</span> <span class="k">out</span> <span class="n">Delegate</span> <span class="n">copyValueDelegate</span><span class="p">)</span> <span class="p">==</span> <span class="k">false</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Type</span> <span class="n">type</span> <span class="p">=</span> <span class="n">propertyInfo</span><span class="p">.</span><span class="n">DeclaringType</span><span class="p">;</span>
+
+        <span class="n">DynamicMethod</span> <span class="n">dm</span> <span class="p">=</span> <span class="k">new</span><span class="p">(</span><span class="s">"CopyValue"</span><span class="p">,</span> <span class="k">null</span><span class="p">,</span> <span class="n">CopyValueArgs</span><span class="p">);</span>
+        <span class="n">ILGenerator</span> <span class="n">il</span> <span class="p">=</span> <span class="n">dm</span><span class="p">.</span><span class="nf">GetILGenerator</span><span class="p">();</span>
+
+        <span class="n">il</span><span class="p">.</span><span class="nf">Emit</span><span class="p">(</span><span class="n">OpCodes</span><span class="p">.</span><span class="n">Ldarg_1</span><span class="p">);</span>
+        <span class="n">il</span><span class="p">.</span><span class="nf">Emit</span><span class="p">(</span><span class="n">OpCodes</span><span class="p">.</span><span class="n">Castclass</span><span class="p">,</span> <span class="n">type</span><span class="p">);</span>
+        <span class="n">il</span><span class="p">.</span><span class="nf">Emit</span><span class="p">(</span><span class="n">OpCodes</span><span class="p">.</span><span class="n">Ldarg_0</span><span class="p">);</span>
+        <span class="n">il</span><span class="p">.</span><span class="nf">Emit</span><span class="p">(</span><span class="n">OpCodes</span><span class="p">.</span><span class="n">Castclass</span><span class="p">,</span> <span class="n">type</span><span class="p">);</span>
+        <span class="n">il</span><span class="p">.</span><span class="nf">Emit</span><span class="p">(</span><span class="n">OpCodes</span><span class="p">.</span><span class="n">Callvirt</span><span class="p">,</span> <span class="n">propertyInfo</span><span class="p">.</span><span class="nf">GetGetMethod</span><span class="p">());</span>
+        <span class="n">il</span><span class="p">.</span><span class="nf">Emit</span><span class="p">(</span><span class="n">OpCodes</span><span class="p">.</span><span class="n">Callvirt</span><span class="p">,</span> <span class="n">propertyInfo</span><span class="p">.</span><span class="nf">GetSetMethod</span><span class="p">(</span><span class="k">true</span><span class="p">));</span>
+        <span class="n">il</span><span class="p">.</span><span class="nf">Emit</span><span class="p">(</span><span class="n">OpCodes</span><span class="p">.</span><span class="n">Ret</span><span class="p">);</span>
+
+        <span class="n">copyValueDelegate</span> <span class="p">=</span> <span class="n">dm</span><span class="p">.</span><span class="n">CreateDelegate</span><span class="p">&lt;</span><span class="n">CopyValueDelegate</span><span class="p">&gt;();</span>
+        <span class="n">CopyPropertyValueDelegateDict</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="n">propertyInfo</span><span class="p">,</span> <span class="n">copyValueDelegate</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="kt">var</span> <span class="n">copy</span> <span class="p">=</span> <span class="p">(</span><span class="n">CopyValueDelegate</span><span class="p">)</span><span class="n">copyValueDelegate</span><span class="p">;</span>
+    <span class="nf">copy</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">destination</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><em>NOTE: Chronologically this happened before my <code class="language-plaintext highlighter-rouge">CodedOutputStream</code> hack I talked about above. This is actually the real moment of my <code class="language-plaintext highlighter-rouge">ILGenerator</code> downfall.</em></p>
+
+<p>This emits the same code as using expression trees, but at an almost ridiculously lower cost: my delegate creation time went from 1050 to about 70 ms, bringing the total time time <code class="language-plaintext highlighter-rouge">AssignPointedAtValues()</code> took to just about 770 ms, a 72% reduction.</p>
+
+<h4 id="net-8-and-quick-jit-for-loops">.NET 8 and Quick JIT for Loops</h4>
+
+<p>C# is part of the .NET platform, and the way it works these days is that there is a new version released every year. Odd versions (7, 8, 9) are supported for 1.5 years, while even versions (6, 8, 10) are long-term support (LTS) releases with 3 years of updates. When a version’s support ends, it stops receiving updates, including security fixes, and Visual Studio starts giving you the evil eye for targeting a “deprecated” framework. The support for .NET 6, the version that MHServerEmu is currently targeting, will end on November 12, 2024. While we can live with VS annoying us slightly more than usual, not having security updates for potentially public-facing server software is unacceptable, so we had to get ready for November.</p>
+
+<p>I had been testing this for some time now. Retargeting is as easy as changing the number from 6 to 8 in project files and pressing the “Build” button, but there were two issues that made me less enthusiastic about this forced upgrade.</p>
+
+<p>The first one is admittedly rather silly: .NET 7 dropped the support for Windows 7, so by retargeting to .NET 8 we would be doing so as well. This is honestly not that big of a deal: the few Windows 7 enjoyers (0.37% of Steam users according to the August 2024 hardware survey) are probably getting used to their OS of choice no longer being supported, and if you really want to, you can retarget the server back to a legacy framework relatively easily.</p>
+
+<p>The other one was much more severe though: for some reason, the exact same game database initialization code targeting .NET 8 ran 35% slower than in .NET 6, contrary to all claims of performance improvements that new .NET versions bring. Something was not right here, but it was difficult by pinpoint the exact issue by profiling.</p>
+
+<p>Eventuallly I ran into <a href="https://stackoverflow.com/questions/74833459/performance-issue-with-for-loop-on-the-initial-run-on-net-7/74837351">a discussion on Stack Overflow</a> started by somebody who was having a similar issue when upgrading to .NET 7. This massive performance degradation appears to be indirectly caused by a feature called <a href="https://devblogs.microsoft.com/dotnet/performance_improvements_in_net_7/#on-stack-replacement">On-Stack Replacement</a> introduced in .NET 7. Here is an overview of it:</p>
+
+<ul>
+  <li>
+    <p>When you build your project, your C# code is compiled to intermediate language (IL), also referred to as bytecode.</p>
+  </li>
+  <li>
+    <p>The runtime that executes your program uses just-in-time (JIT) compilation to compile IL to native code for the platform it is running on. This happens as the program is being executed.</p>
+  </li>
+  <li>
+    <p>There are cases when it takes more time to compile IL than to actually execute it, and if this code is only executed once, wasting too much time compiling it leads to overall performance loss.</p>
+  </li>
+  <li>
+    <p>To mitigate this issue, a feature called <em>tiered compilation</em> was introduced to the JIT compiler in .NET Core 2.1. When code is executed for the first time, it is compiled quickly with minimal optimizations, which is called <em>quick JIT</em>. If the runtime detects that your code is executed often enough, it recompiles it with a higher level of optimization.</p>
+  </li>
+  <li>
+    <p>When quick JIT was first introduced, it had performance issues with functions containing loops, so it was disabled by default for those cases. The changes made in .NET 7 apparently made this no longer necessary, so quick JIT for loops became enabled by default, even though the <a href="https://learn.microsoft.com/en-us/dotnet/core/runtime-config/compilation#quick-jit-for-loops">documentation</a> still says the default behavior is equivalent to <code class="language-plaintext highlighter-rouge">false</code>.</p>
+  </li>
+</ul>
+
+<p>The game database initialization process contains many intensive functions that contain loops and are executed only once. Because of this, most of them do not use quick JIT in .NET 6, making them compile to optimized native code on the initial run (which is their <em>only</em> run). In .NET 8 by default quick JIT is now applied to them, making them run in their least optimized form.</p>
+
+<p>Turning quick JIT for loops off brought our code running on .NET 8 approximately back to .NET 6 levels. Turning quick JIT completely off gave us a noticable performance boost on <em>both</em> 6 and 8 (about 500 ms on my machine).</p>
+
+<hr />
+
+<p>In total all of these optimizations brought full database initialization time from approximately 14500 ms to 8500 ms on average on my machine, an overall 40-42% boost.</p>
+
+<h3 id="round-3-propertylist">Round 3: PropertyList</h3>
+
+<p>The final frontier of this optimization pass was always going to be the <code class="language-plaintext highlighter-rouge">PropertyList</code> data structure. Properties are everywhere in this game: heroes, villains, friendly NPCs, regions, powers, conditions, and more. This makes any changes made to this system more impactful, both in terms of performance gains and ways thing can go wrong.</p>
+
+<p>Each <code class="language-plaintext highlighter-rouge">PropertyCollection</code> has two <code class="language-plaintext highlighter-rouge">PropertyList</code> instances backing it: one is called a <em>base list</em>, which contains all properties actually contained in that collection. The other one is referred to as an <em>aggregate list</em>, and contains properties from the base list aggregated (combined) with properties from all attached child collections. The simplest example of this would be an avatar with equipped gear: <code class="language-plaintext highlighter-rouge">PropertyCollection</code> instances of each equipped item are aggregated with the avatar’s own collection, which results in the base list containing properties inherent to the avatar entity itself, and the aggregate list containing a combination of the avatar’s base properties with all of the item properties.</p>
+
+<p>Our previous <code class="language-plaintext highlighter-rouge">PropertyList</code> implementation was just a simple wrapper around <code class="language-plaintext highlighter-rouge">Dictionary&lt;PropertyId, PropertyValue&gt;</code>. It works well for simple lookups, but the game makes heavy use of all kinds of filtered property iteration, some of which require properties to be grouped by <code class="language-plaintext highlighter-rouge">PropertyEnum</code> (see the <a href="/MHServerEmu/blog/2024/02/28/progress-report-february-2024.html">February 2024 report</a> for more information on how properties work). Initially I tried using <code class="language-plaintext highlighter-rouge">SortedDictionary&lt;PropertyId, PropertyValue&gt;</code>, but its performance was not acceptable compared to a regular dictionary. The fastest and easiest to implement solution that would do the job turned out to be using the <code class="language-plaintext highlighter-rouge">OrderBy()</code> LINQ extension method for every iteration, which copies all data to a new collection and sorts it. While it did work, it was also stupidly inefficient, especially in terms of memory allocation. And when you consider that <code class="language-plaintext highlighter-rouge">PropertyList</code> iteration is also used for lookup methods, like <code class="language-plaintext highlighter-rouge">PropertyCollection.HasProperty()</code>, it starts getting just silly.</p>
+
+<p>For this overhaul I took another look at the client implementation, aptly named <code class="language-plaintext highlighter-rouge">NewPropertyList</code>. While it does some things that do not translate to C# well, there is one core concept I adapted from it. In most cases properties are actually <em>not</em> parameterized: it is common that over a half or even all properties in a collection are basically combinations of <code class="language-plaintext highlighter-rouge">PropertyEnum</code> and <code class="language-plaintext highlighter-rouge">PropertyValue</code>. So instead of storing all properties in a single monolithic collection, it is actually more efficient to use a divide-and-conquer approach:</p>
+
+<ul>
+  <li>
+    <p>Each <code class="language-plaintext highlighter-rouge">PropertyEnum</code> gets a <code class="language-plaintext highlighter-rouge">PropertyEnumNode</code> instance, which can be accessed by a hash table (a <code class="language-plaintext highlighter-rouge">Dictionary&lt;PropertyEnum, PropertyEnumNode&gt;</code> in our implementation).</p>
+  </li>
+  <li>
+    <p>Each <code class="language-plaintext highlighter-rouge">PropertyEnumNode</code> consists of a <code class="language-plaintext highlighter-rouge">PropertyValue</code> and a <code class="language-plaintext highlighter-rouge">PropertyArray</code>, which is a collection of <code class="language-plaintext highlighter-rouge">PropertyId</code>/<code class="language-plaintext highlighter-rouge">PropertyValue</code> pairs. A node is essentially a bucket for a specific <code class="language-plaintext highlighter-rouge">PropertyEnum</code>.</p>
+  </li>
+  <li>
+    <p>When a node is created for an enum for the first time, the list checks whether or not the <code class="language-plaintext highlighter-rouge">PropertyId</code> that is being set has parameters. If it does, a new <code class="language-plaintext highlighter-rouge">PropertyArray</code> is allocated for it, and the id/value pair is added there. If it does not, the value is simply assigned to the <code class="language-plaintext highlighter-rouge">PropertyValue</code> field.</p>
+  </li>
+  <li>
+    <p>If an existing node containing a non-parameterized property is updated with another non-parameterized property, the value field is simply overwritten. If a parameterized property is added to a non-parameterized node, a new <code class="language-plaintext highlighter-rouge">PropertyArray</code> is allocated for this node, and both id/value pairs are added to it.</p>
+  </li>
+</ul>
+
+<p>The end result in our best case scenario is that we do a single dictionary lookup and immediately get our non-parameterized value from the node, nice and efficient. And because most of the time properties are not parameterized, we get our best case most of the time.</p>
+
+<p>When I was picking the backing data structure for our <code class="language-plaintext highlighter-rouge">PropertyArray</code> implementation, at first I looked again at what I tried before, <code class="language-plaintext highlighter-rouge">Dictionary&lt;PropertyId, PropertyValue</code> and <code class="language-plaintext highlighter-rouge">SortedDictionary&lt;PropertyId, PropertyValue&gt;</code>. My thinking was that maybe sorted dictionaries will outperform hashed ones at smaller element counts, but this assumption was wrong: benchmarking with <a href="https://github.com/dotnet/BenchmarkDotNet">BenchmarkDotNet</a> revealed that hash dictionaries were faster in pretty much all circumstances in .NET 6, and almost on par in .NET 8. However, creating tens of thousands of dictionaries, each managing their own hash buckets, was too costly for this, so I looked for the simplest solution possible.</p>
+
+<p>The one I ended up picking was <code class="language-plaintext highlighter-rouge">List&lt;PropertyPair&gt;</code>, with <code class="language-plaintext highlighter-rouge">PropertyPair</code> being a variation of <code class="language-plaintext highlighter-rouge">KeyValuePair&lt;PropertyId, PropertyValue&gt;</code> with an <code class="language-plaintext highlighter-rouge">IComparable</code> implementation that compares pairs by keys. We add pairs to the list in sorted order, which in practice is basically free, because the most common case for property assignment is copying them from another collection, where they would already be sorted.</p>
+
+<p>Since our lists are often tiny (&lt; 10 elements), for lookups we are using the simplest thing possible: linear search with early exit.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="kt">int</span> <span class="nf">Find</span><span class="p">(</span><span class="n">PropertyId</span> <span class="n">id</span><span class="p">,</span> <span class="k">out</span> <span class="n">PropertyValue</span> <span class="k">value</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">count</span> <span class="p">=</span> <span class="n">_list</span><span class="p">.</span><span class="n">Count</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;</span> <span class="n">count</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span>
+    <span class="p">{</span>
+        <span class="n">PropertyPair</span> <span class="n">pair</span> <span class="p">=</span> <span class="n">_list</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Id</span> <span class="p">==</span> <span class="n">id</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">value</span> <span class="p">=</span> <span class="n">pair</span><span class="p">.</span><span class="n">Value</span><span class="p">;</span>
+            <span class="k">return</span> <span class="n">i</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">pair</span><span class="p">.</span><span class="n">Id</span><span class="p">.</span><span class="n">Raw</span> <span class="p">&gt;</span> <span class="n">id</span><span class="p">.</span><span class="n">Raw</span><span class="p">)</span>
+            <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">value</span> <span class="p">=</span> <span class="k">default</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">-</span><span class="m">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>I did some measurements actually playing the game, and in the vast majority of cases (94.13%) this loop exits at <code class="language-plaintext highlighter-rouge">i &lt; 8</code>, with a significant portion of them (32.38%) being at <code class="language-plaintext highlighter-rouge">i &lt; 4</code>. Relatively costly lookups (<code class="language-plaintext highlighter-rouge">i &gt;= 16</code>) were only 5.69%.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/property-array.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/property-array.png" alt="PropertyArray Lookups" /></a></p>
+
+<p>With usage like this the simpler thing is actually more efficient than doing something more complex, like binary search. In theory it should also work better with the CPU’s branch prediction, making it even faster.</p>
+
+<p>With all of that done, the new <code class="language-plaintext highlighter-rouge">PropertyList</code> implementation was almost a drop-in replacement for the old one. The only real major difference that had to be dealt with was the fact that the list can no longer be modified while it is being iterated, because we are now iterating the actual data instead of a copy of it. However, there were only two such cases in our codebase, and they were very easy to fix.</p>
+
+<hr />
+
+<p>And with that our optimization journey comes to an end. There are always more gains to be made, but for now I feel the server is in a much better state than it was a month ago, and now I can get back to implementing exciting gameplay features, such as conditions (buffs/debuffs) and loot system improvements.</p>
+
+<h2 id="mission-impossible">Mission: Impossible</h2>
+
+<p><em>Time for a deep dive into missions, presented by AlexBond.</em></p>
+
+<hr />
+
+<p>Hey everyone, it’s AlexBond. Let there be missions!</p>
+
+<p>In this report I would like to share details on how I brought missions back to the game, and how it all works.</p>
+
+<h3 id="mission-prototypes">Mission Prototypes</h3>
+
+<p>The first thing to do was figuring out what prototypes are used for missions and how they are related to each other. Using the <em>Game Database Browser</em>, I determined the four main prototype classes:</p>
+
+<ul>
+  <li>
+    <p>MissionPrototype</p>
+  </li>
+  <li>
+    <p>MissionObjectivePrototype</p>
+  </li>
+  <li>
+    <p>MissionActionPrototype</p>
+  </li>
+  <li>
+    <p>MissionConditionPrototype</p>
+  </li>
+</ul>
+
+<p>There are various subclasses of MissionPrototype (<code class="language-plaintext highlighter-rouge">OpenMissionPrototype</code>, <code class="language-plaintext highlighter-rouge">LegendaryMissionPrototype</code>, <code class="language-plaintext highlighter-rouge">DailyMissionPrototype</code>, <code class="language-plaintext highlighter-rouge">AdvancedMissionPrototype</code>), but this time we will be looking at the base type.</p>
+
+<p>Here is an overview of what missions are structured like:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-1.png" alt="Mission Structure" style="max-height: 500px;" /></a>
+</center>
+
+<p>The are two varieties of <code class="language-plaintext highlighter-rouge">MissionManager</code>: one for regions, and one for player entities.</p>
+
+<p>When a region is loaded, a global <code class="language-plaintext highlighter-rouge">MissionManager</code> is created and bound to that region. It then loads all <code class="language-plaintext highlighter-rouge">OpenMissionPrototype</code> instances that specify this region in their <code class="language-plaintext highlighter-rouge">ActiveInRegions</code> field.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-2.png" alt="ActiveInRegions" /></a></p>
+
+<p>Also as part of the region generation process a function called <code class="language-plaintext highlighter-rouge">GenerateMissionPopulation()</code> is run, which takes population data from <code class="language-plaintext highlighter-rouge">PopulationSpawns</code> and forwards it to a <code class="language-plaintext highlighter-rouge">MissionSpawnEvent</code> (more on that later).</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-3.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-3.png" alt="MissionPopulationEntry" /></a></p>
+
+<p>After the region finishes loading and spawning all required objects, the mission’s state changes to active, and an <code class="language-plaintext highlighter-rouge">OnStartActions</code> event is invoked, which mainly activates various ambient animations for NPCs and mobs using <code class="language-plaintext highlighter-rouge">MissionActionEntityPerformPowerPrototype</code>.</p>
+
+<p>[<img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-4.png" alt="MissionActionEntityPerformPowerPrototype(/MHServerEmu/assets/blog/progress-report/2024-09/missions-4.png)" /></p>
+
+<p>Each mission has a <code class="language-plaintext highlighter-rouge">MissionState</code> that switches in the following order:</p>
+
+<p><code class="language-plaintext highlighter-rouge">Invalid</code> - <code class="language-plaintext highlighter-rouge">Inactive</code> - <code class="language-plaintext highlighter-rouge">Available</code> - <code class="language-plaintext highlighter-rouge">Completed</code> - <code class="language-plaintext highlighter-rouge">Failed</code></p>
+
+<p>The switching process is very complex, so I will not be going into detail on how it works. Instead, here is a flowchart:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-5.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-5.png" alt="Mission State Chart" /></a></p>
+
+<h3 id="missionobjective">MissionObjective</h3>
+
+<p>Each mission contains a collection of <em>objectives</em>. <code class="language-plaintext highlighter-rouge">MissionObjective</code> has some differences from <code class="language-plaintext highlighter-rouge">Mission</code>, but overall they are very similar:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-6.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-6.png" alt="Mission Objective Structure" style="max-height: 500px;" /></a>
+</center>
+
+<p>When a mission is activated, it switches all of its objectives to the <code class="language-plaintext highlighter-rouge">Available</code> state. This registers events for triggers and creates all the required <em>actions</em> and <em>conditions</em>. When an objective’s state changes to <code class="language-plaintext highlighter-rouge">Active</code>, its <code class="language-plaintext highlighter-rouge">SuccessConditions</code> start being tracked.</p>
+
+<p>All objectives are completed in order, and more often than not their success condition is the completion of another mission. <code class="language-plaintext highlighter-rouge">MissionObjectiveState</code> switching process is similar to <code class="language-plaintext highlighter-rouge">MissionState</code>, but there are some differences. Here is a diagram of this process:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-7.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-7.png" alt="Missions Objective State Chart" /></a></p>
+
+<p>Now that we have “figured out” all the difficulties, it’s time to take a look at how it all works in the game in the context of the <em>story</em> mode.</p>
+
+<h3 id="story">Story</h3>
+
+<p>The game went through a lot of rewrites: many patches came out, the story mode underwent changes, content was removed, gameplay systems were reworked. Because of this, the prototypes are a mess of working and deprecated missions mixed together. Some missions have conflicts with one another, and others do not work at all. Let’s take a look at this:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-8.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-8.png" alt="Act vs Story" /></a></p>
+
+<p>As you can see, we have two mission directories, and many missions are duplicated and/or have conflicts… Sometimes it’s the Story missions that are the working ones, and sometimes it’s the ones from Acts…</p>
+
+<p>Let’s take a look at an example of Story with Chapter 1.</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-9.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-9.png" alt="Story Chapter 1" style="max-height: 500px;" /></a>
+</center>
+
+<p>Missions are divided into <code class="language-plaintext highlighter-rouge">Main</code>, <code class="language-plaintext highlighter-rouge">Controllers</code>, <code class="language-plaintext highlighter-rouge">Discoveries</code>, and <code class="language-plaintext highlighter-rouge">Events</code>.</p>
+
+<p>Each <code class="language-plaintext highlighter-rouge">Main</code> mission contains objectives:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-10.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-10.png" alt="Mission Objectives" /></a>
+</center>
+
+<p>Let’s examine one of these objectives:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-11.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-11.png" alt="Mission Objective Example" /></a></p>
+
+<p>The completion of this objective requires the fullfillment of a <code class="language-plaintext highlighter-rouge">MissionConditionMissionComplete</code> for a controller (another mission) - <code class="language-plaintext highlighter-rouge">NYPDSonicEmitter</code> .</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-12.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-12.png" alt="Mission Condition Example" /></a></p>
+
+<p>Within this controller there are three more conditions:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-13.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-13.png" alt="Mission Controller Example" /></a></p>
+
+<p><code class="language-plaintext highlighter-rouge">Controller</code> missions in most cases manage a single boss, animation, or event.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Discovery</code> missions activate triggers for discoverable mission objects on the map. They manage interactable NPCs that need to be saved or helped. All interactable NPCs on the map are <code class="language-plaintext highlighter-rouge">Discovery</code> missions.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Event</code> missions start region events when a player comes near them.</p>
+
+<p>In other words, <code class="language-plaintext highlighter-rouge">MissionPrototype</code> is essentially a form of scripting. Many smaller missions are restarted automatically.</p>
+
+<p>All of the above was about <em>region missions</em>, now let’s talk about <em>player missions</em>.</p>
+
+<h3 id="player-missions">Player Missions</h3>
+
+<p>Player missions start loading when a player with an active chapter enters a region. In total there are 303 such missions. They are saved per account and represent a player’s story progress. Many of them have the <code class="language-plaintext highlighter-rouge">SaveStatePerAvatar</code> flag and are saved in property collections of each avatar separately, which is what allows you to play through the story from beginning to end as each hero separately.</p>
+
+<p>When I was testing the story, these missions were enough to get me to chapter 5, where I encountered <code class="language-plaintext highlighter-rouge">MetaGames</code> with no way forward without implementing them.</p>
+
+<h3 id="metagames">MetaGames</h3>
+
+<p>MetaGames are sets of global events for a given region that run on timers. Each MetaGame has a <code class="language-plaintext highlighter-rouge">MetaGameMode</code> and a various <code class="language-plaintext highlighter-rouge">MetaStates</code>. The start of a MetaGame event usually creates a UI widget that looks like this:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-14.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-14.jpg" alt="MetaGame Widget" /></a>
+</center>
+
+<p>Here is a list of modes that exist:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>GameMode</th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MetaGameMode</td>
+      <td>Story</td>
+    </tr>
+    <tr>
+      <td>MetaGameModeIdle</td>
+      <td>TrainingRoom</td>
+    </tr>
+    <tr>
+      <td>MetaGameModeShutdown</td>
+      <td>Challenges</td>
+    </tr>
+    <tr>
+      <td>MetaGameStateMode</td>
+      <td>Story</td>
+    </tr>
+    <tr>
+      <td>NexusPvPMainMode</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>PvEScaleGameMode</td>
+      <td>Limbo</td>
+    </tr>
+    <tr>
+      <td>PvEWaveGameMode</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>PvPDefenderGameMode</td>
+      <td>PvP</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>As you can see, the story uses only two modes. It also required a number of states: <code class="language-plaintext highlighter-rouge">MetaStateMissionActivate</code>, <code class="language-plaintext highlighter-rouge">MetaStateMissionSequence</code>, <code class="language-plaintext highlighter-rouge">MetaStatePopulationMaintain</code>, and <code class="language-plaintext highlighter-rouge">MetaStateWaveInstance</code>.</p>
+
+<p>Here is a full list of all states:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>MetaState</th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>MetaStateCombatQueueLockout</td>
+      <td>Raids</td>
+    </tr>
+    <tr>
+      <td>MetaStateEntityEventCounter</td>
+      <td>XMansion, Holo-Sim</td>
+    </tr>
+    <tr>
+      <td>MetaStateEntityModifier</td>
+      <td>XMansion, Holo-Sim</td>
+    </tr>
+    <tr>
+      <td>MetaStateLimitPlayerDeaths</td>
+      <td>Gate, Raids</td>
+    </tr>
+    <tr>
+      <td>MetaStateLimitPlayerDeathsPerMission</td>
+      <td>SurturDebugMainMode</td>
+    </tr>
+    <tr>
+      <td>MetaStateMissionActivate</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>MetaStateMissionProgression</td>
+      <td>Raids</td>
+    </tr>
+    <tr>
+      <td>MetaStateMissionRestart</td>
+      <td>AxisRaid</td>
+    </tr>
+    <tr>
+      <td>MetaStateMissionSequence</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>MetaStateMissionStateListener</td>
+      <td>XMansion</td>
+    </tr>
+    <tr>
+      <td>MetaStatePopulationMaintain</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>MetaStateRegionPlayerAccess</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>MetaStateScoringEventTimerEnd</td>
+      <td>DangerRoomTimerEnd</td>
+    </tr>
+    <tr>
+      <td>MetaStateScoringEventTimerStart</td>
+      <td>DangerRoomTimerStart</td>
+    </tr>
+    <tr>
+      <td>MetaStateScoringEventTimerStop</td>
+      <td>DangerRoomTimerStop</td>
+    </tr>
+    <tr>
+      <td>MetaStateShutdown</td>
+      <td>DangerRoom</td>
+    </tr>
+    <tr>
+      <td>MetaStateStartTargetOverride</td>
+      <td>SurturStartTargetCaldera</td>
+    </tr>
+    <tr>
+      <td>MetaStateTimedBonus</td>
+      <td>AgeOfUltronTimedBonusPhase01</td>
+    </tr>
+    <tr>
+      <td>MetaStateTrackRegionScore</td>
+      <td>DangerRoom, AgeOfUltron</td>
+    </tr>
+    <tr>
+      <td>MetaStateWaveInstance</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>I had to implement the required modes and states to continue working on missions.</p>
+
+<p>Many of these states contain populations that need to be spawned dynamically using <code class="language-plaintext highlighter-rouge">MetaStateSpawnEvent</code>. This is what we will be looking at next.</p>
+
+<h3 id="spawnevent">SpawnEvent</h3>
+
+<p>The old spawning system I was using became no longer suitable for current circumstances. I had to rework it, which involved creating the following classes:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">SpawnEvent</code> (<code class="language-plaintext highlighter-rouge">PopulationAreaSpawnEvent</code>, <code class="language-plaintext highlighter-rouge">MissionSpawnEvent</code>, <code class="language-plaintext highlighter-rouge">MetaStateSpawnEvent</code>)</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">SpawnScheduler</code> (<code class="language-plaintext highlighter-rouge">MarkerScheduler</code>, <code class="language-plaintext highlighter-rouge">LocationScheduler</code>)</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">PopulationObjectQueue</code> (<code class="language-plaintext highlighter-rouge">CriticalQueue</code>, <code class="language-plaintext highlighter-rouge">RegularQueue</code>)</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">SpawnLocation</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">SpawnMap</code> (to be implemented)</p>
+  </li>
+</ul>
+
+<p>All the information we need for spawning is contained in <code class="language-plaintext highlighter-rouge">PopulationObject</code>, but it needs to be retrieved and processed correctly. Previously I did this manually, which is why everything was static. However, the game requires dynamic spawning.</p>
+
+<p>Here is how it’s done. First, the <code class="language-plaintext highlighter-rouge">SpawnEvent</code> type is determined, which then processes our population by getting all <code class="language-plaintext highlighter-rouge">PopulationObject</code> instances from it. Objects are divided based on their properties by how <em>critical</em> they are for spawning and how <em>bound</em> they are to a location. Critical objects are spawned first, and while we have even a single critical object for a marker, none of the non-critical objects should be spawning (this caused a lot of issues with missions). If there is a <code class="language-plaintext highlighter-rouge">UsePopulationMarker</code> marker, the object is forwarded to a <code class="language-plaintext highlighter-rouge">MarkerScheduler</code>, otherwise it goes to a <code class="language-plaintext highlighter-rouge">LocationScheduler</code>.</p>
+
+<p>First, we check if the region has a free marker using <code class="language-plaintext highlighter-rouge">SpawnMarkerRegistry</code>, and if it matches our <code class="language-plaintext highlighter-rouge">SpawnLocation</code>, this marker becomes reserved, and our object spawns on it. The number of markers in a region is limited, which causes problems, because the spawn queue is very large. To solve this issue I have implemented two classes: <code class="language-plaintext highlighter-rouge">PopulationObjectQueue</code> and <code class="language-plaintext highlighter-rouge">SpawnScheduler</code>. They manage the queue and keep everything in order, preventing missions from breaking.</p>
+
+<p>When all <code class="language-plaintext highlighter-rouge">SpawnEvent</code> objects are spawned, an the <code class="language-plaintext highlighter-rouge">OnSpawnedPopulation()</code> event is invoked, which activates the mission. If the marker is occupied, the required mission objects fail to spawn, and the mission does not activate.</p>
+
+<p>This chart demonstrates how spawning is planned:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-15.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-15.png" alt="Spawn Queue Chart" /></a></p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>As you can see, missions are a very complex system of interconnections, states, conditions, and events. This makes it difficult to find the reason something breaks and understand it. Although I was able to fix the most glaring issues, and right now it is possible to finish all 10 chapters of the story, there is still a lot of work to do, including debugging internal missions, MetaState, widgets, animations, rewards, SpawnMap, and so on.</p>
+
+<p>Thank you to everybody who is helping me debug missions, and until we meet again in future reports!</p>
+
+<hr />
+
+<p>This was a huge one! Thanks to everyone who read (or just scrolled) all the way to the end, see you all next time!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2024/09/30/progress-report-september-2024.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>
