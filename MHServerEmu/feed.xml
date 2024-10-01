@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2024-09-30T14:36:19+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: September 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/09/30/progress-report-september-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: September 2024" /><published>2024-09-30T14:35:00+03:00</published><updated>2024-09-30T14:35:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/09/30/progress-report-september-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/09/30/progress-report-september-2024.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2024-09/header.jpg" alt="MHServerEmu Progress Report - September 2024" /></p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2024-10-01T06:28:21+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: September 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/09/30/progress-report-september-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: September 2024" /><published>2024-09-30T14:35:00+03:00</published><updated>2024-09-30T14:35:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/09/30/progress-report-september-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/09/30/progress-report-september-2024.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2024-09/header.jpg" alt="MHServerEmu Progress Report - September 2024" /></p>
 
 <p>You know the drill, it’s progress report time.</p>
 
@@ -6,52 +6,58 @@
 
 <p>This month we released our third stable version, <a href="https://github.com/Crypto137/MHServerEmu/releases/tag/0.3.0">0.3.0</a>, and immediately I started working on features for 0.4.0, which is currently planned for early December.</p>
 
-<p>The first thing on my “to do” list was implementing item affix generation. When I did the loot table implementation <a href="/MHServerEmu/blog/2024/07/31/progress-report-july-2024.html">back in July</a>, I already knew that it would not be difficult to get working with what we already had. However, I wanted to wait until we had persistence working: there is no worse feeling in a loot game than getting a good drop and knowing you are going to lose it as soon as you log out.</p>
+<p>The first thing on my “to do” list was implementing item affix generation. When I did the loot table implementation <a href="/MHServerEmu/blog/2024/07/31/progress-report-july-2024.html">back in July</a>, I already knew that it would not be difficult to get affix generation up and running with what we already had. However, I wanted to wait until we had persistence working: there is no worse feeling in a loot game than getting a good drop and knowing you are going to lose it as soon as you log out.</p>
 
 <p>Here is an overview of how affix generation works. After the <code class="language-plaintext highlighter-rouge">ItemResolver</code> goes through a loot table, you end up with an <code class="language-plaintext highlighter-rouge">ItemSpec</code> that has the item’s base type, quality, and level, but no affixes. This <code class="language-plaintext highlighter-rouge">ItemSpec</code> is passed to a function called <code class="language-plaintext highlighter-rouge">LootUtilities.UpdateAffixes()</code> that does the real magic.</p>
 
-<p>Based mainly on the item’s base type and level, the game rolls a number of <em>category</em> affixes and <em>position</em> affixes. Categories are data-defined pools, which are primarily used for “white” affixes you see on gear, like damage rating and health. Affix positions are hardcoded into the game, and they include what you expect from games in this genre, as well as more special things:</p>
+<p>Based mainly on the item’s base type and level, the game rolls a number of <em>category</em> affixes and <em>position</em> affixes.</p>
+
+<p>Categories are data-defined pools, which in practice are primarily used for “white” affixes you see on gear, like damage rating and health.  Theoretically it should be possible to add more affix categories by changing game data, although you will have to modify both the server and the client <code class="language-plaintext highlighter-rouge">.sip</code> files.</p>
+
+<p>There are 19 affix positions, and they are hardcoded into the game: unlike categories, you cannot add or remove new affix positions without recompiling the client. Available positions include things that are typical for games in this genre, like prefixes and suffixes, but also more specialized options, such as PetTech-specific affixes. Here is a full list of affix positions that exist in version 1.52:</p>
 
 <table>
   <thead>
     <tr>
       <th>Prefix</th>
-      <th>Suffix</th>
-      <th>Visual</th>
-      <th>Ultimate</th>
-      <th>Cosmic</th>
+      <th>Unique</th>
+      <th>PetTech1</th>
+      <th>RegionAffix</th>
     </tr>
   </thead>
   <tbody>
     <tr>
-      <td><strong>Unique</strong></td>
+      <td><strong>Suffix</strong></td>
       <td><strong>Blessing</strong></td>
-      <td><strong>Runeword</strong></td>
-      <td><strong>TeamUp</strong></td>
-      <td><strong>MetaData</strong></td>
-    </tr>
-    <tr>
-      <td><strong>PetTech1</strong></td>
       <td><strong>PetTech2</strong></td>
-      <td><strong>PetTech3</strong></td>
-      <td><strong>PetTech4</strong></td>
-      <td><strong>PetTech5</strong></td>
+      <td><strong>Socket1</strong></td>
     </tr>
     <tr>
-      <td><strong>RegionAffix</strong></td>
-      <td><strong>Socket1</strong></td>
+      <td><strong>Visual</strong></td>
+      <td><strong>Runeword</strong></td>
+      <td><strong>PetTech3</strong></td>
       <td><strong>Socket2</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Ultimate</strong></td>
+      <td><strong>TeamUp</strong></td>
+      <td><strong>PetTech4</strong></td>
       <td><strong>Socket3</strong></td>
-      <td><strong>None</strong></td>
+    </tr>
+    <tr>
+      <td><strong>Cosmic</strong></td>
+      <td><strong>Metadata</strong></td>
+      <td><strong>PetTech5</strong></td>
+      <td> </td>
     </tr>
   </tbody>
 </table>
 
 <p>For each affix roll a pool is formed based on various filters, including compatibility with the base type, keywords, categories, and the region the affix is being rolled in. An affix is then picked from this pool, checking for duplicates that are already attached to this <code class="language-plaintext highlighter-rouge">ItemSpec</code> if needed. Some affixes also require an additional parameter, referred to as its <em>scope</em>: the most typical example of this are affixes that affect specific powers or groups of powers. For an affix like <code class="language-plaintext highlighter-rouge">+3 to Repulsor Barrage</code> the scope would be a reference to the prototype for the <code class="language-plaintext highlighter-rouge">Repulsor Barrage</code> power, while for <code class="language-plaintext highlighter-rouge">+10% Area Power Damage</code> it would be a reference to the prototype for the <code class="language-plaintext highlighter-rouge">Area</code> keyword. The scope system is a good example of how surface-level many BUE changes actually were: although power ranks were “removed”, the entire backend for them still exists and is in use, with all powers simply being set to rank 1 and rebalanced accordingly.</p>
 
-<p>With affixes picked and added to the <code class="language-plaintext highlighter-rouge">ItemSpec</code>, it is now time to apply it to an <code class="language-plaintext highlighter-rouge">Item</code> entity instance. This is when the actual rolling of values happens. The funny thing about this process is that it is done in parallel by the server and the client: rather than sending a fully rolled item, the server sends the client a serialized <code class="language-plaintext highlighter-rouge">ItemSpec</code> that also contains a seed for the random number generator, and because the input data and the algorithm are the same between the two of them, they both generate the same item independently from one another. While this means we have all the logic for the rolling process client-side, any deviation from it also causes desynchronization issues. In addition to that, you can’t modify most of the static item data, such as affix ranges, server-side without also having to change the client.</p>
+<p>With affixes picked and added to the <code class="language-plaintext highlighter-rouge">ItemSpec</code>, it is now time to apply it to an <code class="language-plaintext highlighter-rouge">Item</code> entity instance. This is when the actual rolling of values happens. The funny thing about this process is that it is done in parallel by the server and the client: rather than sending a fully rolled item, the server sends the client a serialized <code class="language-plaintext highlighter-rouge">ItemSpec</code> that also contains a seed for the random number generator. Because the input data and the algorithm are the same between the two of them, they both generate the same item independently from one another. While this means we have all the logic for the rolling process client-side, any deviation from it also causes desynchronization issues. In addition to that, you can’t modify most of the static item data, such as affix ranges, server-side without also having to change the client.</p>
 
-<p>In addition to randomly picked affixes, the prototypes for base types can also have <em>built-in affixes</em>, and <em>built-in properties</em>. The vast majority of fixed stat items you see in the game, like uniques and artifacts, are implemented using built-in properties. The core difference between them is that affix properties are attached to the item as child property collections and can be removed, while built-in properties are written right into the item’s property collection.</p>
+<p>In addition to randomly picked affixes, the prototypes for base types can also have <em>built-in affixes</em>, and <em>built-in properties</em>. The vast majority of fixed stat items you see in the game, like uniques and artifacts, are implemented using built-in properties. The core difference between them is that affix properties are attached to the item as child property collections and can be removed, while built-in properties are written right into the item’s own property collection.</p>
 
 <p>Implementing built-in properties initially caused unexpected game instances crashes. Turns out, the data contains mistakes made by designers, and in some cases minimum and maximum ranges are mixed up. Generally it’s negative decimal numbers, like <code class="language-plaintext highlighter-rouge">-0.1</code> and <code class="language-plaintext highlighter-rouge">-0.2</code>, but there are also cases that look like this:</p>
 
@@ -79,33 +85,33 @@
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>So when you try to clamp a value to a mixed up range like this, an exception is thrown, which leads to a crash. We cannot fix the issue with the data without also modifying the client, so what we have to do here is remove this check and process malformed data in the same way as the client, or we are going to get different rolls server-side and end up with desync issues.</p>
+<p>So when you try to clamp a value to a mixed up range like this, an exception is thrown, which leads to a crash. We cannot fix the issue with the data without also modifying the client, so what we have to do here is remove the <code class="language-plaintext highlighter-rouge">min &gt; max</code> check to process malformed data in the same way as the client, or we are going to get different rolls server-side and end up with desync issues.</p>
 
 <p>With affixes actually rolling and applying, it was now time to take another look at combat calculations. The version of the game we are currently working on uses a form of level scaling called dynamic combat level (DCL). Surprisingly enough, it is actually not that complicated compared to most other systems in this game: all damage players deal to mobs and receive from mobs is scaled as if the mob was the same level as the player (with upper and lower bounds for this scaling defined by the region). Enemy health never actually changes, and the illusion of enemies scaling up or down to player level is created by sending fake damage numbers to the client. So if you would deal <code class="language-plaintext highlighter-rouge">100</code>  damage to a target of your level, it gets scaled to <code class="language-plaintext highlighter-rouge">1000</code> to match the target’s higher level, but the client receives and displays the number <code class="language-plaintext highlighter-rouge">100</code>.</p>
 
 <p>It would not be Marvel Heroes if there was no jank at all though. When the DCL system was initially being implemented, it was made in a way where it could be turned off. For this reason all mobs in the game have two health curves: the default one and the “new” DCL one. The main difference between them is that while default curves have separate baseline scaling for regular mobs and bosses, the new DCL curves are unified, and the difference is achieved by applying external health multipliers. In the vast majority of cases this multiplier comes from the mob’s rank (<code class="language-plaintext highlighter-rouge">Popcorn</code>, <code class="language-plaintext highlighter-rouge">Champion</code>, <code class="language-plaintext highlighter-rouge">Elite</code>, <code class="language-plaintext highlighter-rouge">MiniBoss</code>, <code class="language-plaintext highlighter-rouge">Boss</code>), but sometimes it is baked into the mob’s prototype itself. This was the reason why some mobs, like Doop, were nearly unkillable before: they were using their default health curves that had baseline scaling <em>and</em> they also had a crazy high multiplier bonus that was applied on top of that.</p>
 
-<p>With players having items with stats, the DCL system being fully implemented, and characters using proper health curves with multipliers applied to them, everything in the game now has a much more authentic feel to it, with proper contrast between weaker popcorn mobs and tougher elites. There is still lots and lots of work to do on this front, but I feel we are in a much better place balance-wise now.</p>
+<p>With players having items with stats, the DCL system being mostly implemented, and characters using proper health curves with multipliers applied to them, everything in the game now has a much more authentic feel to it, with proper contrast between weaker popcorn mobs and tougher elites. There is still lots and lots of work to do on this front, but I feel we are in a much better place balance-wise now.</p>
 
 <h2 id="and-this-is-to-go-even-further-beyond">And This… Is to Go Even Further Beyond!</h2>
 
-<p>As MHServerEmu matures and more features are implemented, the workload the server has to do increases. Even 0.3.0 with its basic combat and loot generation already starts coming apart at the seams with high enough load, and with missions and metagames coming in 0.4.0, this month I decided it was time to take a good look at what we can do to optimize the server.</p>
+<p>As MHServerEmu matures and more features are implemented, the workload the server has to do increases. Even 0.3.0, with its basic combat and loot generation, already starts coming apart at the seams with high enough load, and with missions and metagames coming in 0.4.0, this month I decided it was time to take a good look at what we can do to optimize the server.</p>
 
 <h3 id="round-1-memory-management">Round 1: Memory Management</h3>
 
-<p>The core difference between our server implementation and the original game is that MHServerEmu is written in C#, which compiles to bytecode and has automatic memory management, while the client is C++ compiled to native code with manual memory management. The biggest advantage of using C# for this project is that it’s great for rapid iteration with fast build times and features like hot reload, and more often than not <em>it just works</em>. However, there is an inherent loss of control compared to C++, the most critical one being how memory is managed.</p>
+<p>The core difference between our server implementation and the original game is that MHServerEmu is written in C#, which compiles to bytecode and has automatic memory management, while the client is C++ compiled to native code with manual memory management. The biggest advantage of using C# for this project is that it’s great for rapid iteration with fast build times and features like hot reload, and more often than not <em>it just works</em>. However, there is an inherent loss of control compared to C++, the most critical point being how memory is managed.</p>
 
-<p>Both languages use the concepts of the stack and the heap for managing memory. I will not go into too much detail on this, as there are countless other resources that go as deep into this as you will ever want and do a much better job at it than I can, but here is the gist of it:</p>
+<p>Both languages use the concepts of the stack and the heap for managing memory. I will not go into too much detail on this, as there are countless other resources that go as deep into this as you will ever want, and do a much better job at it than I can, but here is the gist of it:</p>
 
 <ul>
   <li>
-    <p>Stack-allocated data is cleared automatically when you leave the block of code that contains the allocation. Working with the stack is very fast, but it has relatively small size (1 MB by default in C#), and if you exceed this limit, you will get the infamous stack overflow error. So generally you want to use this for temporary data with short lifespans.</p>
+    <p>Stack-allocated data is cleared automatically after you leave the block of code that contains the allocation. Working with the stack is very fast, but it has relatively small size (1 MB by default in C#), and if you exceed this limit, you will get the infamous stack overflow error. So generally you want to use this for smaller temporary data with short lifespans.</p>
   </li>
   <li>
     <p>Anything allocated on the heap needs to be cleaned up at some point. In C++ this can be done in various ways, while C# does it automatically using its <em>garbage collector</em> (GC). Working with the heap is much slower than the stack, but it can handle significantly larger volumes of data with longer lifespans.</p>
   </li>
   <li>
-    <p>In C++ pretty much everything can be allocated either on the stack or on the heap. C# restricts this by dividing types into <em>value types</em> and <em>reference types</em>: there are exceptions and edge cases, but the general idea is that reference types cannot be allocated on the stack, and there are cases when value types have to be wrapped in reference types, which forces them to be allocated on the heap. This wrapping process is called <em>boxing</em>.</p>
+    <p>In C++ pretty much anything can be allocated either on the stack or on the heap. C# restricts this by dividing types into <em>value types</em> and <em>reference types</em>: there are exceptions and edge cases, but the general idea is that reference types cannot be allocated on the stack, and there are cases when value types have to be wrapped in reference types, which forces them to be allocated on the heap. This wrapping process is called <em>boxing</em>.</p>
   </li>
 </ul>
 
@@ -115,14 +121,14 @@
 
 <h4 id="arrays">Arrays</h4>
 
-<p>By default arrays in C# are reference types. This means when you create a new array like this…</p>
+<p>By default, arrays in C# are reference types. This means when you create a new array like this…</p>
 
 <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">byte</span><span class="p">[]</span> <span class="n">buffer</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">byte</span><span class="p">[</span><span class="m">1024</span><span class="p">];</span>
 </code></pre></div></div>
 
-<p>…you are allocating 1024 bytes on the heap that the garbage collector will have to reclaim at some point. This is not too bad when it’s done every once in a while, but what if you are doing this tens of thousands of time per second?</p>
+<p>…you are allocating 1024 bytes on the heap that the garbage collector will have to reclaim at some point. This is not too bad when it’s done every once in a while, but what if you are doing this tens of thousands of times per second?</p>
 
-<p>As I was profiling our memory allocations, I discovered that we had literally millions of <code class="language-plaintext highlighter-rouge">double[]</code> allocations happening every minute. The culprit wasn’t even our own code: we are using a third party library that implements <a href="https://www.cs.cmu.edu/~quake/robust.html">fast robust predicates for computational geometry</a>, which is a way of quickly testing floating point values with a high degree of accuracy. The original implementation is written in C, and instead of adapting it to C# ourselves, we used <a href="https://github.com/modios/robust-predicates">an existing port</a>.</p>
+<p>As I was profiling our memory allocations, I discovered that we had literally millions of <code class="language-plaintext highlighter-rouge">double[]</code> allocations happening every minute. The culprit wasn’t even our own code: we are using a third party library that implements <a href="https://www.cs.cmu.edu/~quake/robust.html">fast robust predicates for computational geometry</a>, which is a way of quickly testing points in space with a high degree of accuracy. The original implementation is <a href="https://www.cs.cmu.edu/afs/cs/project/quake/public/code/predicates.c">written in C</a>, and instead of adapting it to C# ourselves, we used <a href="https://github.com/modios/robust-predicates">an existing port</a>.</p>
 
 <p>However, as I looked at the code, I started seeing parts like this:</p>
 
@@ -154,7 +160,7 @@
 <span class="n">Span</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">&gt;</span> <span class="n">temp16a</span> <span class="p">=</span> <span class="k">new</span><span class="p">(</span><span class="n">temp16aPtr</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>Spans are essentially highly limited pointers that allow us to use some C# features that had been traditionally restricted to unsafe code, such as the stackalloc keyword. They are very useful for situations like this, although with an external library it may be worth rewriting it in fully unsafe code to get more performance out of it in the future. Our span-based fork of this robust predicates implementation is available on <a href="https://github.com/Crypto137/robust-predicates">GitHub</a> for everyone to use.</p>
+<p>Spans are essentially highly limited pointers that allow us to use some C# features that had been traditionally restricted to unsafe code, such as the <code class="language-plaintext highlighter-rouge">stackalloc</code> keyword. They are very useful for situations like this, although with an external library it may be worth rewriting it in fully unsafe code to get more performance out of it in the future. Our span-based fork of this robust predicates implementation is available on <a href="https://github.com/Crypto137/robust-predicates">GitHub</a> for everyone to use.</p>
 
 <p>Replacing arrays with spans works for smaller arrays, but what about those that can potentially exceed the 1 MB stack limit or need to persist for longer periods of time? The best example of this are <code class="language-plaintext highlighter-rouge">byte[]</code> buffers used for serializing network messages and player data. This is where another useful optimization tool comes in: <code class="language-plaintext highlighter-rouge">ArrayPool&lt;T&gt;</code>. Instead of allocating a new buffer each time like this:</p>
 
@@ -193,7 +199,7 @@
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>The “normal” thing to do here would be either to accept that we will waste allocations on this, or to just bite bullet and start modifying <code class="language-plaintext highlighter-rouge">protobuf-csharp-port</code> for our needs.  However, I am stubborn, and I felt like doing the latter would be like opening the Pandora’s box: we may end up doing it at some point, but now was not the right time. Modern problems require modern solutions, and here is the one I came up with:</p>
+<p>The “normal” thing to do here would be either to accept that we will waste allocations on this, or to just bite the bullet and start modifying <code class="language-plaintext highlighter-rouge">protobuf-csharp-port</code> for our needs.  However, I am stubborn, and I felt like doing the latter would be like opening the Pandora’s box: we may end up doing it at some point, but now was not the right time. Modern problems require modern solutions, and here is the one I came up with:</p>
 
 <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">class</span> <span class="nc">CodedOutputStreamEx</span>
 <span class="p">{</span>
@@ -236,7 +242,7 @@
 
 <p>Because <code class="language-plaintext highlighter-rouge">int</code> is a value type and <code class="language-plaintext highlighter-rouge">object</code> is a reference type, and reference types cannot exist on the stack in C#, this conversion requires allocating an object instance on the heap that will contain our <code class="language-plaintext highlighter-rouge">value</code>.</p>
 
-<p>In a simple example like this boxing is clear to see if you know about value and reference types, but some of the “automagical” features C# provides can cause unintentional boxing and heap allocations. One common pitfall for this are interfaces: interfaces are inherently reference types, so when a <code class="language-plaintext highlighter-rouge">struct</code>, a value type, implements an interface like <code class="language-plaintext highlighter-rouge">IEnumerator</code>, and is then cast to an instance of this interface, it will end up being boxed.</p>
+<p>In a simple example like this boxing is clear to see if you know about value and reference types, but some of the “automagical” C# features can cause unintentional boxing and heap allocations. One common pitfall for this are interfaces: interfaces are inherently reference types, so when a <code class="language-plaintext highlighter-rouge">struct</code>, a value type, implements an interface like <code class="language-plaintext highlighter-rouge">IEnumerator</code>, and is then cast to an instance of this interface, it will end up being boxed.</p>
 
 <p>Here is an example of a very simplified wrapper class that implements the <code class="language-plaintext highlighter-rouge">IEnumerable</code> interface:</p>
 
@@ -261,7 +267,7 @@
 
 <p>Here is a problem though: <code class="language-plaintext highlighter-rouge">List&lt;T&gt;</code> uses a struct-based enumerator to avoid heap allocations, but when you iterate like this, here is what is actually happening behind the scenes:</p>
 
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="p">(</span><span class="n">IEnumerator</span> <span class="n">enumerator</span> <span class="p">=</span> <span class="n">PowerCollection</span><span class="p">.</span><span class="nf">GetEnumerator</span><span class="p">())</span>
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">using</span> <span class="p">(</span><span class="n">IEnumerator</span><span class="p">&lt;</span><span class="n">Power</span><span class="p">&gt;</span> <span class="n">enumerator</span> <span class="p">=</span> <span class="n">PowerCollection</span><span class="p">.</span><span class="nf">GetEnumerator</span><span class="p">())</span>
 <span class="p">{</span>
     <span class="k">while</span> <span class="p">(</span><span class="n">enumerator</span><span class="p">.</span><span class="nf">MoveNext</span><span class="p">())</span>
     <span class="p">{</span>
@@ -313,7 +319,7 @@
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>This is a quick and dirty way of implementing an iterator, which can be great for getting complex filtered iteration up and running. However, behind the scenes this actually creates a state machine object that causes more heap allocations. So to optimize this I went back and replaced some of our <code class="language-plaintext highlighter-rouge">yield return</code> filtered iteration implementations with struct-based <code class="language-plaintext highlighter-rouge">IEnumerator</code> implementations. It is a more verbose way of doing things, but it prevents more unnecessary garbage.</p>
+<p>This is a quick and dirty way of implementing a custom iterator, which can be great for getting complex filtered iteration up and running. However, behind the scenes this actually creates a state machine object that causes more heap allocations. So to optimize this, I went back and replaced some of our <code class="language-plaintext highlighter-rouge">yield return</code> filtered iteration implementations with struct-based <code class="language-plaintext highlighter-rouge">IEnumerator</code> implementations. It is a more verbose way of doing things, but it prevents more unnecessary garbage.</p>
 
 <h4 id="delegates">Delegates</h4>
 
@@ -453,9 +459,9 @@
 
 <p>The very first thing that happens when you start MHServerEmu is the initialization of the <code class="language-plaintext highlighter-rouge">PakFileSystem</code>. All game data files are stored in <code class="language-plaintext highlighter-rouge">.sip</code> packages that consist of a header, an entry table, and raw data for all files compressed using the <a href="https://lz4.org/">LZ4</a> algorithm. Both the client and our server implementation read the header and the entry table, and then load the compressed data for all files into RAM. When files need to be decompressed and deserialized, their data is taken from RAM rather than disk. This may seem wasteful at first, but this is actually much faster than performing file system IO operations thousands of times.</p>
 
-<p>Previously, we were loading data for each file into separate <code class="language-plaintext highlighter-rouge">byte[]</code> buffers. As I was rechecking all of our libraries after I discovered the issues with <code class="language-plaintext highlighter-rouge">RobustPredicates</code>, I noticed that our LZ4 implementation, <a href="https://github.com/MiloszKrajewski/K4os.Compression.LZ4">K4os.Compression.LZ4</a>, actually accepts <code class="language-plaintext highlighter-rouge">ReadOnlySpan&lt;T&gt;</code> and <code class="language-plaintext highlighter-rouge">Span&lt;T&gt;</code> as arguments. Before we were looking at spans as a way of doing stack allocations for arrays, but they have another use: “slicing” an array. A span is essentially just a way of representing regions of memory, and you can represent different sections of the same array as different spans.</p>
+<p>Previously, we were loading data for each file into separate <code class="language-plaintext highlighter-rouge">byte[]</code> buffers. As I was rechecking all of our libraries after I discovered the issues with <code class="language-plaintext highlighter-rouge">RobustPredicates</code>, I noticed that our LZ4 implementation, <a href="https://github.com/MiloszKrajewski/K4os.Compression.LZ4">K4os.Compression.LZ4</a>, actually accepts <code class="language-plaintext highlighter-rouge">ReadOnlySpan&lt;T&gt;</code> and <code class="language-plaintext highlighter-rouge">Span&lt;T&gt;</code> as arguments. Before, we were looking at spans as a way of doing stack allocations for arrays, but they have another use: “slicing” an array. A span is essentially just a way of representing regions of memory, and you can represent different sections of the same array as different spans.</p>
 
-<p>So I had an idea for of dealing with <code class="language-plaintext highlighter-rouge">.sip</code> packages more efficiently: rather than reading data for each file into separate buffers, we can just read everything into a single large buffer, and slice it with spans on decompression. While it wasn’t really what the file format was designed for, it was easy to implement thanks to the fact that all file entries are in the same order as their data that follows, so the total size of the data section can be easily calculated from the last entry as follows:</p>
+<p>So I had an idea for of dealing with <code class="language-plaintext highlighter-rouge">.sip</code> packages more efficiently: rather than reading data for each file into separate buffers, we could just read everything into a single large buffer, and slice it with spans on decompression. While it wasn’t really what the file format was designed for, it was easy to implement thanks to the fact that all file entries are in the same order as their data that follows, so the total size of the data section can be easily calculated from the last entry as follows:</p>
 
 <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">numEntries</span> <span class="p">=</span> <span class="n">reader</span><span class="p">.</span><span class="nf">ReadInt32</span><span class="p">();</span>
 <span class="n">_entryDict</span><span class="p">.</span><span class="nf">EnsureCapacity</span><span class="p">(</span><span class="n">numEntries</span><span class="p">);</span>
@@ -472,7 +478,7 @@
 <span class="n">_data</span> <span class="p">=</span> <span class="n">reader</span><span class="p">.</span><span class="nf">ReadBytes</span><span class="p">(</span><span class="n">dataSize</span><span class="p">);</span>
 </code></pre></div></div>
 
-<p>Doing it this way doubled the performance of this initial step, reducing the time it takes from 200 to 100 ms on my machine. The real challenge still awaits us though.</p>
+<p>Doing it this way doubled the performance of this initial step, reducing the time it takes from 200 to 100 ms on my machine. The real challenge still awaited me though.</p>
 
 <h4 id="prototype-copying">Prototype Copying</h4>
 
@@ -514,7 +520,7 @@
 <span class="p">}</span>
 </code></pre></div></div>
 
-<p>This generates and caches methods for every encountered prototype/C# property combination that are equivalent to this:</p>
+<p>This generates and caches functions for every encountered prototype/C# property combination that are equivalent to this:</p>
 
 <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">void</span> <span class="nf">CopyValue</span><span class="p">(</span><span class="n">Prototype</span> <span class="n">source</span><span class="p">,</span> <span class="n">Prototype</span> <span class="n">destination</span><span class="p">)</span>
 <span class="p">{</span>
@@ -524,7 +530,7 @@
 
 <p>This did give me a performance boost, reducing the time it took from 2750 to about 1750 ms. However, as I looked more closely at what was taking time, I realized that creating and compiling expression trees took about 1050 ms, with only 700 ms spent on the actual workload. While it was more efficient than naive reflection, it was obvious I was still missing out on performance.</p>
 
-<p>I had to descend deep into the forbidden archives of Microsoft Learn and seek the dark knowledge of <code class="language-plaintext highlighter-rouge">System.Reflection.Emit</code>. Rather than relying on an abstraction in the form of expression trees, I had to throw away what remained of my humanity and look into the abyss of Microsoft Intermediate Language (MSIL) directly. The end result looks like this:</p>
+<p>I had to descend deep into the forbidden archives of Microsoft Learn and seek the dark knowledge of <code class="language-plaintext highlighter-rouge">System.Reflection.Emit</code>. Rather than relying on an abstraction in the form of expression trees, I had to throw away what remained of my humanity and look into the abyss of the Microsoft Intermediate Language (MSIL) directly. The end result looks like this:</p>
 
 <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="n">CopyValue</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="k">this</span> <span class="n">PropertyInfo</span> <span class="n">propertyInfo</span><span class="p">,</span> <span class="n">T</span> <span class="n">source</span><span class="p">,</span> <span class="n">T</span> <span class="n">destination</span><span class="p">)</span>
 <span class="p">{</span>
@@ -564,9 +570,9 @@
 
 <p>The first one is admittedly rather silly: .NET 7 dropped the support for Windows 7, so by retargeting to .NET 8 we would be doing so as well. This is honestly not that big of a deal: the few Windows 7 enjoyers (0.37% of Steam users according to the August 2024 hardware survey) are probably getting used to their OS of choice no longer being supported, and if you really want to, you can retarget the server back to a legacy framework relatively easily.</p>
 
-<p>The other one was much more severe though: for some reason, the exact same game database initialization code targeting .NET 8 ran 35% slower than in .NET 6, contrary to all claims of performance improvements that new .NET versions bring. Something was not right here, but it was difficult by pinpoint the exact issue by profiling.</p>
+<p>The other one was much more severe though: for some reason, the exact same game database initialization code targeting .NET 8 ran 35% slower than in .NET 6, contrary to all claims of performance improvements that new .NET versions bring. Something was not right here, but it was difficult to pinpoint the exact issue by profiling.</p>
 
-<p>Eventuallly I ran into <a href="https://stackoverflow.com/questions/74833459/performance-issue-with-for-loop-on-the-initial-run-on-net-7/74837351">a discussion on Stack Overflow</a> started by somebody who was having a similar issue when upgrading to .NET 7. This massive performance degradation appears to be indirectly caused by a feature called <a href="https://devblogs.microsoft.com/dotnet/performance_improvements_in_net_7/#on-stack-replacement">On-Stack Replacement</a> introduced in .NET 7. Here is an overview of it:</p>
+<p>Eventuallly I ran into <a href="https://stackoverflow.com/questions/74833459/performance-issue-with-for-loop-on-the-initial-run-on-net-7/74837351">a discussion on Stack Overflow</a> started by somebody who was having a similar issue when upgrading to .NET 7. This massive performance degradation appears to be indirectly caused by a feature called <a href="https://devblogs.microsoft.com/dotnet/performance_improvements_in_net_7/#on-stack-replacement">On-Stack Replacement</a> introduced in .NET 7. Here is an overview of what was happening:</p>
 
 <ul>
   <li>
@@ -576,29 +582,29 @@
     <p>The runtime that executes your program uses just-in-time (JIT) compilation to compile IL to native code for the platform it is running on. This happens as the program is being executed.</p>
   </li>
   <li>
-    <p>There are cases when it takes more time to compile IL than to actually execute it, and if this code is only executed once, wasting too much time compiling it leads to overall performance loss.</p>
+    <p>There are cases when it takes more time to compile IL than to actually execute it, and if this code is only executed once, wasting too much time compiling it leads to an overall performance loss.</p>
   </li>
   <li>
-    <p>To mitigate this issue, a feature called <em>tiered compilation</em> was introduced to the JIT compiler in .NET Core 2.1. When code is executed for the first time, it is compiled quickly with minimal optimizations, which is called <em>quick JIT</em>. If the runtime detects that your code is executed often enough, it recompiles it with a higher level of optimization.</p>
+    <p>To mitigate this issue, a feature called <em>tiered compilation</em> was introduced to the JIT compiler in .NET Core 2.1. When a piece of code is executed for the first time, it is compiled quickly with minimal optimizations, which is called <em>quick JIT</em>. If the runtime detects that your code is executed often enough, it recompiles it with a higher level of optimization.</p>
   </li>
   <li>
-    <p>When quick JIT was first introduced, it had performance issues with functions containing loops, so it was disabled by default for those cases. The changes made in .NET 7 apparently made this no longer necessary, so quick JIT for loops became enabled by default, even though the <a href="https://learn.microsoft.com/en-us/dotnet/core/runtime-config/compilation#quick-jit-for-loops">documentation</a> still says the default behavior is equivalent to <code class="language-plaintext highlighter-rouge">false</code>.</p>
+    <p>When quick JIT was first introduced, it had performance issues with functions containing loops, so it was disabled by default for those cases. .NET 7 changes apparently made this no longer necessary, so quick JIT for loops became enabled by default, even though the <a href="https://learn.microsoft.com/en-us/dotnet/core/runtime-config/compilation#quick-jit-for-loops">documentation</a> still says the default behavior is equivalent to <code class="language-plaintext highlighter-rouge">false</code>.</p>
   </li>
 </ul>
 
-<p>The game database initialization process contains many intensive functions that contain loops and are executed only once. Because of this, most of them do not use quick JIT in .NET 6, making them compile to optimized native code on the initial run (which is their <em>only</em> run). In .NET 8 by default quick JIT is now applied to them, making them run in their least optimized form.</p>
+<p>The game database initialization contains many intensive functions with loops that are executed only once. Because of this, most of them do not use quick JIT in .NET 6, making them compile to optimized native code on the initial run (which is their <em>only</em> run). In .NET 8, by default quick JIT is now applied to them, making them run in their less optimized form.</p>
 
 <p>Turning quick JIT for loops off brought our code running on .NET 8 approximately back to .NET 6 levels. Turning quick JIT completely off gave us a noticable performance boost on <em>both</em> 6 and 8 (about 500 ms on my machine).</p>
 
 <hr />
 
-<p>In total all of these optimizations brought full database initialization time from approximately 14500 ms to 8500 ms on average on my machine, an overall 40-42% boost.</p>
+<p>All of these optimizations brought full database initialization time from approximately 14500 ms to 8500 ms on average on my machine, an overall 40-42% boost.</p>
 
 <h3 id="round-3-propertylist">Round 3: PropertyList</h3>
 
 <p>The final frontier of this optimization pass was always going to be the <code class="language-plaintext highlighter-rouge">PropertyList</code> data structure. Properties are everywhere in this game: heroes, villains, friendly NPCs, regions, powers, conditions, and more. This makes any changes made to this system more impactful, both in terms of performance gains and ways thing can go wrong.</p>
 
-<p>Each <code class="language-plaintext highlighter-rouge">PropertyCollection</code> has two <code class="language-plaintext highlighter-rouge">PropertyList</code> instances backing it: one is called a <em>base list</em>, which contains all properties actually contained in that collection. The other one is referred to as an <em>aggregate list</em>, and contains properties from the base list aggregated (combined) with properties from all attached child collections. The simplest example of this would be an avatar with equipped gear: <code class="language-plaintext highlighter-rouge">PropertyCollection</code> instances of each equipped item are aggregated with the avatar’s own collection, which results in the base list containing properties inherent to the avatar entity itself, and the aggregate list containing a combination of the avatar’s base properties with all of the item properties.</p>
+<p>Each <code class="language-plaintext highlighter-rouge">PropertyCollection</code> has two <code class="language-plaintext highlighter-rouge">PropertyList</code> instances backing it. One is called a <em>base list</em>, which contains all properties actually belonging to that collection. The other one is referred to as an <em>aggregate list</em>, and it contains properties from the base list aggregated (combined) with properties from all attached child collections. The simplest example of this would be an avatar with equipped gear: <code class="language-plaintext highlighter-rouge">PropertyCollection</code> instances of each equipped item are aggregated with the avatar’s own collection, which results in the base list containing properties inherent to the avatar entity itself, and the aggregate list containing a combination of the avatar’s base properties with all of the item properties.</p>
 
 <p>Our previous <code class="language-plaintext highlighter-rouge">PropertyList</code> implementation was just a simple wrapper around <code class="language-plaintext highlighter-rouge">Dictionary&lt;PropertyId, PropertyValue&gt;</code>. It works well for simple lookups, but the game makes heavy use of all kinds of filtered property iteration, some of which require properties to be grouped by <code class="language-plaintext highlighter-rouge">PropertyEnum</code> (see the <a href="/MHServerEmu/blog/2024/02/28/progress-report-february-2024.html">February 2024 report</a> for more information on how properties work). Initially I tried using <code class="language-plaintext highlighter-rouge">SortedDictionary&lt;PropertyId, PropertyValue&gt;</code>, but its performance was not acceptable compared to a regular dictionary. The fastest and easiest to implement solution that would do the job turned out to be using the <code class="language-plaintext highlighter-rouge">OrderBy()</code> LINQ extension method for every iteration, which copies all data to a new collection and sorts it. While it did work, it was also stupidly inefficient, especially in terms of memory allocation. And when you consider that <code class="language-plaintext highlighter-rouge">PropertyList</code> iteration is also used for lookup methods, like <code class="language-plaintext highlighter-rouge">PropertyCollection.HasProperty()</code>, it starts getting just silly.</p>
 
@@ -621,7 +627,7 @@
 
 <p>The end result in our best case scenario is that we do a single dictionary lookup and immediately get our non-parameterized value from the node, nice and efficient. And because most of the time properties are not parameterized, we get our best case most of the time.</p>
 
-<p>When I was picking the backing data structure for our <code class="language-plaintext highlighter-rouge">PropertyArray</code> implementation, at first I looked again at what I tried before, <code class="language-plaintext highlighter-rouge">Dictionary&lt;PropertyId, PropertyValue</code> and <code class="language-plaintext highlighter-rouge">SortedDictionary&lt;PropertyId, PropertyValue&gt;</code>. My thinking was that maybe sorted dictionaries will outperform hashed ones at smaller element counts, but this assumption was wrong: benchmarking with <a href="https://github.com/dotnet/BenchmarkDotNet">BenchmarkDotNet</a> revealed that hash dictionaries were faster in pretty much all circumstances in .NET 6, and almost on par in .NET 8. However, creating tens of thousands of dictionaries, each managing their own hash buckets, was too costly for this, so I looked for the simplest solution possible.</p>
+<p>When I was picking the backing data structure for our <code class="language-plaintext highlighter-rouge">PropertyArray</code> implementation, at first I looked again at what I tried before, <code class="language-plaintext highlighter-rouge">Dictionary&lt;PropertyId, PropertyValue</code> and <code class="language-plaintext highlighter-rouge">SortedDictionary&lt;PropertyId, PropertyValue&gt;</code>. My thinking was that maybe sorted dictionaries will outperform hashed ones at smaller element counts, but this assumption was wrong: benchmarking revealed that hash dictionaries were faster in pretty much all circumstances in .NET 6, and almost on par in .NET 8. However, creating tens of thousands of dictionaries, each managing their own hash buckets, was too costly for this, so I looked for the simplest solution possible.</p>
 
 <p>The one I ended up picking was <code class="language-plaintext highlighter-rouge">List&lt;PropertyPair&gt;</code>, with <code class="language-plaintext highlighter-rouge">PropertyPair</code> being a variation of <code class="language-plaintext highlighter-rouge">KeyValuePair&lt;PropertyId, PropertyValue&gt;</code> with an <code class="language-plaintext highlighter-rouge">IComparable</code> implementation that compares pairs by keys. We add pairs to the list in sorted order, which in practice is basically free, because the most common case for property assignment is copying them from another collection, where they would already be sorted.</p>
 
@@ -654,9 +660,9 @@
 
 <p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/property-array.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/property-array.png" alt="PropertyArray Lookups" /></a></p>
 
-<p>With usage like this the simpler thing is actually more efficient than doing something more complex, like binary search. In theory it should also work better with the CPU’s branch prediction, making it even faster.</p>
+<p>With usage like this, the simpler thing is actually more efficient than doing something more complex, like binary search. In theory it should also work better with the CPU’s branch prediction, making it even faster.</p>
 
-<p>With all of that done, the new <code class="language-plaintext highlighter-rouge">PropertyList</code> implementation was almost a drop-in replacement for the old one. The only real major difference that had to be dealt with was the fact that the list can no longer be modified while it is being iterated, because we are now iterating the actual data instead of a copy of it. However, there were only two such cases in our codebase, and they were very easy to fix.</p>
+<p>With all of that done, the new <code class="language-plaintext highlighter-rouge">PropertyList</code> implementation was almost a drop-in replacement for the old one. The only real major difference that had to be dealt with was the fact that the list can no longer be modified while it is being iterated, because we are now iterating the actual data instead of its copy. However, there were only two such cases in our codebase, and they were both very easy to fix.</p>
 
 <hr />
 
@@ -678,22 +684,24 @@
 
 <ul>
   <li>
-    <p>MissionPrototype</p>
+    <p><code class="language-plaintext highlighter-rouge">MissionPrototype</code></p>
   </li>
   <li>
-    <p>MissionObjectivePrototype</p>
+    <p><code class="language-plaintext highlighter-rouge">MissionObjectivePrototype</code></p>
   </li>
   <li>
-    <p>MissionActionPrototype</p>
+    <p><code class="language-plaintext highlighter-rouge">MissionActionPrototype</code></p>
   </li>
   <li>
-    <p>MissionConditionPrototype</p>
+    <p><code class="language-plaintext highlighter-rouge">MissionConditionPrototype</code></p>
   </li>
 </ul>
 
 <p>There are various subclasses of MissionPrototype (<code class="language-plaintext highlighter-rouge">OpenMissionPrototype</code>, <code class="language-plaintext highlighter-rouge">LegendaryMissionPrototype</code>, <code class="language-plaintext highlighter-rouge">DailyMissionPrototype</code>, <code class="language-plaintext highlighter-rouge">AdvancedMissionPrototype</code>), but this time we will be looking at the base type.</p>
 
-<p>Here is an overview of what missions are structured like:</p>
+<p>The two primary groups of data contained in a <code class="language-plaintext highlighter-rouge">MissionPrototype</code> are <code class="language-plaintext highlighter-rouge">MissionConditions</code> and <code class="language-plaintext highlighter-rouge">MissionActions</code>. The former group defines events that need to tracked, while the latter determines what will happen when a mission’s state changes.</p>
+
+<p>Here is an overview of how <code class="language-plaintext highlighter-rouge">MissionPrototype</code> data is used to interact with players and other objects in the game world:</p>
 
 <center>
 <a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-1.png" alt="Mission Structure" style="max-height: 500px;" /></a>
@@ -705,13 +713,13 @@
 
 <p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-2.png" alt="ActiveInRegions" /></a></p>
 
-<p>Also as part of the region generation process a function called <code class="language-plaintext highlighter-rouge">GenerateMissionPopulation()</code> is run, which takes population data from <code class="language-plaintext highlighter-rouge">PopulationSpawns</code> and forwards it to a <code class="language-plaintext highlighter-rouge">MissionSpawnEvent</code> (more on that later).</p>
+<p>Also, as part of the region generation process, a function called <code class="language-plaintext highlighter-rouge">GenerateMissionPopulation()</code> is run, which takes population data from <code class="language-plaintext highlighter-rouge">PopulationSpawns</code> and forwards it to a <code class="language-plaintext highlighter-rouge">MissionSpawnEvent</code> (more on that later).</p>
 
 <p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-3.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-3.png" alt="MissionPopulationEntry" /></a></p>
 
-<p>After the region finishes loading and spawning all required objects, the mission’s state changes to active, and an <code class="language-plaintext highlighter-rouge">OnStartActions</code> event is invoked, which mainly activates various ambient animations for NPCs and mobs using <code class="language-plaintext highlighter-rouge">MissionActionEntityPerformPowerPrototype</code>.</p>
+<p>After the region finishes loading and spawning all required objects, the mission’s state changes to active, and the <code class="language-plaintext highlighter-rouge">OnStartActions</code> event is invoked, which mainly activates various ambient animations for NPCs and mobs using <code class="language-plaintext highlighter-rouge">MissionActionEntityPerformPowerPrototype</code>.</p>
 
-<p>[<img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-4.png" alt="MissionActionEntityPerformPowerPrototype(/MHServerEmu/assets/blog/progress-report/2024-09/missions-4.png)" /></p>
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-4.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-4.png" alt="MissionActionEntityPerformPowerPrototype" /></a></p>
 
 <p>Each mission has a <code class="language-plaintext highlighter-rouge">MissionState</code> that switches in the following order:</p>
 
@@ -735,7 +743,7 @@
 
 <p><a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-7.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-7.png" alt="Missions Objective State Chart" /></a></p>
 
-<p>Now that we have “figured out” all the difficulties, it’s time to take a look at how it all works in the game in the context of the <em>story</em> mode.</p>
+<p>Now that we have “figured out” all the complexities, it’s time to take a look at how it all works in the game in the context of the <em>story</em> mode.</p>
 
 <h3 id="story">Story</h3>
 
@@ -789,7 +797,7 @@
 
 <h3 id="metagames">MetaGames</h3>
 
-<p>MetaGames are sets of global events for a given region that run on timers. Each MetaGame has a <code class="language-plaintext highlighter-rouge">MetaGameMode</code> and a various <code class="language-plaintext highlighter-rouge">MetaStates</code>. The start of a MetaGame event usually creates a UI widget that looks like this:</p>
+<p>MetaGames are sets of global events for a given region that run on timers. Each MetaGame has a <code class="language-plaintext highlighter-rouge">MetaGameMode</code> and various <code class="language-plaintext highlighter-rouge">MetaStates</code>. The start of a MetaGame event usually creates a UI widget that looks like this:</p>
 
 <center>
 <a href="/MHServerEmu/assets/blog/progress-report/2024-09/missions-14.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-09/missions-14.jpg" alt="MetaGame Widget" /></a>
@@ -840,7 +848,7 @@
   </tbody>
 </table>
 
-<p>As you can see, the story uses only two modes. It also required a number of states: <code class="language-plaintext highlighter-rouge">MetaStateMissionActivate</code>, <code class="language-plaintext highlighter-rouge">MetaStateMissionSequence</code>, <code class="language-plaintext highlighter-rouge">MetaStatePopulationMaintain</code>, and <code class="language-plaintext highlighter-rouge">MetaStateWaveInstance</code>.</p>
+<p>As you can see, the story uses only two modes. It also requires a number of states: <code class="language-plaintext highlighter-rouge">MetaStateMissionActivate</code>, <code class="language-plaintext highlighter-rouge">MetaStateMissionSequence</code>, <code class="language-plaintext highlighter-rouge">MetaStatePopulationMaintain</code>, and <code class="language-plaintext highlighter-rouge">MetaStateWaveInstance</code>.</p>
 
 <p>Here is a full list of all states:</p>
 
@@ -963,11 +971,11 @@
 
 <p>All the information we need for spawning is contained in <code class="language-plaintext highlighter-rouge">PopulationObject</code>, but it needs to be retrieved and processed correctly. Previously I did this manually, which is why everything was static. However, the game requires dynamic spawning.</p>
 
-<p>Here is how it’s done. First, the <code class="language-plaintext highlighter-rouge">SpawnEvent</code> type is determined, which then processes our population by getting all <code class="language-plaintext highlighter-rouge">PopulationObject</code> instances from it. Objects are divided based on their properties by how <em>critical</em> they are for spawning and how <em>bound</em> they are to a location. Critical objects are spawned first, and while we have even a single critical object for a marker, none of the non-critical objects should be spawning (this caused a lot of issues with missions). If there is a <code class="language-plaintext highlighter-rouge">UsePopulationMarker</code> marker, the object is forwarded to a <code class="language-plaintext highlighter-rouge">MarkerScheduler</code>, otherwise it goes to a <code class="language-plaintext highlighter-rouge">LocationScheduler</code>.</p>
+<p>Here is how it’s done. First, the <code class="language-plaintext highlighter-rouge">SpawnEvent</code> type is determined, which then processes our population by getting all <code class="language-plaintext highlighter-rouge">PopulationObject</code> instances from it. Objects are divided based on their properties by how <em>critical</em> they are for spawning and how <em>tied</em> they are to a location. Critical objects are spawned first, and while we have even a single critical object for a marker, none of the non-critical objects should be spawning (this caused a lot of issues with missions). If there is a <code class="language-plaintext highlighter-rouge">UsePopulationMarker</code> marker, the object is forwarded to a <code class="language-plaintext highlighter-rouge">MarkerScheduler</code>, otherwise it goes to a <code class="language-plaintext highlighter-rouge">LocationScheduler</code>.</p>
 
-<p>First, we check if the region has a free marker using <code class="language-plaintext highlighter-rouge">SpawnMarkerRegistry</code>, and if it matches our <code class="language-plaintext highlighter-rouge">SpawnLocation</code>, this marker becomes reserved, and our object spawns on it. The number of markers in a region is limited, which causes problems, because the spawn queue is very large. To solve this issue I have implemented two classes: <code class="language-plaintext highlighter-rouge">PopulationObjectQueue</code> and <code class="language-plaintext highlighter-rouge">SpawnScheduler</code>. They manage the queue and keep everything in order, preventing missions from breaking.</p>
+<p>First, we check if the region has a free marker using <code class="language-plaintext highlighter-rouge">SpawnMarkerRegistry</code>, and if it matches our <code class="language-plaintext highlighter-rouge">SpawnLocation</code>, this marker becomes reserved, and our object spawns on it. The number of markers in a region is limited, which causes problems, because the spawn queue is very large. To solve this issue, I have implemented two classes: <code class="language-plaintext highlighter-rouge">PopulationObjectQueue</code> and <code class="language-plaintext highlighter-rouge">SpawnScheduler</code>. They manage the queue and keep everything in order, preventing missions from breaking.</p>
 
-<p>When all <code class="language-plaintext highlighter-rouge">SpawnEvent</code> objects are spawned, an the <code class="language-plaintext highlighter-rouge">OnSpawnedPopulation()</code> event is invoked, which activates the mission. If the marker is occupied, the required mission objects fail to spawn, and the mission does not activate.</p>
+<p>When all <code class="language-plaintext highlighter-rouge">SpawnEvent</code> objects are spawned, the <code class="language-plaintext highlighter-rouge">OnSpawnedPopulation</code> event is invoked, which activates the mission. If the marker is occupied, the required mission objects fail to spawn, and the mission does not activate.</p>
 
 <p>This chart demonstrates how spawning is planned:</p>
 
