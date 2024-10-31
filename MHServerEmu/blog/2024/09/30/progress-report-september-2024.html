@@ -49,7 +49,9 @@
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <p><img src="/MHServerEmu/assets/blog/progress-report/2024-09/header.jpg" alt="MHServerEmu Progress Report - September 2024" /></p>
+    <!--more-->
+
+<p><img src="/MHServerEmu/assets/blog/progress-report/2024-09/header.jpg" alt="MHServerEmu Progress Report - September 2024" /></p>
 
 <p>You know the drill, it’s progress report time.</p>
 
@@ -193,7 +195,7 @@
 <span class="kt">double</span><span class="p">[]</span> <span class="n">axtbc</span> <span class="p">=</span> <span class="k">new</span> <span class="kt">double</span><span class="p">[</span><span class="m">8</span><span class="p">];</span>
 </code></pre></div></div>
 
-<p>These tests are used extensively in the game for updating the navi system, which can happen millions of times in just a few minutes of playing. Thankfully, this is temporary data that gets thrown away as soon the function finishes, so we can make use of one of the optimization tools available in C# - <code class="language-plaintext highlighter-rouge">Span&lt;T&gt;</code>:</p>
+<p>These tests are used extensively in the game for updating the navi system, and they can cause millions of heap allocations in just a few minutes of playing. Thankfully, this is temporary data that gets thrown away as soon the function finishes, so we can make use of one of the optimization tools available in C# - <code class="language-plaintext highlighter-rouge">Span&lt;T&gt;</code>:</p>
 
 <div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Span</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">&gt;</span> <span class="n">finswap</span> <span class="p">=</span> <span class="k">stackalloc</span> <span class="kt">double</span><span class="p">[</span><span class="m">0</span><span class="p">];</span>
 <span class="n">Span</span><span class="p">&lt;</span><span class="kt">double</span><span class="p">&gt;</span> <span class="n">temp16a</span> <span class="p">=</span> <span class="k">stackalloc</span> <span class="kt">double</span><span class="p">[</span><span class="m">16</span><span class="p">];</span>

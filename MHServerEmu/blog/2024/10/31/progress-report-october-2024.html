@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: October 2024 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: October 2024" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2024/10/31/progress-report-october-2024.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2024/10/31/progress-report-october-2024.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-10-31T17:55:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: October 2024" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-10-31T17:55:00+03:00","datePublished":"2024-10-31T17:55:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: October 2024","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2024/10/31/progress-report-october-2024.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2024/10/31/progress-report-october-2024.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: October 2024</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2024-10-31T17:55:00+03:00" itemprop="datePublished">Oct 31, 2024
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2024-10/header.jpg" alt="MHServerEmu Progress Report - October 2024" /></p>
+
+<p>Time for the spookiest MHServerEmu Progress Report of the year.</p>
+
+<h2 id="loot-continued">Loot Continued</h2>
+
+<p>With most of the obvious low-hanging fruit features taken care of, this month it was time for me to work on a more time-consuming aspect of the game. After discussing this with Alex and some of the community members on our Discord server, I decided to continue iterating on our loot system implementation.</p>
+
+<p>At the start of the month we had loot tables rolling, items dropping, and affixes being picked, but the game’s loot system is much broader than just items. In total there are 12 loot types:</p>
+
+<ul>
+  <li>
+    <p><strong>Item</strong> - should be self-explanatory.</p>
+  </li>
+  <li>
+    <p><strong>Agent</strong> - health, mana, and experience orbs, as well as boons.</p>
+  </li>
+  <li>
+    <p><strong>Credits</strong> - legacy loot type from before currencies were implemented, credit piles are represented by agent entities (more on that later).</p>
+  </li>
+  <li>
+    <p><strong>Experience</strong> - mission experience rewards.</p>
+  </li>
+  <li>
+    <p><strong>Power Points</strong> - extra power points (pre-BUE missions only).</p>
+  </li>
+  <li>
+    <p><strong>Health Bonus</strong> - max health bonuses (pre-BUE missions only).</p>
+  </li>
+  <li>
+    <p><strong>Endurance Bonus</strong> - max primary resource (spirit, etc.) bonuses (pre-BUE missions only).</p>
+  </li>
+  <li>
+    <p><strong>Real Money</strong> - special drop type used only for the <a href="https://web.archive.org/web/20150711031211/https://forums.marvelheroes.com/discussion/216905/marvel-heroes-2015-1-61-patch-notes">Vibranium Ticket promotion</a> in 2015.</p>
+  </li>
+  <li>
+    <p><strong>Callback Nodes</strong> - actions that need to happen when loot is distributed, such as displaying a banner message.</p>
+  </li>
+  <li>
+    <p><strong>Vanity Title</strong> - title unlocks.</p>
+  </li>
+  <li>
+    <p><strong>Vendor XP</strong> - experience for leveling up vendors (this is also how Genosha influence rewards are implemented).</p>
+  </li>
+  <li>
+    <p><strong>Currency</strong> - any non-credits currency that can be represented by either an item or an agent.</p>
+  </li>
+</ul>
+
+<p>Loot can awarded through two types of <em>loot actions</em>: <em>spawning</em> and <em>giving</em>. Spawning creates loot represented in the game world by items and agents for players to pick up, while giving adds everything straight to players’ inventories. Only items, agents, credits, and currency can exist in the game world, everything else goes directly to players, even if the spawn loot action is requested.</p>
+
+<p>Loot that needs to be clicked on to be picked up is represented by the <code class="language-plaintext highlighter-rouge">Item</code> entity class, while things that get picked automatically when you run over them exist as <code class="language-plaintext highlighter-rouge">Agent</code> entity instances. Here is a chart that shows how loot types relate to entity types that represent them:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-10/loot-entity-types.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-10/loot-entity-types.png" alt="Loot Entity Types" /></a>
+</center>
+
+<p>Note that item and agent <em>loot types</em> are different from <code class="language-plaintext highlighter-rouge">Item</code> and <code class="language-plaintext highlighter-rouge">Agent</code> <em>entity types</em>. When loot tables are rolled, and an item or an agent drop node is encountered, the game checks if the entity prototype specified in the node has an <code class="language-plaintext highlighter-rouge">ItemCurrency</code> property defined. If it does, the drop gets designated as a currency loot type, rather than the loot type corresponding its underlying entity type. To add even more confusion to the mix, credits are their own drop type, and they are always represented by <code class="language-plaintext highlighter-rouge">Agent</code> entities. And because things were not hectic enough, <code class="language-plaintext highlighter-rouge">Agent</code> entities representing currencies are referred to as currency <em>items</em> in the game data.</p>
+
+<p>With all of that figured out, we now had non-item drops spawning. The next thing to do was implementing pickups for orb (agent) drops when you run over them.</p>
+
+<p>The obvious approach would have been to use the physics system to detect when avatars overlap with orbs, and do the pickup interaction in the handler for this event. There was a problem though: most orb entities do not have a collision shape defined, meaning they are not capable of overlapping with other world entities. The correct way to do it was to implement the <code class="language-plaintext highlighter-rouge">ProceduralProfileOrbPrototype</code> and do the pickup interaction within the <code class="language-plaintext highlighter-rouge">Think()</code> method. Orbs actually have the <code class="language-plaintext highlighter-rouge">AICustomThinkRateMS</code> property, allowing them to “think” and check distances to potential receipients on every frame, making this interaction more responsive than it would have been with default AI settings.</p>
+
+<p>Here is what the current implementation of <code class="language-plaintext highlighter-rouge">Think()</code> for orbs looks like:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">Think</span><span class="p">(</span><span class="n">AIController</span> <span class="n">ownerController</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">ProceduralAI</span> <span class="n">proceduralAI</span> <span class="p">=</span> <span class="n">ownerController</span><span class="p">.</span><span class="n">Brain</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">proceduralAI</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+    <span class="n">Agent</span> <span class="n">agent</span> <span class="p">=</span> <span class="n">ownerController</span><span class="p">.</span><span class="n">Owner</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">agent</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+    <span class="n">Game</span> <span class="n">game</span> <span class="p">=</span> <span class="n">agent</span><span class="p">.</span><span class="n">Game</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">game</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+    <span class="c1">// Destroy this orb if it has finished shrinking</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ShrinkageDurationMS</span> <span class="p">&gt;</span> <span class="m">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">TimeSpan</span> <span class="n">shrinkageEndTime</span> <span class="p">=</span> <span class="n">agent</span><span class="p">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">PropertyEnum</span><span class="p">.</span><span class="n">AICustomTimeVal1</span><span class="p">]</span> 
+            <span class="p">+</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="nf">FromMilliseconds</span><span class="p">(</span><span class="n">ShrinkageDelayMS</span><span class="p">)</span> 
+            <span class="p">+</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="nf">FromMilliseconds</span><span class="p">(</span><span class="n">ShrinkageDurationMS</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">game</span><span class="p">.</span><span class="n">CurrentTime</span> <span class="p">&gt;=</span> <span class="n">shrinkageEndTime</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">agent</span><span class="p">.</span><span class="nf">Kill</span><span class="p">(</span><span class="k">null</span><span class="p">,</span> <span class="n">KillFlags</span><span class="p">.</span><span class="n">NoDeadEvent</span> <span class="p">|</span> <span class="n">KillFlags</span><span class="p">.</span><span class="n">NoExp</span> <span class="p">|</span> <span class="n">KillFlags</span><span class="p">.</span><span class="n">NoLoot</span><span class="p">);</span>
+            <span class="k">return</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="c1">// Find an avatar that can potentially pick this orb up</span>
+    <span class="n">Avatar</span> <span class="n">avatar</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+
+    <span class="kt">ulong</span> <span class="n">restrictedToPlayerGuid</span> <span class="p">=</span> <span class="n">agent</span><span class="p">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">PropertyEnum</span><span class="p">.</span><span class="n">RestrictedToPlayerGuid</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">restrictedToPlayerGuid</span> <span class="p">!=</span> <span class="m">0</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Player</span> <span class="n">player</span> <span class="p">=</span> <span class="n">game</span><span class="p">.</span><span class="n">EntityManager</span><span class="p">.</span><span class="n">GetEntityByDbGuid</span><span class="p">&lt;</span><span class="n">Player</span><span class="p">&gt;(</span><span class="n">restrictedToPlayerGuid</span><span class="p">);</span>
+        <span class="c1">// Get current avatar for the player we are looking for</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">player</span><span class="p">?.</span><span class="n">CurrentAvatar</span><span class="p">?.</span><span class="n">IsInWorld</span> <span class="p">==</span> <span class="k">true</span><span class="p">)</span>
+            <span class="n">avatar</span> <span class="p">=</span> <span class="n">player</span><span class="p">.</span><span class="n">CurrentAvatar</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="c1">// If we found an avatar, check if it can pick this orb up</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">avatar</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">Vector3</span> <span class="n">agentPosition</span> <span class="p">=</span> <span class="n">agent</span><span class="p">.</span><span class="n">RegionLocation</span><span class="p">.</span><span class="n">Position</span><span class="p">;</span>
+        <span class="n">Vector3</span> <span class="n">avatarPosition</span> <span class="p">=</span> <span class="n">avatar</span><span class="p">.</span><span class="n">RegionLocation</span><span class="p">.</span><span class="n">Position</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">Vector3</span><span class="p">.</span><span class="nf">DistanceSquared2D</span><span class="p">(</span><span class="n">agentPosition</span><span class="p">,</span> <span class="n">avatarPosition</span><span class="p">)</span> <span class="p">&lt;</span> <span class="n">_orbRadiusSquared</span> <span class="p">&amp;&amp;</span> <span class="nf">TryGetPickedUp</span><span class="p">(</span><span class="n">agent</span><span class="p">,</span> <span class="n">avatar</span><span class="p">))</span>
+            <span class="k">return</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The actual pickup interaction happens within <code class="language-plaintext highlighter-rouge">TryGetPickedUp()</code>: this includes applying orb effects, such as adding currency, awarding XP, and activating powers (restoring health/spirit, applying boon buffs, etc.). There is still some additional AI behavior left to implement: health and spirit orbs are supposed to be able to follow avatars that get close enough to them, and some orbs need to be non-instanced and available for all players to pick up. This is something we will be iterating on in the future.</p>
+
+<p>With more varied loot being able to drop and be picked up, it was now time to expand the range of available <em>loot drop event types</em>. Everything so far has been using the four events associated with defeating enemies: <code class="language-plaintext highlighter-rouge">OnKilled</code>, <code class="language-plaintext highlighter-rouge">OnKilledChampion</code>, <code class="language-plaintext highlighter-rouge">OnKilledElite</code>, and <code class="language-plaintext highlighter-rouge">OnKilledMiniBoss</code>. However, for treasure chests it was necessary to implement a separate event type called <code class="language-plaintext highlighter-rouge">OnInteractedWith</code>, which was not possible to trigger without a more in-depth interaction system.</p>
+
+<p>I did not have to go through the trouble of overhauling the entire interaction system: as part of his work on missions, Alex had already done most of the work needed. However, missions are a huge all-encompassing system, and merging the development branch would have been too disruptive at this stage. So instead I went through it and manually ported just the parts that could work on their own, including the new interaction system. There were a few small crashes as a result of this porting process, but they were very quickly dealt with, and implementing treasure chest loot was as easy as adding some function calls in the right place. I also had to do a bit of refactoring to isolate some code from <code class="language-plaintext highlighter-rouge">OnKilled</code> event handlers that could be shared with <code class="language-plaintext highlighter-rouge">OnInteractedWith</code>. With that taken care of, we now have a much more satifying treasure room experience.</p>
+
+<p>The next thing to do became obvious as soon as currency items started dropping: without cooldowns, entire screens were covered with Eternity Splinters, which was obviously not how it was supposed to work. Work on this is still ongoing at the time of writing this, but the iconic six-minute Eternity Splinter timer is now working in nightly builds as it should.</p>
+
+<p>This is just one type of loot cooldowns though. As with almost everything in this game, there are many almost conflicting systems that were piled up on top of one another. For instance, some loot cooldowns can be tied to specific entities rather than drops, like terminal bosses you would get Cube Shards from. Other cooldowns are rollover-based, meaning your loot is gated by specific daily or weekly reset times rather than amount of time since your last drop. Untangling all of this is going to take some time, which is what I am going to be continuing to work on next month.</p>
+
+<h2 id="lets-get-dangerous">Let’s Get Dangerous</h2>
+
+<p><em>Alex has some details to share on what he has been working on in October.</em></p>
+
+<hr />
+
+<p>Hello everyone, this is AlexBond. In this report I would like to <del>overwhelm you with code</del> talk about how the <code class="language-plaintext highlighter-rouge">SpawnMap</code> class works, how <em>Legendary Missions</em> are rolled, and how I got into the <em>Danger Room</em>.</p>
+
+<h3 id="spawnmap">SpawnMap</h3>
+
+<p><code class="language-plaintext highlighter-rouge">AreaPrototype</code> contains various population parameters, and some of them have a <code class="language-plaintext highlighter-rouge">SpawnMap</code> prefix. We used to ignore them, but now we took advantage of them to implement an additional spawning system.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-10/alex-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-10/alex-1.png" alt="AlexBond 1" /></a></p>
+
+<p>A <code class="language-plaintext highlighter-rouge">SpawnMap</code> (also referred to as a <code class="language-plaintext highlighter-rouge">HeatMap</code>) is like a bitmap image with a resolution of 256x256, in which each “pixel” represents a byte of information of type <code class="language-plaintext highlighter-rouge">HeatData</code>. The contained “heat” is transferred to clusters of mobs for spawning.</p>
+
+<p>When we initialize this class, we iterate over all coordinates within our area to determine walkable sections using the navi system.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">y</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">y</span> <span class="p">&lt;</span> <span class="n">_boundsY</span><span class="p">;</span> <span class="n">y</span><span class="p">++)</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">x</span> <span class="p">&lt;</span> <span class="n">_boundsX</span><span class="p">;</span> <span class="n">x</span><span class="p">++)</span>
+    <span class="p">{</span>
+        <span class="n">Vector3</span> <span class="n">position</span> <span class="p">=</span> <span class="n">center</span> <span class="p">+</span> <span class="k">new</span> <span class="nf">Vector3</span><span class="p">(</span><span class="n">Resolution</span> <span class="p">*</span> <span class="n">x</span><span class="p">,</span> <span class="n">Resolution</span> <span class="p">*</span> <span class="n">y</span><span class="p">,</span> <span class="m">0.0f</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">navi</span><span class="p">.</span><span class="nf">Contains</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">spawnRadius</span><span class="p">,</span> <span class="k">new</span> <span class="nf">WalkPathFlagsCheck</span><span class="p">()))</span>
+        <span class="p">{</span>
+            <span class="n">_heatMap</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="p">=</span> <span class="n">HeatData</span><span class="p">.</span><span class="n">Min</span><span class="p">;</span>
+            <span class="n">_spawnZone</span><span class="p">++;</span>
+        <span class="p">}</span>
+        <span class="n">index</span><span class="p">++;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Using the <code class="language-plaintext highlighter-rouge">spawnZone</code> parameter, we calculate the heat density of the population that is going to be spawned. This density is then applied to our <code class="language-plaintext highlighter-rouge">SpawnMap</code> instance.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Add heat to HeatMap</span>
+<span class="n">_pool</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">index</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">index</span> <span class="p">&lt;</span> <span class="n">_heatMap</span><span class="p">.</span><span class="n">Length</span><span class="p">;</span> <span class="n">index</span><span class="p">++)</span>
+<span class="p">{</span>
+    <span class="n">HeatData</span> <span class="n">heatData</span> <span class="p">=</span> <span class="n">_heatMap</span><span class="p">[</span><span class="n">index</span><span class="p">];</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nf">HasFlags</span><span class="p">(</span><span class="n">heatData</span><span class="p">))</span> <span class="k">continue</span><span class="p">;</span>
+
+    <span class="kt">int</span> <span class="n">heat</span> <span class="p">=</span> <span class="nf">GetHeat</span><span class="p">(</span><span class="n">heatData</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">heat</span> <span class="p">+</span> <span class="n">_heatBase</span> <span class="p">&lt;</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">HeatData</span><span class="p">.</span><span class="n">Max</span><span class="p">)</span>
+        <span class="n">_heatMap</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="p">=</span> <span class="p">(</span><span class="n">HeatData</span><span class="p">)(</span><span class="n">heat</span> <span class="p">+</span> <span class="n">_heatBase</span><span class="p">);</span>
+    <span class="k">else</span>
+        <span class="n">_pool</span> <span class="p">+=</span> <span class="n">_heatBase</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The surplus heat is transferred to a <em>pool</em>, and at intervals defined by the <code class="language-plaintext highlighter-rouge">SpawnMapPoolTickMS</code> parameter we attempt to bring back the heat from the pool to the map.</p>
+
+<p>Because <code class="language-plaintext highlighter-rouge">SpawnMap</code> instances update every time a player moves, they require some additional optimizations. To reduce server load, only areas around players defined by <code class="language-plaintext highlighter-rouge">SpawnGimbal</code> instances are populated.</p>
+
+<p>A <code class="language-plaintext highlighter-rouge">SpawnGimbal</code> is a sort of shifting area that has already been checked, in which a player is located. This system allows us to significantly reduce server load for processing areas that have already been populated.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">UpdateSpawnMap</span><span class="p">(</span><span class="n">Vector3</span> <span class="n">position</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="n">Region</span> <span class="n">region</span> <span class="p">=</span> <span class="nf">GetRegion</span><span class="p">();</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">region</span> <span class="p">==</span> <span class="k">null</span> <span class="p">||</span> <span class="n">_spawnGimbal</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_spawnGimbal</span><span class="p">.</span><span class="nf">ProjectGimbalPosition</span><span class="p">(</span><span class="n">region</span><span class="p">.</span><span class="n">Aabb</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="k">out</span> <span class="n">Point2</span> <span class="n">coord</span><span class="p">)</span> <span class="p">==</span> <span class="k">false</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_spawnGimbal</span><span class="p">.</span><span class="n">Coord</span> <span class="p">==</span> <span class="n">coord</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+    <span class="kt">bool</span> <span class="n">inGimbal</span> <span class="p">=</span> <span class="n">_spawnGimbal</span><span class="p">.</span><span class="nf">InGimbal</span><span class="p">(</span><span class="n">coord</span><span class="p">);</span>
+    <span class="n">_spawnGimbal</span><span class="p">.</span><span class="nf">UpdateGimbal</span><span class="p">(</span><span class="n">coord</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">inGimbal</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+    <span class="n">Aabb</span> <span class="n">volume</span> <span class="p">=</span> <span class="n">_spawnGimbal</span><span class="p">.</span><span class="nf">HorizonVolume</span><span class="p">(</span><span class="n">position</span><span class="p">);</span>
+    <span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">area</span> <span class="k">in</span> <span class="n">region</span><span class="p">.</span><span class="nf">IterateAreas</span><span class="p">(</span><span class="n">volume</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">area</span><span class="p">.</span><span class="n">SpawnMap</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
+            <span class="n">area</span><span class="p">.</span><span class="n">PopulationArea</span><span class="p">?.</span><span class="nf">UpdateSpawnMap</span><span class="p">(</span><span class="n">position</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>There is a trade-off though: when a player moves at high speed, groups of enemies can spawn right at their position, but this behavior is accurate to the original game. The reason for these delays is that spawning takes at least 500 ms, which is not enough for enemies to spawn ahead of time. We can reduce this number, but then it would take longer to wait a spawn to happen.</p>
+
+<p>When <code class="language-plaintext highlighter-rouge">UpdateHeatMap()</code> is called, the related population is spawned in “hot spots”. These spots are projected to the <code class="language-plaintext highlighter-rouge">HeatMap</code>, and the heat is subtracted from those points, along with neighboring points within a certain radius. This frees up space for a group of mobs represented by a <code class="language-plaintext highlighter-rouge">ClusterObject</code>, and allows us to spread the population evenly.</p>
+
+<p>Clusters may contain special <code class="language-plaintext highlighter-rouge">BlackOutZone</code> objects that prevent spawning from happening. We take these objects into account by transferring heat from their locations into the common pool.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">index</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+<span class="kt">int</span> <span class="n">spawnZone</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">y</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">y</span> <span class="p">&lt;</span> <span class="n">_boundsY</span><span class="p">;</span> <span class="n">y</span><span class="p">++)</span>
+<span class="p">{</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">x</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">x</span> <span class="p">&lt;</span> <span class="n">_boundsX</span><span class="p">;</span> <span class="n">x</span><span class="p">++)</span>
+    <span class="p">{</span>
+        <span class="n">_heatMap</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="p">&amp;=</span> <span class="p">~</span><span class="n">HeatData</span><span class="p">.</span><span class="n">BlackOut</span><span class="p">;</span>
+
+        <span class="n">Vector3</span> <span class="n">position</span> <span class="p">=</span> <span class="n">center</span> <span class="p">+</span> <span class="k">new</span> <span class="nf">Vector3</span><span class="p">(</span><span class="n">Resolution</span> <span class="p">*</span> <span class="n">x</span><span class="p">,</span> <span class="n">Resolution</span> <span class="p">*</span> <span class="n">y</span><span class="p">,</span> <span class="m">0.0f</span><span class="p">);</span>
+        <span class="k">foreach</span> <span class="p">(</span><span class="n">BlackOutZone</span> <span class="n">zone</span> <span class="k">in</span> <span class="n">zones</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="kt">float</span> <span class="n">radiusSq</span> <span class="p">=</span> <span class="n">MathHelper</span><span class="p">.</span><span class="nf">Square</span><span class="p">(</span><span class="n">zone</span><span class="p">.</span><span class="n">Sphere</span><span class="p">.</span><span class="n">Radius</span><span class="p">);</span>
+            <span class="kt">float</span> <span class="n">distanceSq</span> <span class="p">=</span> <span class="n">Vector3</span><span class="p">.</span><span class="nf">DistanceSquared2D</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">zone</span><span class="p">.</span><span class="n">Sphere</span><span class="p">.</span><span class="n">Center</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">distanceSq</span> <span class="p">&lt;</span> <span class="n">radiusSq</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="kt">int</span> <span class="n">heat</span> <span class="p">=</span> <span class="nf">GetHeat</span><span class="p">(</span><span class="n">_heatMap</span><span class="p">[</span><span class="n">index</span><span class="p">]);</span>
+                <span class="n">_heatMap</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="p">=</span> <span class="p">(</span><span class="n">_heatMap</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="p">&amp;</span> <span class="n">HeatData</span><span class="p">.</span><span class="n">FlagMask</span><span class="p">)</span> <span class="p">|</span> <span class="n">HeatData</span><span class="p">.</span><span class="n">BlackOut</span><span class="p">;</span>
+                <span class="nf">PoolHeat</span><span class="p">(</span><span class="n">heat</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="nf">HasFlags</span><span class="p">(</span><span class="n">_heatMap</span><span class="p">[</span><span class="n">index</span><span class="p">])</span> <span class="p">==</span> <span class="k">false</span><span class="p">)</span> <span class="n">spawnZone</span><span class="p">++;</span>
+        <span class="n">index</span><span class="p">++;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>When a group of enemies is fully destroyed, the heat they took is returned to the common pool. This gives regions an endless lifespan, which is crucial for public regions.  This way newly arriving players will encounter a living world, rather than a wasteland from past battles. Ensuring this is the primary function of the <code class="language-plaintext highlighter-rouge">SpawnMap</code> class.</p>
+
+<p>As you can see, there are numerous different systems for spawning: <code class="language-plaintext highlighter-rouge">PopulationArea</code>, <code class="language-plaintext highlighter-rouge">RespawnDestructibles</code>, <code class="language-plaintext highlighter-rouge">MetaGame</code>, <code class="language-plaintext highlighter-rouge">Mission</code>, <code class="language-plaintext highlighter-rouge">SpawnMap</code>, <code class="language-plaintext highlighter-rouge">Spawner</code>, and more. Here is a recap of what they are all for:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">PopulationArea</code> populates regions without using markers.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">RespawnDestructibles</code> allows props, such as cars and garbage cans, to be restored.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">MetaGame</code> populates regions with timer-based events or waves.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">Mission</code> spawns in response to event triggers.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">SpawnMap</code> prevents regions from becoming barren wastelands.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">Spawner</code> can activate when a player enters its radius, or via some other kind of trigger.</p>
+  </li>
+</ul>
+
+<p>In other words, dynamic spawning makes the game more alive. Now let’s take a look at legendary missions.</p>
+
+<h3 id="legendary-missions">Legendary Missions</h3>
+
+<p>This game has a lot of activities: in addition to the story, region events, and terminal bounties, there are also Legendary Missions, Daily Missions, Shared Quests, Omega Missions, and Weekly Missions. So how does it all work?</p>
+
+<p>When a player enters a region, their <code class="language-plaintext highlighter-rouge">MissionManager</code> runs <code class="language-plaintext highlighter-rouge">InitializeForPlayer()</code> and does a number of random picks.</p>
+
+<p>First it picks <em>categories</em> through <code class="language-plaintext highlighter-rouge">LegendaryMissionCategoryPicker</code>, and then for each category it picks a random mission using <code class="language-plaintext highlighter-rouge">PickLegendaryMissionForCategory()</code>. At first it seems simple enough, but there is a catch.</p>
+
+<p>For example, a mission was picked, and we don’t like it. What do we do in this case? That’s right, we reroll it with credits!</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-10/alex-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-10/alex-2.png" alt="AlexBond 6" /></a>
+</center>
+
+<p>In this case the current mission must be added to a <code class="language-plaintext highlighter-rouge">LegendaryMissionBlacklist</code>, and we should receive a new one. This is also used when we complete a mission, so that we don’t get the same one multiple times in a row. But what happens when all missions get blacklisted? In this case we need a second round of picking.</p>
+
+<p>This is what the code looks like. Confusing, isn’t it?</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="n">PrototypeId</span> <span class="nf">PickLegendaryMission</span><span class="p">()</span>
+<span class="p">{</span> 
+    <span class="n">PrototypeId</span> <span class="n">pickedMissionRef</span> <span class="p">=</span> <span class="n">PrototypeId</span><span class="p">.</span><span class="n">Invalid</span><span class="p">;</span>
+
+    <span class="n">Picker</span><span class="p">&lt;</span><span class="n">LegendaryMissionCategoryPrototype</span><span class="p">&gt;</span> <span class="n">picker</span> <span class="p">=</span> <span class="nf">LegendaryMissionCategoryPicker</span><span class="p">();</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">picker</span><span class="p">.</span><span class="nf">PickRemove</span><span class="p">(</span><span class="k">out</span> <span class="n">LegendaryMissionCategoryPrototype</span> <span class="n">categoryProto</span><span class="p">))</span>
+    <span class="p">{</span>
+        <span class="n">List</span><span class="p">&lt;</span><span class="n">PrototypeGuid</span><span class="p">&gt;</span> <span class="n">blacklist</span> <span class="p">=</span> <span class="k">null</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">categoryProto</span><span class="p">.</span><span class="n">BlacklistLength</span> <span class="p">&gt;</span> <span class="m">0</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">PrototypeGuid</span> <span class="n">guid</span> <span class="p">=</span> <span class="n">GameDatabase</span><span class="p">.</span><span class="nf">GetPrototypeGuid</span><span class="p">(</span><span class="n">categoryProto</span><span class="p">.</span><span class="n">DataRef</span><span class="p">);</span>
+            <span class="n">_legendaryMissionBlacklist</span><span class="p">.</span><span class="nf">TryGetValue</span><span class="p">(</span><span class="n">guid</span><span class="p">,</span> <span class="k">out</span> <span class="n">blacklist</span><span class="p">);</span>
+        <span class="p">}</span>
+        <span class="n">pickedMissionRef</span> <span class="p">=</span> <span class="nf">PickLegendaryMissionForCategory</span><span class="p">(</span><span class="n">categoryProto</span><span class="p">,</span> <span class="n">blacklist</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">pickedMissionRef</span> <span class="p">!=</span> <span class="n">PrototypeId</span><span class="p">.</span><span class="n">Invalid</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">pickedMissionRef</span> <span class="p">==</span> <span class="n">PrototypeId</span><span class="p">.</span><span class="n">Invalid</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">picker</span> <span class="p">=</span> <span class="nf">LegendaryMissionCategoryPicker</span><span class="p">();</span>
+        <span class="k">while</span> <span class="p">(</span><span class="n">picker</span><span class="p">.</span><span class="nf">PickRemove</span><span class="p">(</span><span class="n">LegendaryMissionCategoryPrototype</span> <span class="kt">var</span> <span class="n">categoryProto</span><span class="p">))</span>
+        <span class="p">{</span>
+            <span class="n">pickedMissionRef</span> <span class="p">=</span> <span class="nf">PickLegendaryMissionForCategory</span><span class="p">(</span><span class="n">categoryProto</span><span class="p">,</span> <span class="k">null</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">pickedMissionRef</span> <span class="p">!=</span> <span class="n">PrototypeId</span><span class="p">.</span><span class="n">Invalid</span><span class="p">)</span> <span class="k">break</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">pickedMissionRef</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>When picking Legendary Missions, one thing that needs to be taken into account is its restriction defined using the <code class="language-plaintext highlighter-rouge">EvalCanStart</code> eval. It uses the same formula for all Legendary Missions that looks like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>EvalCanStart = ( ( CharacterLevelProp &gt; 19 ) &amp;&amp; ( CharacterLevelProp &lt; 61 ) )
+</code></pre></div></div>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-10/alex-3.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-10/alex-3.png" alt="AlexBond 3" /></a></p>
+
+<p>This ensures that Legendary Missions are unavailable until level 20. However, the game designers did not define separate formulas for each mission, which is why I would get Legendary Missions for chapter 9 at level 20. I wanted to do them as I went through the story, so I had to spend all my credits on rerolling!</p>
+
+<p>In addition to Legendary Missions there are also <em>Daily Missions</em>, and they use a different picking method.</p>
+
+<p>First, the current <code class="language-plaintext highlighter-rouge">CalendarDay</code> is determined, and if it’s larger than the last recorded day, daily missions get rerolled.</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="n">calendarDay</span> <span class="p">=</span> <span class="nf">CalendarDay</span><span class="p">();</span>
+<span class="kt">int</span> <span class="n">lastDailyDay</span> <span class="p">=</span> <span class="n">Player</span><span class="p">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">PropertyEnum</span><span class="p">.</span><span class="n">LastDailyMissionCalendarDay</span><span class="p">];</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">lastDailyDay</span> <span class="p">&lt;</span> <span class="n">calendarDay</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="nf">ResetDailyMissions</span><span class="p">(</span><span class="n">calendarDay</span><span class="p">,</span> <span class="n">lastDailyDay</span><span class="p">);</span>
+    <span class="nf">RollDailyMissions</span><span class="p">();</span>
+    <span class="n">Player</span><span class="p">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">PropertyEnum</span><span class="p">.</span><span class="n">LastDailyMissionCalendarDay</span><span class="p">]</span> <span class="p">=</span> <span class="n">calendarDay</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>As part of the reroll process, the current day of the week is determined, and missions for this day are activated.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-10/alex-4.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-10/alex-4.jpg" alt="AlexBond 4" /></a></p>
+
+<p>The same happens for <em>Advanced Missions</em>, but with blacklists and two picking passes, similar to Legendary Missions.</p>
+
+<p>But what happens if someone plays at night and waits for the daily reset at midnight? In this case we need a clock: events scheduled using <code class="language-plaintext highlighter-rouge">ScheduleDailyMissionUpdate()</code> check every second whether the current day ended, like a second hand on a clock.</p>
+
+<p>With this taken care of, let’s move onto another fun activity.</p>
+
+<h3 id="danger-room">Danger Room</h3>
+
+<p>The main difficulty with implementing the <em>Danger Room</em> mode is regenerating the same region with different input data.</p>
+
+<p>Here is what the insides of a generator prototype for such region look like:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-10/alex-5.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-10/alex-5.png" alt="AlexBond 5" /></a></p>
+
+<p>The current mode is chosen based on the <code class="language-plaintext highlighter-rouge">EndlessLevel</code> parameter like this:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">EndlessThemeEntryPrototype</span> <span class="nf">GetEndlessGeneration</span><span class="p">(</span><span class="kt">int</span> <span class="n">randomSeed</span><span class="p">,</span> <span class="kt">int</span> <span class="n">endlessLevel</span><span class="p">,</span> <span class="kt">int</span> <span class="n">endlessLevelsTotal</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">EndlessThemes</span> <span class="p">==</span> <span class="k">null</span> <span class="p">||</span> <span class="n">endlessLevel</span> <span class="p">&lt;=</span> <span class="m">0</span> <span class="p">||</span> <span class="n">endlessLevelsTotal</span> <span class="p">&lt;=</span> <span class="m">0</span><span class="p">)</span> <span class="k">return</span> <span class="k">null</span><span class="p">;</span>
+
+    <span class="kt">int</span> <span class="n">totalThemes</span> <span class="p">=</span> <span class="n">EndlessThemes</span><span class="p">.</span><span class="n">Length</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">randomIndex</span> <span class="p">=</span> <span class="n">randomSeed</span> <span class="p">%</span> <span class="n">totalThemes</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">endlessOffset</span> <span class="p">=</span> <span class="p">(</span><span class="n">endlessLevel</span> <span class="p">-</span> <span class="m">1</span><span class="p">)</span> <span class="p">/</span> <span class="n">endlessLevelsTotal</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">selectedIndex</span> <span class="p">=</span> <span class="p">(</span><span class="n">randomIndex</span> <span class="p">+</span> <span class="n">endlessOffset</span><span class="p">)</span> <span class="p">%</span> <span class="n">totalThemes</span><span class="p">;</span>
+
+    <span class="n">EndlessThemePrototype</span> <span class="n">EndlessTheme</span> <span class="p">=</span> <span class="n">EndlessThemes</span><span class="p">[</span><span class="n">selectedIndex</span><span class="p">];</span>
+    <span class="kt">int</span> <span class="n">levelInTheme</span> <span class="p">=</span> <span class="n">endlessLevel</span> <span class="p">%</span> <span class="n">endlessLevelsTotal</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">levelInTheme</span> <span class="p">==</span> <span class="m">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">EndlessTheme</span><span class="p">.</span><span class="n">TreasureRoom</span><span class="p">;</span>
+    <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">levelInTheme</span> <span class="p">==</span> <span class="n">endlessLevelsTotal</span> <span class="p">-</span> <span class="m">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">EndlessTheme</span><span class="p">.</span><span class="n">Boss</span><span class="p">;</span>
+    <span class="k">else</span>
+        <span class="k">return</span> <span class="n">EndlessTheme</span><span class="p">.</span><span class="n">Normal</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>For the initial region <code class="language-plaintext highlighter-rouge">EndlessLevel = 1</code>, so this function will return the <code class="language-plaintext highlighter-rouge">Normal</code> mode.</p>
+
+<p>Next, in the <code class="language-plaintext highlighter-rouge">Normal</code> mode a random <code class="language-plaintext highlighter-rouge">Entry</code> is picked from <code class="language-plaintext highlighter-rouge">Challenges</code>, and a mission approprite for our difficulty <code class="language-plaintext highlighter-rouge">Tier</code> is started.</p>
+
+<p>The transfer of all of these settings and affixes from a <code class="language-plaintext highlighter-rouge">DangerRoomScenario</code> item to a region goes through the following sequence:</p>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">DangerRoomScenario</code> – <code class="language-plaintext highlighter-rouge">Transition</code> – <code class="language-plaintext highlighter-rouge">RegionContext</code> – <code class="language-plaintext highlighter-rouge">RegionSettings</code> – <code class="language-plaintext highlighter-rouge">Region</code></p>
+</blockquote>
+
+<p>When the first <code class="language-plaintext highlighter-rouge">EndlessLevel</code> is cleared, it is incremented by one, and the settings sequence looks like this:</p>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">OldRegion</code> - <code class="language-plaintext highlighter-rouge">RegionContext</code> - <code class="language-plaintext highlighter-rouge">RegionSettings</code> - <code class="language-plaintext highlighter-rouge">Region</code></p>
+</blockquote>
+
+<p>All of these settings make the region transfer more complex. But there is more.</p>
+
+<p>When a Danger Room mission is cleared, the client needs to receive an invitation to move to the next level. It looks like this:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-10/alex-6.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-10/alex-6.jpg" alt="AlexBond 6" /></a>
+</center>
+
+<p>Implementing it was not easy at all. To create this dialog, we needed to implement a lot of classes, and the result is almost as complex as <code class="language-plaintext highlighter-rouge">CreateDialogA</code> in the Windows API:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="k">void</span> <span class="nf">CreateDialog</span><span class="p">(</span><span class="kt">ulong</span> <span class="n">playerGuid</span><span class="p">,</span> <span class="n">DialogPrototype</span> <span class="n">dialogProto</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">_dialogs</span><span class="p">.</span><span class="nf">TryGetValue</span><span class="p">(</span><span class="n">playerGuid</span><span class="p">,</span> <span class="k">out</span> <span class="n">GameDialogInstance</span> <span class="n">dialog</span><span class="p">)</span> <span class="p">==</span> <span class="k">false</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">dialog</span> <span class="p">=</span> <span class="n">Game</span><span class="p">.</span><span class="n">GameDialogManager</span><span class="p">.</span><span class="nf">CreateInstance</span><span class="p">(</span><span class="n">playerGuid</span><span class="p">);</span>
+        <span class="n">dialog</span><span class="p">.</span><span class="n">OnResponse</span> <span class="p">=</span> <span class="n">_onResponseAction</span><span class="p">;</span>
+        <span class="n">dialog</span><span class="p">.</span><span class="n">Message</span><span class="p">.</span><span class="n">LocaleString</span> <span class="p">=</span> <span class="n">dialogProto</span><span class="p">.</span><span class="n">Text</span><span class="p">;</span>
+        <span class="n">dialog</span><span class="p">.</span><span class="n">Options</span> <span class="p">=</span> <span class="n">DialogOptionEnum</span><span class="p">.</span><span class="n">ScreenBottom</span><span class="p">;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">dialogProto</span><span class="p">.</span><span class="n">Button1</span> <span class="p">!=</span> <span class="n">LocaleStringId</span><span class="p">.</span><span class="n">Blank</span><span class="p">)</span>
+            <span class="n">dialog</span><span class="p">.</span><span class="nf">AddButton</span><span class="p">(</span><span class="n">GameDialogResultEnum</span><span class="p">.</span><span class="n">eGDR_Option1</span><span class="p">,</span> <span class="n">dialogProto</span><span class="p">.</span><span class="n">Button1</span><span class="p">,</span> <span class="n">dialogProto</span><span class="p">.</span><span class="n">Button1Style</span><span class="p">);</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">dialogProto</span><span class="p">.</span><span class="n">Button2</span> <span class="p">!=</span> <span class="n">LocaleStringId</span><span class="p">.</span><span class="n">Blank</span><span class="p">)</span>
+            <span class="n">dialog</span><span class="p">.</span><span class="nf">AddButton</span><span class="p">(</span><span class="n">GameDialogResultEnum</span><span class="p">.</span><span class="n">eGDR_Option2</span><span class="p">,</span> <span class="n">dialogProto</span><span class="p">.</span><span class="n">Button2</span><span class="p">,</span> <span class="n">dialogProto</span><span class="p">.</span><span class="n">Button2Style</span><span class="p">);</span>
+
+        <span class="n">_dialogs</span><span class="p">.</span><span class="nf">Add</span><span class="p">(</span><span class="n">playerGuid</span><span class="p">,</span> <span class="n">dialog</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">dialog</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
+        <span class="n">Game</span><span class="p">.</span><span class="n">GameDialogManager</span><span class="p">.</span><span class="nf">ShowDialog</span><span class="p">(</span><span class="n">dialog</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Here is how it works: finishing a mission initiates <code class="language-plaintext highlighter-rouge">MetaStateShutdown</code> and creates a dialog that is relayed to the client through <code class="language-plaintext highlighter-rouge">NetMessagePostDialogToClient</code>. The player presses the dialog button, and the client responds with <code class="language-plaintext highlighter-rouge">NetMessageDialogResult</code> that triggers the <code class="language-plaintext highlighter-rouge">OnDialogResult()</code> event on the server. <code class="language-plaintext highlighter-rouge">OnDialogResult()</code> calls <code class="language-plaintext highlighter-rouge">MetaStateShutdown.OnResponse()</code> that teleports the player to the next <code class="language-plaintext highlighter-rouge">EndlessLevel</code> region.</p>
+
+<p>As you can see, a simple button has a not-so-simple implementation. And there is also a case for when there are multiple players in a party, and each one has to confirm for a teleport to happen.</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2024-10/alex-7.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-10/alex-7.jpg" alt="AlexBond 7" /></a>
+</center>
+
+<p>To get the mode to a feature-complete state we still have timer widgets to implement with three <code class="language-plaintext highlighter-rouge">MetaStateScoringEventTimer</code> states: <code class="language-plaintext highlighter-rouge">Start</code>, <code class="language-plaintext highlighter-rouge">Stop</code>, and <code class="language-plaintext highlighter-rouge">End</code>. However, even at this stage Danger Room regions can be completed without any significant issues.</p>
+
+<p>Now you should have a better idea about what I have been working on this month. There is still a lot more work to do, see you in future reports!</p>
+
+<hr />
+
+<p>That’s all we have for you today. See you next month!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2024/10/31/progress-report-october-2024.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>
