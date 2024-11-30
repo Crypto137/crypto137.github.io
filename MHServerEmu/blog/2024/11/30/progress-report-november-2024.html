@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: November 2024 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: November 2024" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2024/11/30/progress-report-november-2024.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2024/11/30/progress-report-november-2024.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-11-30T14:00:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: November 2024" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-11-30T14:00:00+03:00","datePublished":"2024-11-30T14:00:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: November 2024","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2024/11/30/progress-report-november-2024.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2024/11/30/progress-report-november-2024.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: November 2024</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2024-11-30T14:00:00+03:00" itemprop="datePublished">Nov 30, 2024
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2024-11/header.jpg" alt="MHServerEmu Progress Report - November 2024" /></p>
+
+<p>Progress Report is back yet again to bring you all the latest updates on the development of MHServerEmu.</p>
+
+<h2 id="040-and-beyond">0.4.0 and Beyond</h2>
+
+<p>As I am writing this report, we are putting the finishing touches on the fourth stable release of MHServerEmu: version 0.4.0. The highlights of this release include all the loot updates we have done over the last three months, as well as a feature-complete implementation of the mission system that has been in the works since July. 0.4.0 will be released during the first week of December, before a certain event on the 6th that will hold the attention of many ARPG fans, including myself. Sorry if there will be limited updates next month!</p>
+
+<p>While most of the updates in 0.4.0 focus on restoring features that give you reasons to play the game in the long term, for the next stable version I plan to focus on the long-awaited improvements to the moment-to-moment feel of the game, most of which require implementing additional power subsystems. I cannot give you an in-depth list of what is going to make it into 0.5.0 right now, but the first thing I am going to work on will be <em>conditions</em>, which is the term the game uses to refer to various buff and debuff effects. In addition to the obvious benefit of being able to apply various bonuses and penalties, this system is also important because enemy AI relies on some of the status effects applied by conditions to make decisions, such as moving around or using powers. Not having the right conditions can cause various issues, including client-server desynchronization when fighting teleporting bosses like Living Laser and MODOK, or Bullseye being able to run around while he is charging his instant kill attack.</p>
+
+<p>In addition to this, Alex and Kawaikikinou have started working on implementing the achievement system. Unfortunately, this may take a little longer than expected: while most of the game data is mirrored to the client, the achievement system is implemented in a way that allowed the developers to modify achievement data without patching the client. The client receives a dump of the server’s achievement database when you log in, and we have a copy of such dump we extracted from packet captures, but the data the client receives is incomplete. There is enough information to reconstruct the missing data by cross-referencing localized text with prototype file names, but this is a pretty laborious and mostly manual process that is going to take some time.</p>
+
+<p>We will talk more about 0.5.0 features in future reports as we get them working.</p>
+
+<h2 id="vendors">Vendors</h2>
+
+<p>One extra feature I was able to sneak into 0.4.0 is <em>vendors</em>. Previously it was already possible to sell items to vendors, but now you can also buy items using all sorts of currencies (including buying back the items you sold for credits), as well as level up vendors by donating items or completing influence missions.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-11/vendors.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-11/vendors.jpg" alt="Vendors" /></a></p>
+
+<p>As with many other systems in this game, there is a lot of smoke and mirrors to sell you (no pun intended) the illusion of buying items from NPCs in the game world, but the reality is much more self-centered. Items sold by various vendors are actually contained in inventories belonging to the <code class="language-plaintext highlighter-rouge">Player</code> entity, which represents your account data. When you interact with a vendor NPC, all the items available for sale technically already belong to you, and the cost you pay to purchase them is to move them from one inventory to another. The same is true for buyback: when you sell an item, you get credits for moving it from your general inventory to your buyback inventory. The buyback inventory is not persistent, so it resets when you transition to another region. Some items are flagged as <code class="language-plaintext highlighter-rouge">ClonedWhenPurchasedFromVendor</code>, which means purchasing them creates a duplicate that gets put into your inventory.</p>
+
+<p>But where do these items actually come from? When you press the refresh button or level up a vendor, the game rolls four vendor-related properties that exist and get saved as part of your <code class="language-plaintext highlighter-rouge">Player</code> entity: <code class="language-plaintext highlighter-rouge">VendorRollAvatar</code>, <code class="language-plaintext highlighter-rouge">VendorRollLevel</code>, <code class="language-plaintext highlighter-rouge">VendorRollSeed</code>, and <code class="language-plaintext highlighter-rouge">VendorRollTableLevel</code>. The values of these properties are used as input settings for rolling the loot tables associated with the <em>vendor type</em> you refreshed or leveled up. Each vendor type contains one or more inventories, which are initially empty. When you interact with an NPC that has a <code class="language-plaintext highlighter-rouge">VendorType</code> property referring to a vendor type prototype, the game uses the previously determined input settings to roll the loot table and create the items this vendor is supposed to be selling. Because the loot table rolling algorithm is deterministic and all the input settings remain the same, you get the same items every time. The game tracks inventory slots the contain the items you have already purchased and filters them out the next time the loot table is rolled.</p>
+
+<p>The prices displayed in the vendor panel are calculated by the client in parallel to the server, and this has been a major source of frustration. I have checked everything multiple times and calculated the formulas by hand for various input parameters, and no matter how you look at it, there are what appears to be pretty massive rounding errors happening client-side when calculating prices in credits. Unfortunately, I have not been able to find a way to replicate this behavior server-side yet, so for the time being the prices items are being bought and sold for will be slightly off. This affects only prices in credits as far as I can tell, and buy prices are affected more than sell prices, most likely due to the difference in coefficients used for calculating them.</p>
+
+<p>With vendors implemented there is one side effect you can see: crafter NPCs now have their recipe lists populated and can also be leveled up. This is because crafters share their backend with vendors: every recipe is actually an item that is stored in the player’s inventory associated with a specific crafter type. “Items” representing recipes that unlock by leveling up your crafters are rolled using loot tables, same as items sold by regular vendors. As for recipes you can learn by using consumable items, they are stored separately in a special inventory called <code class="language-plaintext highlighter-rouge">PlayerCraftingRecipesLearned</code>. After a crafter’s recipe list is rolled, additional recipes contained in the <code class="language-plaintext highlighter-rouge">PlayerCraftingRecipesLearned</code> are duplicated and appended to the list. Please note that while you can level up your crafters in the current work-in-progress server builds, you cannot craft any recipes or learn new ones from consumable items.</p>
+
+<p>Special vendor types, including Eternity Splinter and Odin Mark vendors, also work now, meaning you now have access to additional content, like the Classified Bovine Sector and Bovineheim portals you can purchase from Eternity Splinter vendors, as well as legendary items you can buy with Odin Marks. I have also put in some additional work to get legendary item leveling working. With all of this you should have plenty of medium-term goals to work towards while we work on restoring other features of the game.</p>
+
+<h2 id="map-rotation">Map Rotation</h2>
+
+<p>In this section I would like to talk about not a flashy new feature, but rather a frustrating bug that I have spent way too much time on than I probably should have.</p>
+
+<p>First, let’s establish the background. Entities that can have a location in the game world are called <em>world entities</em>. A world entity can <em>enter</em> and <em>exit</em> the world: for example, when an item drops on the ground, it <em>enters</em> the world, but as soon as you pick it up, it <em>exits the world</em> and gets put into one of your inventories. Whether an entity is in the world or not can also be different between the client and the server. This is because the client simulates only the part of the world that is within the player’s proximity, while the server manages entire regions. However, the client can still be aware of entities that exist outside of its proximity, like other players, valuable items, and transitions to other regions.</p>
+
+<p>In most cases entities outside of proximity are represented by map icons, and the client needs some way of knowing where to put them. The client cannot simulate locomotion without loading the environment, so instead there are two properties that world entities can have: <code class="language-plaintext highlighter-rouge">MapPosition</code> and <code class="language-plaintext highlighter-rouge">MapOrientation</code>. As the server simulates entities and locomotes them, it also periodically updates these two properties to notify when distant entities move or rotate. However, there was a problem: for some mysterious reason, map icons were not able to face bottom left directions. While this is an incredibly minor issue, it was bugging me (pun intended), so I had to get to the bottom of it.</p>
+
+<p>Rotation in Marvel Heroes is expressed in radians rather than degrees. This is how most game engines do this, and the main reason is that while radians are less human-readable, they are easier and therefore faster to do calculations with. The game normalizes the results of most rotation-related calculations to a range of [-π ; π], which is also true for the <code class="language-plaintext highlighter-rouge">MapOrientation</code> property that holds a <code class="language-plaintext highlighter-rouge">float</code> type with a value range of approximately [-3.14 ; 3.14]. Here is a diagram to visualize what it looks like within the context of the coordinate system used by Marvel Heroes:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-11/rotation-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-11/rotation-1.png" alt="Rotation 1" /></a></p>
+
+<p>If you look carefully, you can probably notice what was causing the issue with bottom left directions specifically: they are expressed by <em>negative values</em>. Why is this an issue? Each entity property has a minimum and maximum allowed value, and everything outside of this range is clamped. For <code class="language-plaintext highlighter-rouge">MapOrientation</code> this range is [0 ; 65535], meaning any negative values get clamped to zero. What greatly added to the confusion was that in the packet captures we have the client in fact did receive negative values for the <code class="language-plaintext highlighter-rouge">MapOrientation</code> property from the server. So the instinct was to look for bugs in how properties work. However, this turned out to be a massive waste of time. You see, the clamping happens within the <code class="language-plaintext highlighter-rouge">PropertyCollection::SetPropertyValue()</code> method. However, the replication of the value is handled by the <code class="language-plaintext highlighter-rouge">ReplicatedPropertyCollection</code> class that inherits from <code class="language-plaintext highlighter-rouge">PropertyCollection</code>. In its <code class="language-plaintext highlighter-rouge">SetPropertyValue()</code> override it passes all the arguments to the implementation from the base class and then notifies the client if the property actually changed. Here is what the code looks like in our reimplementation:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">protected</span> <span class="k">override</span> <span class="kt">bool</span> <span class="nf">SetPropertyValue</span><span class="p">(</span><span class="n">PropertyId</span> <span class="n">id</span><span class="p">,</span> <span class="n">PropertyValue</span> <span class="k">value</span><span class="p">,</span> <span class="n">SetPropertyFlags</span> <span class="n">flags</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">bool</span> <span class="n">changed</span> <span class="p">=</span> <span class="k">base</span><span class="p">.</span><span class="nf">SetPropertyValue</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">flags</span><span class="p">);</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">changed</span><span class="p">)</span>
+        <span class="nf">MarkPropertyChanged</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="k">value</span><span class="p">,</span> <span class="n">flags</span><span class="p">);</span>
+
+    <span class="k">return</span> <span class="n">changed</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The issue is that the new value is passed to the base implementation <em>by value</em> rather than <em>by reference</em>, which means the code clamps <em>a copy</em> of the value that was passed, and the value that is sent to the client is unaffected by it! In other words, <em>both</em> the client and the server clamp the original negative value to zero. Therefore, it is not possible to make the client accept negative values for <code class="language-plaintext highlighter-rouge">MapOrientation</code> without modifying its prototype data.</p>
+
+<p>Figuring all of this out was the hard part, and the solution was actually incredibly easy. Rather than normalizing the value to a range of [-π ; π], we now get rid of negative values by using a range of [0 ; 2π]:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-11/rotation-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-11/rotation-2.png" alt="Rotation 2" /></a></p>
+
+<p>And with that icons for distant players can now face bottom left, as they should:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-11/rotation-3.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-11/rotation-3.jpg" alt="Rotation 3" /></a></p>
+
+<p>As insignificant as this bug may seem to be, I wanted to talk about it because it is a great example of one of the main difficulties we have with this project. Because we no longer have access to the original game, at times it can be hard to distinguish issues with our implementation from bugs that existed back in the day.</p>
+
+<hr />
+
+<p>Thank you for following the development of MHServerEmu. See you next time!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2024/11/30/progress-report-november-2024.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>
