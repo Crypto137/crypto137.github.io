@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: December 2024 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: December 2024" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-12-30T17:45:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: December 2024" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2024-12-30T17:45:00+03:00","datePublished":"2024-12-30T17:45:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: December 2024","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: December 2024</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2024-12-30T17:45:00+03:00" itemprop="datePublished">Dec 30, 2024
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2024-12/header.jpg" alt="MHServerEmu Progress Report - December 2024" /></p>
+
+<p>Another year is almost over, and we are steadily approaching our goal of fully restoring Marvel Heroes.</p>
+
+<h2 id="conditions">Conditions</h2>
+
+<p>With version 0.4.0’s release the game is now in a state that most people would probably consider “playable”. However, our work is still far from over, and now we need to focus on restoring the remaining depth of various systems.</p>
+
+<p>In December it was time for me to go back to work on powers, which is something many people have been anxiously waiting for while I was busy with other features. We already had the basic framework for them in place since <a href="/MHServerEmu/blog/2024/07/31/progress-report-july-2024.html">July</a>, and more backend work was done in <a href="/MHServerEmu/blog/2024/09/30/progress-report-september-2024.html">September</a> while I was implementing dynamic combat levels, but all of that was just the tip of the power iceberg that we now need to tackle head-on:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-12/power-iceberg.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-12/power-iceberg.jpg" alt="The Power Iceberg" /></a></p>
+
+<p>The next big step for powers was implementing <em>conditions</em>, which is the term the game uses internally for various buffs and debuffs that can be applied to world entities. Here is an overview of how it works.</p>
+
+<p>Each <code class="language-plaintext highlighter-rouge">WorldEntity</code> instance has a <code class="language-plaintext highlighter-rouge">ConditionCollection</code> that contains <code class="language-plaintext highlighter-rouge">Condition</code> instances that have been applied to it. Conditions are applied as a result of various powers and can come from two main sources: a standalone <code class="language-plaintext highlighter-rouge">ConditionPrototype</code>, or a “mix-in” prototype within the <code class="language-plaintext highlighter-rouge">PowerPrototype</code> of the power that applied the condition. Generally speaking, standalone conditions are conditions that can be applied by different powers, such as boosts, while mix-in conditions are exclusive to a single power. The vast majority of conditions come from power mix-ins.</p>
+
+<p>At their core <code class="language-plaintext highlighter-rouge">Condition</code> instances are essentially <code class="language-plaintext highlighter-rouge">PropertyCollection</code> instances with extra metadata that determine parameters like duration, pause state, and prototype overrides. When a <code class="language-plaintext highlighter-rouge">Condition</code> is added to a <code class="language-plaintext highlighter-rouge">ConditionCollection</code>, it is <em>accrued</em> to the collection’s owner, which includes attaching the condition’s properties to the owner’s in the same way as, for example, when you equip an item. Many conditions also affect the appearance of the entity they are applied to with various visual effects and animation changes.</p>
+
+<p>Condition properties can cause a wide variety of effects. While some are simple stat modifiers, others are used to flag entities with <em>status effects</em>, like stuns and knockups. A whole separate category is over time properties, which are applied continuously using <em>tickers</em>. This is how things like damage over time (DoT) and regeneration effects are implemented.</p>
+
+<p>If a condition’s metadata contains a valid duration, its end is scheduled when it is added. Some conditions do not have a duration, which means they have to be removed by an external event, like a power ending. A good example of this are bounce powers where the avatar is the one bouncing, like the ones Ant-Man and Daredevil have: when the bounce power activates, a condition is applied that makes the avatar’s mesh invisible and prevents movement. This condition is removed only when the bounce power ends, the timing of which varies depending on the distance between bounce targets. Another example is passive powers: they are powers that are automatically activated when an entity becomes simulated, which results in a condition that stays on for as long as the passive power is assigned. There are also conditions that last for as long as some movement is happening, like knockback conditions that prevent entities from moving themselves until the forced knockback movement ends.</p>
+
+<p>Conditions can have various <em>stacking behaviors</em> defined in their prototypes, which restrict how multiple instances of the same condition can be applied to an entity. The main defining feature of a <code class="language-plaintext highlighter-rouge">StackingBehaviorPrototype</code> is its <code class="language-plaintext highlighter-rouge">ApplicationStyle</code>, which can have one of six possible values:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">DontRefresh</code>: condition instances are applied separately from one another.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">Refresh</code>: applying new condition instances resets the duration of other instances that have already been applied.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">Recreate</code>: applying new condition instances removes all other instances.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">MatchDuration</code>: the duration of the newly applied instances match the longest remaining duration out of all instances that have already been applied.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">SingleStackAddDuration</code>: only a single condition instance can be applied, and additional applications extend the duration of the applied instance.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">MultiStackAddDuration</code>: a combination of <code class="language-plaintext highlighter-rouge">Refresh</code> and <code class="language-plaintext highlighter-rouge">SingleStackAddDuration</code>, which results in the duration of other instances that have already been applied being refreshed and extended.</p>
+  </li>
+</ul>
+
+<p>Condition instances are grouped into stacks using a structure called <code class="language-plaintext highlighter-rouge">StackId</code>, which consists of a prototype reference and a creator id. Based on the <code class="language-plaintext highlighter-rouge">StackingBehaviorPrototype</code>, in some cases conditions applied by different powers or created by different owners can still belong to the same stack. Finally, the stacking behavior determines how many instances should be applied per application, as well as how many instances in total can be applied using the same <code class="language-plaintext highlighter-rouge">StackId</code>.</p>
+
+<p>There are some unique quirks related to condition persistence. Because only world entities can have conditions applied to them, and the player entity representing the account is not a world entity, account-wide conditions, like boosts, are “faked” by copying them when you switch between avatars. Conditions also need to be carefully serialized and deserialized, because many conditions are not supposed to run out when you are offline.</p>
+
+<p>As of the time of writing this, the core implementation of the condition system is available for testing in nightly work-in-progress builds of version 0.5.0. Some additional features still need to be implemented, including pausing conditions in hub regions and property ticking. Tickers specifically are going to have a huge effect on the entire combat, because they are also going to allow us to implement various primary and secondary resources used by different heroes.</p>
+
+<h2 id="bounce-powers">Bounce Powers</h2>
+
+<p>As alluded to above, bounce powers are also now functional. This includes targeted powers that bounce around, like Storm’s Chain Lightning, bouncing projectiles, such as Captain America’s Shield Bounce, and powers where the avatar is bouncing in a chain of attacks, like Daredevil’s Street Sweeper. What is interesting about all of these is that everything about them is smoke and mirrors, <em>there is no actual movement happening</em>.</p>
+
+<p>When a power is applied, its properties and the properties of its owner are snapshotted and recorded into a <code class="language-plaintext highlighter-rouge">PowerPayload</code> object. Some of these properties determine the “bounciness” of the power: <code class="language-plaintext highlighter-rouge">BounceCountPayload</code>, <code class="language-plaintext highlighter-rouge">BounceRangePayload</code>, and <code class="language-plaintext highlighter-rouge">BounceSpeedPayload</code>. When the payload is delivered and its effects are applied to its target, the game checks the remaining bounce count, and if it is higher than zero, it “bounces” the payload to another target, which simply changes its target id and schedules a new delivery after a delay. This delay is calculated from the payload’s bounce range and speed.</p>
+
+<p>All the visuals of an object physically bouncing between targets is completely faked by the client. Every time a bounce delay is calculated, the server informs the client about it using the following message:</p>
+
+<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">message</span> <span class="nc">NetMessagePowerBounce</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">idPowerUser</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">idLastTarget</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="k">required</span> <span class="n">NetStructPoint3</span>    <span class="na">lastTargetPosition</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">idNewTarget</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">powerPrototypeId</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">userOriginalAssetId</span>    <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">userCurrentAssetId</span>    <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">float</span>    <span class="na">projectileSpeed</span>    <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">fxRandomSeed</span>    <span class="o">=</span> <span class="mi">9</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The client uses data from this message to fake all the movement.</p>
+
+<p>One last piece of the puzzle is how bounce targets are determined. When a bouncing payload’s target is set, its id is recorded as a <code class="language-plaintext highlighter-rouge">PowerPreviousTargetsID</code> property: depending on the power, these properties are later used to deprioritize or even completely avoid targets (if the <code class="language-plaintext highlighter-rouge">BounceCanRepeatTarget</code> flag is not set on the payload). When the payload hits a target, the game scans all entities in a radius around it, skipping those that have the <code class="language-plaintext highlighter-rouge">InvalidBounceTarget</code> property or are not valid targets for a particular power for other reasons. The most suitable target is then picked, taking into account distance, whether the entity has already been hit by this payload, and whether it is an enemy or a destructible environment object. The highest priority is given to closest enemies that have not been hit.</p>
+
+<p>The bouncing continues until the payload either runs out of bounces or fails to find a new valid target. When the bouncing ends, the client is notified of it via one final <code class="language-plaintext highlighter-rouge">NetMessagePowerBounce</code>, which it uses to play the finishing visual effect or animation (e.g. a weapon returning to its owner). And with all of that we have bouncing:</p>
+
+<div><video controls="" width="100%" /><source src="/MHServerEmu/assets/blog/progress-report/2024-12/bounce.webm" type="video/webm" /></div>
+
+<p>This is a relatively minor addition in the grand scheme of things, but it made many powers across the entire hero roster usable.</p>
+
+<h2 id="achievements-and-leaderboards">Achievements and Leaderboards</h2>
+
+<p>While I was busy working on powers <del>and totally not grinding in Path of Exile 2</del>, Alex was hard at work implementing achievements and leaderboards, which utilize event-based tracking similar to missions, in which he has become quite an expert in it over the past months.</p>
+
+<p>One peculiar thing about how achievements and leaderboards work is how their static data is delivered. The logical appoach would have been to have achievements be more rigid and rely on client-side data, while doing the leaderboards in a more dynamic way that relies on server data, but it is actually the other way around. The entire achievement database is sent from the server to the client on login, while all the leaderboards are hardcoded into the client and cannot be changed without a patch. Thankfully, we have a dump of the achievement database for version 1.52 we extracted from captured packets, which gave us a mostly complete dataset for this version. However, unfortunately, it is the only one we have, meaning that supporting achievements for other versions, like 1.48, is going to require pretty extensive reconstruction efforts using secondary sources, such as archived versions of the good old Marvel Heroes Compendium by Mjoll. We may have to build some custom tools to make the reconstruction process easier, but with enough time and effort this is a problem that can be solved. On the bright side, this also means that custom achievements will be relatively easy to implement.</p>
+
+<p>Achievements are now functional and available for testing in nightly 0.5.0 builds. Some achievements may not be obtainable right now due to certain gameplay features not being implemented, but the overall achievement system is working, and more things will be properly tracked as they are done. The tracking for achievements also includes retroactive granting for some achievements, like reaching specific level thresholds and collecting thematic sets of items.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2024-12/achievements.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-12/achievements.jpg" alt="Achievements" /></a></p>
+
+<p>As I am writing this, Alex has now turned his attention to leaderboards, which proved to actually be a tougher nut to crack. One reason for this is that leaderboards have a lot of unfinished functionality, like guild leaderboards that were never used. They also required a pretty significant amount of backend work, mainly because leaderboards have instances that run in real time, with expired instances being archived in the database in case somebody decides to claim their rewards at some point in the future. All of this is in addition to tracking and reward systems similar to missions and achievements.</p>
+
+<p>Although it was more laborious than expected, an early version of leaderboards is now being tested, and if things go well it will be merged and added to nightly builds relatively soon.</p>
+
+<hr />
+
+<p>That is all we have for you this year. See you all in the next one!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2024/12/30/progress-report-december-2024.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>
