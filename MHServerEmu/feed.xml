@@ -1,4 +1,140 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2024-12-30T17:48:49+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: December 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: December 2024" /><published>2024-12-30T17:45:00+03:00</published><updated>2024-12-30T17:45:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2024-12/header.jpg" alt="MHServerEmu Progress Report - December 2024" /></p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2025-01-31T22:17:02+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: January 2025</title><link href="https://crypto137.github.io/MHServerEmu/blog/2025/01/31/progress-report-january-2025.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: January 2025" /><published>2025-01-31T22:15:00+03:00</published><updated>2025-01-31T22:15:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2025/01/31/progress-report-january-2025</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2025/01/31/progress-report-january-2025.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2025-01/header.jpg" alt="MHServerEmu Progress Report - January 2025" /></p>
+
+<p>The first month of 2025 is almost over, and we have some MHServerEmu progress to share.</p>
+
+<h2 id="conditions">Conditions</h2>
+
+<p><a href="/MHServerEmu/blog/2024/12/30/progress-report-december-2024.html">By the end of last month</a> we had the skeleton for the condition system working, and it was time to build upon it. Two major things that were still missing were <em>pausing</em> and <em>disabling</em>.</p>
+
+<p>Pausing makes it possible for a condition with finite duration to function as an infinite condition for as long as the pause is in effect. Pausing is allowed only for conditions flagged as <code class="language-plaintext highlighter-rouge">IsBoost</code> if one of the following criteria is met:</p>
+
+<ul>
+  <li>
+    <p>The owner of the condition is currently in a region flagged as <code class="language-plaintext highlighter-rouge">PausesBoostConditions</code> (e.g. hub regions).</p>
+  </li>
+  <li>
+    <p>The owner of the condition exits the world, such as during a loading screen.</p>
+  </li>
+  <li>
+    <p>The global live tuning variable <code class="language-plaintext highlighter-rouge">eGTV_BoostTimersRunning</code> is set to false.</p>
+  </li>
+</ul>
+
+<p>One important thing to note is that pausing a condition affects only its duration. Its effect remains applied even if it is “paused”.</p>
+
+<p>Separate from pausing is disabling a condition. When a condition is disabled, it remains attached to its owner, but its effects are removed until it is enabled again. Conditions are disabled by setting the <code class="language-plaintext highlighter-rouge">DisablePowerEffects</code> property on the owner, which can be done by applying another condition. This system, combined with power activations triggered by power events and procs, functions essentially as a scripting language that can affect the state of the owner in different ways. For example, various special resource behaviors, like Hulk’s Anger or Punisher’s Ammo, use this functionality to enable and disable primary resource regeneration and decay depending on the current combat state.</p>
+
+<p>With these taken care of, the condition system is now in a mostly functional state.</p>
+
+<h2 id="resources">Resources</h2>
+
+<p>The original plan was to merge the remaining power subsystems one by one as they were ready. However, while I was working on implementing Spirit, which is the simplest primary resource that many of the heroes use, it became apparent that on its own it will leave many other characters that rely on special behaviors in a semi-broken state. After getting some feedback from the players on our Discord server, I decided to batch these systems into a larger update of the power system, and this is what I have spent the majority of my time working on this month.</p>
+
+<p>Resources in Marvel Heroes come in two flavors: primary and secondary. Each resource has an associated <code class="language-plaintext highlighter-rouge">ManaBehaviorPrototype</code> that defines its behavior, such as whether it starts empty or depletes on death. Avatars are the only entities that use resources; enemies, team-ups, and other AI-controlled characters do not have any.</p>
+
+<p>Primary resources are referred to internally as <code class="language-plaintext highlighter-rouge">Endurance</code>, and all heroes have them. A hero can technically have multiple primary resources which are distinguished by the <code class="language-plaintext highlighter-rouge">ManaType</code> parameter, but in practice the only hero that uses this is Doctor Doom. The default primary resource is Spirit, which is essentially just mana. Special primary resource behaviors are implemented via the scripting-like system of powers and conditions mentioned in the previous section. Primary resources are displayed in the UI as the “globe” on the right side of the action bar:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-01/primary-resources.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-01/primary-resources.jpg" alt="Primary Resources" /></a></p>
+
+<p>Secondary resources are optional, and they can represent various things, from combo points to ants, depending on the hero, with no default behavior. They can have pips, which are basically breakpoints for spending them and activating effects. Secondary resources are represented by horizontal bars above the power slots:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-01/secondary-resources.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-01/secondary-resources.jpg" alt="Secondary Resources" /></a></p>
+
+<p>Implementing this system on its own was not particularly difficult, and we could have done it a long time ago. The real roadblocker until now has been getting all the other things that interact with it working, and we have made significant progress on that front as well.</p>
+
+<h2 id="procs">Procs</h2>
+
+<p><a href="/MHServerEmu/blog/2024/07/31/progress-report-july-2024.html">Back in July of last year</a> when we first got the power system working, I talked about how  in many cases powers are actually implemented as “combo” chains. Here is a quick recap: when a more complex effect is needed, it is done by activating subsequent powers when various <em>power events</em> happen, such as a power’s animation reaching its contact frame. <em>Procs</em> are essentially an extension of this system, except their only action is activation of a specific proc power (which in turn can do more varied actions), and their triggers are not limited to stages of the power pipeline.</p>
+
+<p>In total there are 74 proc triggers as of version 1.52. Some of them are more generic, like <code class="language-plaintext highlighter-rouge">OnPowerHit</code> and <code class="language-plaintext highlighter-rouge">OnGotDamaged</code>, while others are more specialized, such as <code class="language-plaintext highlighter-rouge">OnSecondaryResourcePipGain</code>, <code class="language-plaintext highlighter-rouge">OnSkillshotReflect</code>, and <code class="language-plaintext highlighter-rouge">OnControlledEntityReleased</code>. Procs are assigned to entities using one of three proc properties: <code class="language-plaintext highlighter-rouge">Proc</code>, <code class="language-plaintext highlighter-rouge">ProcKeyword</code>, and <code class="language-plaintext highlighter-rouge">ProcNotKeyword</code>. In many cases these properties come from conditions applied by passive powers. Proc properties are parameterized by their trigger, a reference to the power they activate, and an optional parameter:</p>
+
+<ul>
+  <li>
+    <p>For regular procs the parameter is a threshold value (e.g. an <code class="language-plaintext highlighter-rouge">OnEnduranceBelow</code> proc with a threshold value of <code class="language-plaintext highlighter-rouge">50</code> is going to activate when the owner’s primary resource drops below 50%).</p>
+  </li>
+  <li>
+    <p>For <code class="language-plaintext highlighter-rouge">ProcKeyword</code> and <code class="language-plaintext highlighter-rouge">ProcNotKeyword</code> the parameter is a reference to a keyword prototype, with the former requiring something to have the keyword, and the latter being the opposite and requiring something to <em>not</em> have the keyword.</p>
+  </li>
+</ul>
+
+<p>The value of the property represents the trigger chance of the proc. In some cases this chance is multiplied by the <code class="language-plaintext highlighter-rouge">OnHitProcChanceMultiplier</code> value taken from the prototype of the power that triggered the proc. When this multiplier is applied, the <code class="language-plaintext highlighter-rouge">ProcChanceMultiplierBehaviorType</code> that is also defined in the power prototype is taken into account. Possible values include:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">AllowProcChanceMultiplier</code> - applies the multiplier normally.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">IgnoreProcChanceMultiplier</code> - the multiplier is not applied.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">IgnoreProcChanceMultiplierUnlessZero</code> - the multiplier is used only to disable on hit procs completely.</p>
+  </li>
+</ul>
+
+<p>The purpose of these multipliers is to limit the proc activation rate for fast hitting powers, which would trigger procs too often without them.</p>
+
+<p>Here are some examples of proc properties:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ProcProp[OnAnyHit][CosmicItemSkyBeamAoe][0][0] = 0.05f</code></p>
+
+    <ul>
+      <li>This proc is activated by the <code class="language-plaintext highlighter-rouge">OnAnyHit</code> trigger, and the activation chance is 5%. The power this proc is going to activate is <code class="language-plaintext highlighter-rouge">CosmicItemSkyBeamAoe</code>. This is a proc assigned by one of the cosmic affixes found on gear.</li>
+    </ul>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ProcKeywordProp[OnPowerHit][FuryGainProcEffect][Fury][0] = 1.0f</code></p>
+
+    <ul>
+      <li>This proc is activated by the <code class="language-plaintext highlighter-rouge">OnPowerHit</code> trigger, it requires the triggering power to have the <code class="language-plaintext highlighter-rouge">Fury</code> keyword, and the activation chance is 100%. The power this proc is going to activate is <code class="language-plaintext highlighter-rouge">FuryGainProcEffect</code>. This is a proc assigned by one of Wolverine’s passive powers, and it’s his main way of restoring his primary resource.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>The big challenge with implementing procs has been the sheer amount of code needed to handle all the various triggers. The code itself is very boilerplate and involves doing checks and filling out <code class="language-plaintext highlighter-rouge">PowerActivationSettings</code> instances, but the behavior of various triggers is subtly different enough to not be able to just reuse all the code.</p>
+
+<p>After a few weeks of work though it was done, and now we have a fully-featured proc system. There is just one more gear needed to get this whole mechanism moving.</p>
+
+<h2 id="tickers">Tickers</h2>
+
+<p>Some properties apply effects to the entities they are assigned to periodically. Most of these involve dealing damage over time (DoT), healing over time (HoT), and applying resource changes over time. For this the game uses a class called <code class="language-plaintext highlighter-rouge">PropertyTicker</code>.</p>
+
+<p>A ticker is essentially just a timer that applies properties at certain update intervals. What makes it special is how it interacts with conditions and procs: a proc can activate a power that will enable or disable a condition, which in turn will enable or disable its ticker. This is how resources like Hulk’s Anger works: entering and exiting combat triggers procs that turn Anger regeneration and decay on or off.</p>
+
+<p>At the time of writing this the timer aspect of tickers has been implemented, and what remains is to expand the power results calculation pipeline to work with over time properties. As part of this I will also be doing a pass on how damage is calculated in general so that we can implement various damage mitigation effects. Overall I expect this to take a week or two, and after that this batch of power changes should be ready for testing in nightly builds.</p>
+
+<h2 id="population-improvements">Population Improvements</h2>
+
+<p>While I was busy with powers, Alex has also been hard at work improving some systems that needed more attention. Among them is the population system, which still had some marker-related issues that needed to be fixed.</p>
+
+<p>The basic idea behind the population system is that the game has limited resources for spawning, and the <code class="language-plaintext highlighter-rouge">PopulationManager</code> class distributes these resources among various requests that often exceed the available resources. One example of such resource is markers, which are spawn points hand placed by game designers on various cells. There are many examples in the game when there are fewer markers than entities that try to spawn on them, and the population system has to handle this.</p>
+
+<p>One issue we had was how mission requests for markers were handled. We had some instances where markers were partially used by different missions, and as a result none of them had enough enemies to complete them. To deal with this, Alex has implemented an “all or nothing” style distribution system for missions where markers get reserved in chunks, and if there aren’t enough markers, the mission will wait until it is its time to shine. Implementing this allowed us to deal with population issues in regions like Midtown Patrol.</p>
+
+<p>Another problem was related to how spawn requests were prioritized. Some requests are flagged as “critical”, which means they need to spawn before everything else. When this priority is not taken into account, unexpected semi-random behavior can occur, like missions becoming incompletable. Due to a small oversight this priority was not taken into account in some cases, and this has now been fixed.</p>
+
+<p>And here is a fun fact about marker conflicts: we just found a bug related to them that existed in the original game. In the Castle Doom terminal during the fight with Doctor Doom cutscenes are supposed to be playing on phase transitions, just like they do in story mode. However, because the terminal has two conflicting missions (<code class="language-plaintext highlighter-rouge">G09DoctorDoomDailyEndgame</code> and <code class="language-plaintext highlighter-rouge">DoomFightDailyKismetControl</code>), the necessary hotspots that trigger the cutscenes fail to spawn at all! This bug is now fixed by disabling one of the missions via live tuning, but you can still get the authentic buggy experience if you prefer it by turning the tuning off.</p>
+
+<h2 id="modding">Modding</h2>
+
+<p>In addition to polishing existing systems, in January Alex has also started some preliminary work on modding tools for modifying the client as a side project. While it is still very early, there have been some successful experiments with simple texture swaps.</p>
+
+<p>The tool he is currently working on is called <em>MH Texture Manager</em>, and it is going to allow potential mod developers to browse and replace various textures. Here is what it looks like right now:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-01/texture-manager.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-01/texture-manager.png" alt="MH Texture Manager" /></a></p>
+
+<p>And here is what it is like in-game:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-01/texture-swap-example.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-01/texture-swap-example.jpg" alt="Texture Swap Example" /></a></p>
+
+<p>Please keep in mind that this is purely experimental at this stage, and the scope of the MHServerEmu project does not include creating any new custom content. You can follow Alex’s progress with modding tools on <a href="https://github.com/AlexBond2/MHTextureManager">GitHub</a>.</p>
+
+<hr />
+
+<p>Back to the coding mines for us. See you all next time!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">MHServerEmu Progress Report: December 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: December 2024" /><published>2024-12-30T17:45:00+03:00</published><updated>2024-12-30T17:45:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024.html"><![CDATA[<!--more-->
+
+<p><img src="/MHServerEmu/assets/blog/progress-report/2024-12/header.jpg" alt="MHServerEmu Progress Report - December 2024" /></p>
 
 <p>Another year is almost over, and we are steadily approaching our goal of fully restoring Marvel Heroes.</p>
 
@@ -2841,211 +2977,4 @@
 
 <hr />
 
-<p>We hope you enjoyed this report, see you again next time!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">MHServerEmu Progress Report: March 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/03/31/progress-report-march-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: March 2024" /><published>2024-03-31T19:50:00+03:00</published><updated>2024-03-31T19:50:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/03/31/progress-report-march-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/03/31/progress-report-march-2024.html"><![CDATA[<!--more-->
-
-<p><img src="/MHServerEmu/assets/blog/progress-report/2024-03/header.jpg" alt="MHServerEmu Progress Report - March 2024" /></p>
-
-<p>Spring has come to the Northern Hemisphere, and the development of MHServerEmu is blooming.</p>
-
-<h2 id="010-release">0.1.0 Release</h2>
-
-<p>This month we have reached an important milestone: our first “official” binary release. Version 0.1.0 represents the progress we were able to achieve in the first 8 months of this project, including all the work on the game database, properties, and region generation we have been talking about in these reports. In addition to that, we have implemented enough fundamental systems to remove the last remaining hardcoded data packets, which allows us to fully control the data that is serialized to the client and no longer be bound to a specific version of the game.</p>
-
-<p>If you have been following the development and tried out the nightly snapshot builds, most of what is contained in this release should be familiar to you. However, there are a few extras we included.</p>
-
-<p>0.1.0 comes with the new Setup Sorcerer Supreme tool, which is our flavored spin on the setup wizard idea that is common in software. Here is what it currently does:</p>
-
-<ul>
-  <li>
-    <p>Verifies the game client version by finding the main executable, hashing it, and comparing the hash to the expected one.</p>
-  </li>
-  <li>
-    <p>Copies the <code class="language-plaintext highlighter-rouge">.sip</code> files required to run the server to the MHServerEmu data directory.</p>
-  </li>
-  <li>
-    <p>Creates a <code class="language-plaintext highlighter-rouge">StartClient.bat</code> file that launches the client configured to connect to a local server.</p>
-  </li>
-  <li>
-    <p>Creates a <code class="language-plaintext highlighter-rouge">StartClientAutoLogin.bat</code> file that launches the client configured to connect to a local server with automatic login using pre-defined credentials.</p>
-  </li>
-</ul>
-
-<center>
-<a href="/MHServerEmu/assets/blog/progress-report/2024-03/setup-sorcerer-supreme.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/setup-sorcerer-supreme.png" alt="Setup Sorcerer Supreme" /></a>
-</center>
-
-<p>This release also comes bundled with the Apache web server and web assets for the in-game store and news panels. These assets are also available separately in the new <a href="https://github.com/Crypto137/MHServerEmuWebAssets">MHServerEmuWebAssets</a> repository.</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/news.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/news.jpg" alt="New Web Assets - News Panel" /></a></p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/store.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/store.jpg" alt="New Web Assets - Store Panel" /></a></p>
-
-<p>As soon as 0.1.0 was released, we started working on version 0.2.0. Currently we do not have any estimates for when it is going to be out, but like always you can follow the progress on <a href="https://github.com/Crypto137/MHServerEmu/network">GitHub</a> and via nightly builds.</p>
-
-<h2 id="game-database-browser">Game Database Browser</h2>
-
-<p>Kawaikikinou has finished the work on a new game database browser tool that allows you to easily browse all the static game data we have been decoding over the past few months. Now you can relatively easily find out, for instance, what was the <em>actual</em> drop rate of the infamous Gem of the Kursed.</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/game-database-browser.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/game-database-browser.jpg" alt="Game Database Browser" /></a></p>
-
-<p>The browser works by plugging in existing server code into a WPF-based GUI. This is more of a development tool rather than something that is intended to be used by end users, but it has already proven to be extremely helpful in getting a better understanding of how everything fits together. The source code is available on <a href="https://github.com/Kawaikikinou/MHServerEmu/tree/game-database-browser">GitHub</a>.</p>
-
-<h2 id="server-architecture-improvements">Server Architecture Improvements</h2>
-
-<p>One of the first things I wanted to do in 0.2.0 was to make improvements to the overall server achitecture and how data flows around. Here is an overview of what has been done so far.</p>
-
-<p>Major parts of the server (game, player management, billing, and so on) have been decoupled from each other and split into separate library projects. This allows us to potentially remove or substitute certain service implementations. For example, the database access layer can now be more easily modified to use various persistent storage solutions, such as a fully featured database management system. Also this allows us to reuse game code for tools, like the previously mentioned game database browser.</p>
-
-<p>Duplicate login handling has been improved. Previously, the player manager would refuse connections for any players that are trying to log in using an account that is already logged in. This could cause potential issues if for some reason a player remained logged in due to an unexpected crash or some other problem. Now it works like most online games: when a duplicate login is detected, the already logged in player is disconnected, their data is saved, and then reassigned to the new session.</p>
-
-<p>Our continuous integration pipeline that is used for nightly builds now has an additional step - running automated tests. As the server codebase grows, it becomes harder and harder to keep track of all the potential things that could break, especially because there are certain parts that have to be 100% in sync with the client. With daily automated testing hopefully we will be able to discover and fix any potential issues with existing code as soon as they come up.</p>
-
-<p>The network message flow has been overhauled. Messages are now deserialized asynchronously before they reach game simulations, which frees up valuable frame time. The way messages are batched together and sent to the clients has also been redone, and is now closer to the client implementation. Connected players are now represented in the game they are in by <code class="language-plaintext highlighter-rouge">PlayerConnection</code> instances, which allowed us to clean up message handling and improve individual player state tracking.</p>
-
-<p>The work on this front continues, and some more progress has been made with properly reimplementing the custom Gazillion serialization archive system, which we are going to talk more about in the next report.</p>
-
-<h2 id="steam-deck-support">Steam Deck Support</h2>
-
-<p>Thanks to the efforts of <strong>FF_Lowthor</strong> from our Discord server we have been able to get the game running on Linux (and Steam Deck).</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/steam-deck.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/steam-deck.jpg" alt="Marvel Heroes Steam Deck" /></a></p>
-
-<p>The game client has a rather peculiar compatibility issue when running under Proton. During the authentication process the client receives a session token and a 256-bit AES encryption key from the auth server. It then generates an initialization vector (IV) that it mixes with the encryption key to encrypt the token it received, which is then used to authenticate with the frontend server. Something goes wrong somewhere in this token encryption process under Proton, which causes the authentication to fail.</p>
-
-<p>FF_Lowthor has made a patch that allows the client to ignore this error and proceed with the login without a properly encrypted token. You can apply this patch by changing <code class="language-plaintext highlighter-rouge">75</code> to <code class="language-plaintext highlighter-rouge">EB</code> at <code class="language-plaintext highlighter-rouge">0x019B317E</code> in the Win64 version of <code class="language-plaintext highlighter-rouge">MarvelHeroesOmega.exe</code> either manually with a hex editor, or using our <a href="https://github.com/Crypto137/MHPatcher">MHPatcher</a> tool.</p>
-
-<p>Server-side you also have to enable <code class="language-plaintext highlighter-rouge">BypassAuth</code> in <code class="language-plaintext highlighter-rouge">Config.ini</code> to allow clients to log in without valid session tokens. As quality of life feature, the server now also saves data for the default account used when BypassAuth is enabled in a JSON file.</p>
-
-<h2 id="entity-spawning-and-navi">Entity Spawning and Navi</h2>
-
-<p>This month AlexBond is back to talk about world entity spawning and the NaviSystem. If you have not already, be sure to check out his explanation of the procedural region generation from the <a href="/MHServerEmu/blog/2024/01/30/progress-report-january-2024.html">January report</a>.</p>
-
-<hr />
-
-<p>Hey everyone, it’s AlexBond. In this report I would like to talk about the enemy spawning process and a little bit about NaviMesh generation.</p>
-
-<h3 id="clusterobject">ClusterObject</h3>
-
-<p><code class="language-plaintext highlighter-rouge">ClusterObject</code> is the foundation of all spawners in the game, from idle NPCs standing around and chatting with each other, to armies of enemies in a formation with their leaders and henchmen.</p>
-
-<p>At the heart of these objects lies data from <code class="language-plaintext highlighter-rouge">PopulationObjectPrototype</code> instances. They describe the number of regulars enemies (called <em>riders</em>), their <em>formation</em>, and a bunch of other settings. This prototype class has various derived classes that define whether a group has a <em>leader</em>, how many <em>henchmen</em> it contains, and many other specifics. ClusterObjects also belong to a <code class="language-plaintext highlighter-rouge">ClusterGroup</code>, and there is a derived <code class="language-plaintext highlighter-rouge">ClusterEntity</code> class that is responsible for spawning specific enemies.</p>
-
-<h3 id="populationmarker-spawning">PopulationMarker Spawning</h3>
-
-<p>Cell prototypes contain <code class="language-plaintext highlighter-rouge">SpawnMarkerPrototype</code> instances. When we load region missions, we look for the <code class="language-plaintext highlighter-rouge">PopulationSpawns</code> field that describes the amount of enemies on the map and the name of the spawn marker. We assemble all of this information into the <code class="language-plaintext highlighter-rouge">PopulationMarkers</code> array, and in the <code class="language-plaintext highlighter-rouge">Cell.PostGenerate()</code> method we add enemies to their places.</p>
-
-<p>For random placements we have the <code class="language-plaintext highlighter-rouge">SpawnMarkerRegistry</code> class that uses <code class="language-plaintext highlighter-rouge">SpawnReservation</code> to randomly pick free markers that are appropriate for specific enemies.</p>
-
-<p>After determining the required marker coordinates, we place the enemy group using the assigned formation method. There are four kinds of formations:</p>
-
-<ul>
-  <li>
-    <p>BoxFormation - grid-type formation that uses rows and columns.</p>
-  </li>
-  <li>
-    <p>LineFormation - formation along a line.</p>
-  </li>
-  <li>
-    <p>ArcFormation - formation along an arc.</p>
-  </li>
-  <li>
-    <p>FixedFormation - formation that uses fixed coordinates (FormationSlot).</p>
-  </li>
-</ul>
-
-<p>Other than formations, there is also placement using coordinates defined in <code class="language-plaintext highlighter-rouge">EncounterResourcePrototype</code>. For example, Jessica Jones and Ben Urich in the Avengers Tower are placed this way.</p>
-
-<h3 id="spawner">Spawner</h3>
-
-<p>A <em>spawner</em> is a special entity type that contains information about the number of enemies, their spawn timers, the uniqueness of their spawn distance, and many other parameters. Since spawners are derived from entities, they can be a part of a ClusterObject.</p>
-
-<p>Currently we do not take spawn timers into account, so all enemies spawn at the same time (which occasionally looks overly populated).</p>
-
-<p>One important distinction of spawners is that they place enemies randomly using the <code class="language-plaintext highlighter-rouge">PickPositionInSector()</code> method. To better illustrate how this works, let’s imagine a game of darts:</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/darts.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/darts.png" alt="Spawner Darts" /></a></p>
-
-<p>We divide the space in a radius around an object into equal sections, and then we randomly determine the slot we are going to use for spawning. Then we check for collisions with other objects, and if this check fails we randomly pick another spawning point. Currently we do not have any Navi checks, so many enemies spawn in the air or inside walls.</p>
-
-<p>In addition to spawners described in missions and cells, there are also spawners defined in MetaState prototypes.</p>
-
-<h3 id="metastate-spawning">MetaState Spawning</h3>
-
-<p>All region prototypes have a <code class="language-plaintext highlighter-rouge">MetaGame</code> field. We can get MetaState by going through the following sequence:</p>
-
-<center>
-Region – MetaGames – GameModes – ApplyStates
-</center>
-
-<p>For wave-based regions, such as the S.H.I.E.L.D. Holo-Sim, the path is slightly different:</p>
-
-<center>
-Region – MetaGames – GameModes – States
-</center>
-
-<p>There are different varieties of MetaStates:</p>
-
-<ul>
-  <li>
-    <p>MetaStateMissionProgressionPrototype</p>
-  </li>
-  <li>
-    <p>MetaStateMissionActivatePrototype</p>
-  </li>
-  <li>
-    <p>MetaStateMissionSequencerPrototype</p>
-  </li>
-  <li>
-    <p>MetaStateWaveInstancePrototype</p>
-  </li>
-  <li>
-    <p>MetaStatePopulationMaintainPrototype</p>
-  </li>
-</ul>
-
-<p>Right now we don’t have properly working events in the game, so we just get population objects from the <code class="language-plaintext highlighter-rouge">PopulationRequiredObjectPrototype</code>, and then we retrieve PopulationMarkers, which we then proceed to use as described above.</p>
-
-<p>There is one more type of enemy placements defined in <code class="language-plaintext highlighter-rouge">PopulationThemePrototype</code> instances. Instead of markers, it uses <code class="language-plaintext highlighter-rouge">BlackOutZonePrototype</code> instances and weights. However, we cannot implement this method of spawning without the NaviSystem.</p>
-
-<h3 id="navisystem">NaviSystem</h3>
-
-<p>Over the last month I have been working on reimplementing the NaviSystem, and I have already achieved some results. Essentially, the NaviSystem is a <code class="language-plaintext highlighter-rouge">NaviMesh</code>, which is a set of <code class="language-plaintext highlighter-rouge">NaviTriangles</code> consisting of three <code class="language-plaintext highlighter-rouge">NaviEdges</code> built from two <code class="language-plaintext highlighter-rouge">NaviPoints</code>. The generation process happens in the <code class="language-plaintext highlighter-rouge">NaviCDT</code> class (CDT stands for Constrained Delaunay Triangulation). <a href="https://gwlucastrig.github.io/TinfourDocs/DelaunayIntroCDT/index.html">Here is an article</a> about this technique in case you are interested to learn more.</p>
-
-<p>When we initialize a game region, we create a region-sized rectangle consisting of two triangles. Then we add cell information to <code class="language-plaintext highlighter-rouge">ModifyMeshPatch</code> using <code class="language-plaintext highlighter-rouge">AddNavigationDataToRegion()</code>, which we then use to add points to our NaviMesh by breaking our triangles into smaller <code class="language-plaintext highlighter-rouge">SplitTriangles</code>. Afterwards these points are connected by an edge that splits other edges through <code class="language-plaintext highlighter-rouge">SplitEdge()</code>. After adding all edges, we mark triangles with <code class="language-plaintext highlighter-rouge">MarkupMesh()</code>. We then apply the following <code class="language-plaintext highlighter-rouge">PathFlags</code> as necessary:</p>
-
-<ul>
-  <li>
-    <p>Walk</p>
-  </li>
-  <li>
-    <p>Fly</p>
-  </li>
-  <li>
-    <p>Power</p>
-  </li>
-  <li>
-    <p>Sight</p>
-  </li>
-  <li>
-    <p>TallWalk</p>
-  </li>
-</ul>
-
-<p>By knowing the coordinates of a point we can determine what triangle it is in, and this way the game understands whether you can walk, fly, use abilities, or aim in this point.</p>
-
-<p>Here is an animation of how triangles are broken down for the <code class="language-plaintext highlighter-rouge">NPEAvengersTowerHUBRegion</code>:</p>
-
-<center>
-<a href="/MHServerEmu/assets/blog/progress-report/2024-03/triangulate.gif"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/triangulate.gif" alt="NaviMesh Generation" /></a>
-<p>(Note: P=100 means that 100 NaviPoints were added to the NaviMesh.)</p>
-</center>
-
-<p>If we filter the triangles and show only those that contain the Walk PathFlag, we get an outline of the Avengers Tower:</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-03/navimesh.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-03/navimesh.png" alt="Walkable Triangles" /></a></p>
-
-<p>There is still a work to do with the NaviSystem. For example, it took me three days to find the cause of one of the issues. The system is complex, but it is the foundation of all physics in the game.</p>
-
-<hr />
-
-<p>This is all we have for you today. See you in a month!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry></feed>
+<p>We hope you enjoyed this report, see you again next time!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry></feed>
