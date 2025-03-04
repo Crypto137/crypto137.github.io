@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: February 2025 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: February 2025" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2025/03/04/progress-report-february-2025.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2025/03/04/progress-report-february-2025.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-03-04T20:45:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: February 2025" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-03-04T20:45:00+03:00","datePublished":"2025-03-04T20:45:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: February 2025","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2025/03/04/progress-report-february-2025.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2025/03/04/progress-report-february-2025.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: February 2025</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2025-03-04T20:45:00+03:00" itemprop="datePublished">Mar 4, 2025
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2025-02/header.jpg" alt="MHServerEmu Progress Report - February 2025" /></p>
+
+<p>Another month, another MHServerEmu Progress Report.</p>
+
+<h2 id="050-status">0.5.0 Status</h2>
+
+<p>As I am writing this, we are finalizing the work on our next quarterly stable release, version 0.5.0. As a result of player feedback and testing it ourselves, we have shuffled features around, with some getting pushed forward (e.g. Infinity / Omega), and others being delayed (e.g. leaderboards). Overall I feel we ended up with a very substantial package of changes, focused mostly on getting powers and the overall combat into a more refined state.</p>
+
+<p>All the major features that will be coming in 0.5.0 are now done, and we are currently working on some additional polish and bug fixes. The current plan is to have it all ready at some point next week.</p>
+
+<h2 id="difficulty-scaling">Difficulty Scaling</h2>
+
+<p>One hot topic that came up after the major batch of power changes in February was the issue of difficulty scaling, particularly at level 60 in group-oriented content, such as Midtown Patrol. I would like to use this opportunity to talk more about what is happening behind the scenes with it.</p>
+
+<p>First of all, <em>there was no difficulty scaling prior to these changes</em>. Green, Red, and Cosmic difficulty tiers were all using the same baseline values, which in most cases correspond to the Green difficulty. The only thing that was affected by difficulty tier selection before these changes was loot, so you were effectively getting Cosmic levels of loot for doing Green content. This was semi-balanced by the fact that many sources of damage and survivability were not working, but overall it was still heavily skewed towards being too easy. As procs and over time tickers were implemented, it became clear that leaving combat calculations as is would result in this situation becoming even more lopsided, so it was time to finally rip the bandaid off.</p>
+
+<p>Get your tinfoil hats ready, because we are about to expose a bit of a conspiracy. Have you ever wondered why you never see the exact health values of the enemies you fight in Marvel Heroes? There is a very good reason for this: all damage numbers you see are actually <em>fake</em>. When the game needs to make an enemy twice as tanky, it does not increase its health or defenses. Instead, <em>the player’s damage gets cut in half</em>, and the damage numbers that are sent to the client are manipulated to hide this multiplier. This applies only to player -&gt; mob damage, when enemies attack players or player-controlled entities you get more or less real damage with only the level scaling applied.</p>
+
+<p>The key thing here is where these multipliers are coming from. This is handled by a class called <code class="language-plaintext highlighter-rouge">TuningTable</code>, and each region has its own instance of it. The difficulty damage multiplier is calculated by the region’s <code class="language-plaintext highlighter-rouge">TuningTable</code> instance each time damage is applied to a target based on the following factors:</p>
+
+<ul>
+  <li>
+    <p>Whether the source of the damage is a player-owned entity (avatar, summon, team-up, etc.) or not.</p>
+  </li>
+  <li>
+    <p>The rank of the target (popcorn, boss, etc.).</p>
+  </li>
+  <li>
+    <p>The difficulty tier of the current region (Green / Red / Cosmic).</p>
+  </li>
+  <li>
+    <p>The difficulty index of the current region. This is used in modes such as Holo-Sim and X-Defense to gradually escalate the difficulty.</p>
+  </li>
+  <li>
+    <p>The number of nearby players. The exact radius of “nearby” differs depending on the region. In general, for private instances it is set to 100000 units, which covers pretty much the entire region, while in public combat zones it is set to 1200 units, which is roughly about the size of a screen.</p>
+  </li>
+  <li>
+    <p>Whether the region is a public combat zone (PCZ) or not.</p>
+  </li>
+</ul>
+
+<p>One important point to note here is how this is balanced in practice in group-oriented public combat zones, such as Midtown Patrol. The curves used in them start aggressive, but have heavy diminishing returns, which means that bosses will feel very tanky when fighting them solo, but as more players join the fight, their damage will relatively quickly outscale the fake “boss health” gains (which are actually player damage penalties).</p>
+
+<p>I have tested everything extensively, which included manually calculating the multipliers for various situations, and I can say with a high degree of confidence that the system appears to be working consistent with the game data. However, there have been some very vocal feedback from some testers that the game is now “unplayable”. To address this feedback, we have rearranged the features on our roadmap to get some of the additional sources of player power working sooner.</p>
+
+<h2 id="infinity-and-omega">Infinity and Omega</h2>
+
+<p>After evaluating the cost-benefit ratio of various missing sources of player power, with cost being the time it would take to implement them, and benefit being the increase in power they provide, I decided it made the most sense to push forward the two alternate advancement systems, Infinity and Omega. The main reason for this is because they rely mostly on the backend functionality we already have implemented, such as entity modifiers that are used for features like enemy ranks, which meant it took only a few days of work to get them up and running. At the same time, they are a major source of player power, although not quite as “infinite” as one of them implies.</p>
+
+<p>“But wasn’t Omega removed in BUE?” — some of you may ask. Well, yes and no: when the client connects to the server, it receives a <code class="language-plaintext highlighter-rouge">NetMessageLocalPlayer</code> that contains a  <code class="language-plaintext highlighter-rouge">NetStructGameOptions</code> that looks like this:</p>
+
+<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">message</span> <span class="nc">NetStructGameOptions</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">teamUpSystemEnabled</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">achievementsEnabled</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">omegaMissionsEnabled</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">veteranRewardsEnabled</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">multiSpecRewardsEnabled</span>    <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">giftingEnabled</span>    <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">characterSelectV2Enabled</span>    <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">communityNewsV2Enabled</span>    <span class="o">=</span> <span class="mi">9</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">leaderboardsEnabled</span>    <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">newPlayerExperienceEnabled</span>    <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">serverTimeOffsetUTC</span>    <span class="o">=</span> <span class="mi">13</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">useServerTimeOffset</span>    <span class="o">=</span> <span class="mi">14</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">missionTrackerV2Enabled</span>    <span class="o">=</span> <span class="mi">15</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">giftingAccountAgeInDaysRequired</span>    <span class="o">=</span> <span class="mi">16</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">giftingAvatarLevelRequired</span>    <span class="o">=</span> <span class="mi">17</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">giftingLoginCountRequired</span>    <span class="o">=</span> <span class="mi">18</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">infinitySystemEnabled</span>    <span class="o">=</span> <span class="mi">19</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">chatBanVoteAccountAgeInDaysRequired</span>    <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">chatBanVoteAvatarLevelRequired</span>    <span class="o">=</span> <span class="mi">21</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">chatBanVoteLoginCountRequired</span>    <span class="o">=</span> <span class="mi">22</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">isDifficultySliderEnabled</span>    <span class="o">=</span> <span class="mi">23</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">bool</span>    <span class="na">orbisTrophiesEnabled</span>    <span class="o">=</span> <span class="mi">24</span> <span class="p">[</span><span class="k">default</span> <span class="o">=</span> <span class="kc">false</span><span class="p">];</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">platformType</span>    <span class="o">=</span> <span class="mi">25</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">NetMessageLocalPlayer</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">localPlayerEntityId</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">required</span> <span class="n">NetStructGameOptions</span>    <span class="na">gameOptions</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>One of the fields here is called <code class="language-plaintext highlighter-rouge">infinitySystemEnabled</code>. When it is set to <code class="language-plaintext highlighter-rouge">false</code>, not only does it disable the Infinity system, but it also reenables Omega in the state it was left in as of version 1.52. While this is some neat trivia, why bother implementing it right now? The reason is very simple: the vast majority of code for Infinity is literally copypasted Omega code with the word “Omega” replaced with “Infinity”, and I am not exaggerating this. The biggest difference between them is how points are calculated: Infinity uses a “squished” experience curve in which 10 Omega points are equivalent to 1 Infinity point, and each Infinity point you receive is colored to match various Infinity Stones. Another semi-major difference is the unlock requirement: Infinity is unlocked at level 60 account-wide, while Omega is unlocked per-hero at level 30. Everything else is pretty much the exact same thing code-wise, all the way to checking various prerequisite nodes (that are simply left blank in Infinity). So, by implementing one of them, it was very easy to get the other one working as well.</p>
+
+<p>While we are at it, here is another fun fact: despite being called “Infinity”, it is not actually infinite. The system is capped at 6 000 000 points, of which only 80 400 are actually spendable. This is still a heavy grind, especially when compared to Omega, which had a cap of 10 000 (equivalent to 1 000 when using the Infinity curve), but I would not be surprised to see people reach it years down the line after 1.0 is out and there are no more wipes.</p>
+
+<p>As for Omega, the exact state of its balance in the context of BUE remains to be evaluated. One idea that has been floating around is “uncapping” to match Infinity, but it needs to be extensively tested to make sure nothing breaks. In any case, even if it does not find extensive use in 1.52, this is still going to be useful for when get to backporting the server to version 1.48 (aka “pre-BUE”).</p>
+
+<p>With these two systems working (Infinity in particular), there is now both an additional long term grind to work on, and a way to brute force past the remaining unimplemented systems, such as talents, which require more time and effort to implement.</p>
+
+<h2 id="summons">Summons</h2>
+
+<p><em>AlexBond is back for this month’s report to talk about his work on summon powers, hotspots, and controlled agents.</em></p>
+
+<hr />
+
+<p>Hello everyone, this is AlexBond. In this report we are going to talk about summons.</p>
+
+<p>Summons are allies created by powers that help you in combat. If you ask a Marvel Heroes player to give an example of a summoner hero you will probably hear Squirrel Girl, Magik, or Doctor Doom; nobody is going to say Cyclops, Deadpool, or Nova. However, almost all heroes in the game are summoners. Why is that? Allow me to explain.</p>
+
+<p>Each power is a chain of different actions. When you play as Cyclops and activate the Optic Beam power (internally referred to as <code class="language-plaintext highlighter-rouge">ChanneledBeam</code>), a hotspot called <code class="language-plaintext highlighter-rouge">CyclopsChanneledEnergyBeamArea</code> is summoned. This hotspot has a triangle shape with a 10 degree angle and a length of 700 units. It is attached to Cyclops, and when you move the mouse cursor, he rotates towards it, and the attached hotspot follows. When the hotspot overlaps with other entities, it applies powers defined in the <code class="language-plaintext highlighter-rouge">AppliesPowers</code> field of its prototype: in this example in particular it applies <code class="language-plaintext highlighter-rouge">ChanneledEnergyBeamEffect</code>, which is the damage component, and <code class="language-plaintext highlighter-rouge">ChanneledEnergyBeamSlowEffect</code>, which is an additional status effect.</p>
+
+<p>Three systems needed to be implemented for all of this to work correctly: <em>summon powers</em>, <em>hotspots</em>, and <em>attached entities</em>.</p>
+
+<h3 id="summon-powers">Summon Powers</h3>
+
+<p>Each power prototype contains many different parameters, but the main one we are interested in is <code class="language-plaintext highlighter-rouge">SummonEntityContexts</code>:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-02/summons-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-02/summons-1.png" alt="Summons 1" /></a>
+</center>
+
+<p>It contains the settings we need to use to create a <code class="language-plaintext highlighter-rouge">SummonEntity</code>.</p>
+
+<p>In most cases, when a power is activated, it creates a <code class="language-plaintext highlighter-rouge">PowerPayload</code> instance. Summon powers register for the <code class="language-plaintext highlighter-rouge">OnDeliverPayload()</code> event, which we use to get the target that we are going to attach our future summon entity to. In <code class="language-plaintext highlighter-rouge">SummonPayloadEntity()</code> we calculate the number of entities that have already been summoned, and if the <code class="language-plaintext highlighter-rouge">KillPreviousSummons</code> flag is set, we kill existing ones to prevent infinite spawning. We get the number of summon entities to create from <code class="language-plaintext highlighter-rouge">SummonNumPerActivation</code>, compare it to <code class="language-plaintext highlighter-rouge">SummonMaxSimultaneous</code>, and then create the entities using <code class="language-plaintext highlighter-rouge">SummonEntityContext()</code>. We need to not only create the entities, but also calculate their position relative to the summoner, taking into account all the restrictions, offsets, collisions, and other parameters. All of this is handled by a function called <code class="language-plaintext highlighter-rouge">GetSummonPositions()</code>. After we get our spawn coordinates, we put our newly created entities into the world and attach them to the caster or the target based on the prototype flags if needed (<code class="language-plaintext highlighter-rouge">AttachSummonsToCaster</code> and <code class="language-plaintext highlighter-rouge">AttachSummonsToTarget</code> respectively).</p>
+
+<p>In most cases this entity is going to be an invisible area called a <em>hotspot</em> that will damage and/or apply other effects to whoever overlaps with it.</p>
+
+<h3 id="hotspots">Hotspots</h3>
+
+<p>In most cases hotspots are invisible to players (except for visual effects in rare cases). When they enter the world, they also begin interacting with the game’s physics system, which is processed on the server and the client in parallel. The physics system simulates movement of entities within the game world and invokes events such as <code class="language-plaintext highlighter-rouge">OnOverlapBegin()</code> and <code class="language-plaintext highlighter-rouge">OnOverlapEnd()</code>.</p>
+
+<p>The two main use cases for hotspots are mission triggers (<code class="language-plaintext highlighter-rouge">HandleOverlapBegin_Missions()</code>) and power triggers (<code class="language-plaintext highlighter-rouge">HandleOverlapBegin_Powers()</code> and <code class="language-plaintext highlighter-rouge">HandleOverlapEnd_PowerEvent()</code>). We have already covered missions in previous reports, and now it is time to talk about powers.</p>
+
+<p>Hotspots apply powers defined in the prototype in the following two fields:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">AppliesPowers</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">AppliesIntervalPowers</code></p>
+  </li>
+</ul>
+
+<p>And this is where it becomes complex. There are many powers and many targets, targets can enter and exit the hotspot, and all of this needs to be tracked. We use a dictionary with target id as key and a structure called <code class="language-plaintext highlighter-rouge">PowerTargetMap</code> as value:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="n">Dictionary</span><span class="p">&lt;</span><span class="kt">ulong</span><span class="p">,</span> <span class="n">PowerTargetMap</span><span class="p">&gt;</span> <span class="n">_overlapPowerTargets</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">struct</span> <span class="nc">PowerTargetMap</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="n">HotspotPowerMask</span> <span class="n">ActivePowers</span><span class="p">;</span>
+    <span class="k">public</span> <span class="n">HotspotPowerMask</span> <span class="n">IgnorePowers</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">HotspotPowerMask</code> is a bit field that can contain the state of up to 32 different powers. We use these masks to ensure that targets do not have effects applied to them multiple times, and the <code class="language-plaintext highlighter-rouge">HasConditionsForTarget()</code> function helps us prevent infinite condition stacks.</p>
+
+<p><code class="language-plaintext highlighter-rouge">AppliesIntervalPowers</code> works differently: it can either affect random targets if the <code class="language-plaintext highlighter-rouge">IntervalPowersRandomTarget</code> flag is set, or it can target all entities at the same time.</p>
+
+<p>When a new target begins overlapping with a hotspot’s bounds, it gets tracked using our dictionary, and all active powers are applied to it.</p>
+
+<p>As you can see, this is a pretty complex process that involves the interaction of many different systems and events. Let’s take a closer look at one of them.</p>
+
+<h3 id="attached-entities">Attached Entities</h3>
+
+<p>When an entity flagged as <code class="language-plaintext highlighter-rouge">IsAttachedToEntity</code> enters the world, it is attached to the <code class="language-plaintext highlighter-rouge">EntityPhysics</code> component of the specified entity, where it is added to the <code class="language-plaintext highlighter-rouge">AttachedEntities</code> collection.</p>
+
+<p>Every time the <code class="language-plaintext highlighter-rouge">PhysicsManager</code> processes entity movement, it calls <code class="language-plaintext highlighter-rouge">UpdateAttachedEntityPositions()</code>, which calls <code class="language-plaintext highlighter-rouge">ChangeRegionPosition()</code> for all entities in the <code class="language-plaintext highlighter-rouge">AttachedEntities</code> collection. Hotspots override <code class="language-plaintext highlighter-rouge">ChangeRegionPosition()</code> to take into account the offset it gets from <code class="language-plaintext highlighter-rouge">GetCenterOffset()</code> and the relative <code class="language-plaintext highlighter-rouge">SummonOffsetAngle</code>, which allows the beam to rotate around the user rather than its own center.</p>
+
+<p>With this our short overview of hotspots is over, and you should have a general understanding of how it all works. Now I would like to talk about another topic.</p>
+
+<h3 id="controlled-agents">Controlled Agents</h3>
+
+<p>While I was working on summon powers, I noticed that it was related to two other systems: <code class="language-plaintext highlighter-rouge">TeamUpAgent</code> and <code class="language-plaintext highlighter-rouge">ControlledAgent</code>. These two, along with <code class="language-plaintext highlighter-rouge">VanityPet</code> summons, all belong to the same group called <code class="language-plaintext highlighter-rouge">PersistentAgents</code>.</p>
+
+<p>When you transition within the same region using teleports (e.g. elevators in tower regions), your pets should transition with you (and not temporarily get stuck in the previous area like team-ups used to do). This is handled by the <code class="language-plaintext highlighter-rouge">RespawnPersistentAgents()</code> function. I had to overhaul our old team-up implementation for these new requirements. Now all three team-up modes are selectable, although not all functionality related to them is implemented at the time of writing. Let’s move over to controlled agents.</p>
+
+<p>There is a relatively small number of heroes that can control enemies and turn them into pets. Here is the full least of them:</p>
+
+<ul>
+  <li>
+    <p>Emma Frost (living enemies)</p>
+  </li>
+  <li>
+    <p>Rogue (same as Emma Frost via a stolen power)</p>
+  </li>
+  <li>
+    <p>Vision (robots)</p>
+  </li>
+  <li>
+    <p>Magik (demons)</p>
+  </li>
+</ul>
+
+<p>When you use a control power, the <code class="language-plaintext highlighter-rouge">ControlAgentAI</code> power event is invoked via <code class="language-plaintext highlighter-rouge">DoPowerEventActionControlAgentAI()</code>, which calls the <code class="language-plaintext highlighter-rouge">SetControlledAgent()</code> function that establishes control via <code class="language-plaintext highlighter-rouge">SetControlledAgent()</code>. This involves removing the existing controlled agent if needed (e.g. Magik) and binding the new one. The binding process includes placing the controlled entity into an inventory called <code class="language-plaintext highlighter-rouge">AvatarControlledEntities</code> belonging to the controlling avatar, setting the <code class="language-plaintext highlighter-rouge">AIMasterAvatarDbGuid</code> property on it to make it follow the avatar, and overriding its alliance to match the avatar. All boosts flagged as <code class="language-plaintext highlighter-rouge">DisableForControlledAgents</code> are removed, and we get an obedient pet.</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-02/summons-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-02/summons-2.png" alt="Summons 2" /></a>
+</center>
+
+<p>As it turns out, in version 1.52 it is not possible to change pets on the fly. I am not sure when exactly it was changed, but currently the data-defined requirement looks like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>HasEntityInInventory(Context=[Var2], Entity=[], Inventory=[Controlled]) ? False : True
+</code></pre></div></div>
+
+<p>This means that if our inventory with the <code class="language-plaintext highlighter-rouge">Controlled</code> label has any entity in it, it is impossible to control a new one. To get a new pet we first need to dismiss the existing one in the power panel:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-02/summons-3.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-02/summons-3.png" alt="Summons 3" /></a>
+</center>
+
+<p>Implementing all the systems we discussed above restored a lot of gameplay functionality: bosses are now more fun, enemies are more dangerous, and heroes are more playable (and summon-focused heroes are “playable” for the first time in a sense).</p>
+
+<p>Hopefully you found this interesting. Until we meet again in future reports, and have fun playing!</p>
+
+<hr />
+
+<p>That is all we have to share today. Time for us to get back to finishing 0.5.0!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2025/03/04/progress-report-february-2025.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>

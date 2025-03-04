@@ -1,4 +1,215 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2025-01-31T22:17:02+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: January 2025</title><link href="https://crypto137.github.io/MHServerEmu/blog/2025/01/31/progress-report-january-2025.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: January 2025" /><published>2025-01-31T22:15:00+03:00</published><updated>2025-01-31T22:15:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2025/01/31/progress-report-january-2025</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2025/01/31/progress-report-january-2025.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2025-01/header.jpg" alt="MHServerEmu Progress Report - January 2025" /></p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2025-03-04T21:00:31+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: February 2025</title><link href="https://crypto137.github.io/MHServerEmu/blog/2025/03/04/progress-report-february-2025.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: February 2025" /><published>2025-03-04T20:45:00+03:00</published><updated>2025-03-04T20:45:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2025/03/04/progress-report-february-2025</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2025/03/04/progress-report-february-2025.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2025-02/header.jpg" alt="MHServerEmu Progress Report - February 2025" /></p>
+
+<p>Another month, another MHServerEmu Progress Report.</p>
+
+<h2 id="050-status">0.5.0 Status</h2>
+
+<p>As I am writing this, we are finalizing the work on our next quarterly stable release, version 0.5.0. As a result of player feedback and testing it ourselves, we have shuffled features around, with some getting pushed forward (e.g. Infinity / Omega), and others being delayed (e.g. leaderboards). Overall I feel we ended up with a very substantial package of changes, focused mostly on getting powers and the overall combat into a more refined state.</p>
+
+<p>All the major features that will be coming in 0.5.0 are now done, and we are currently working on some additional polish and bug fixes. The current plan is to have it all ready at some point next week.</p>
+
+<h2 id="difficulty-scaling">Difficulty Scaling</h2>
+
+<p>One hot topic that came up after the major batch of power changes in February was the issue of difficulty scaling, particularly at level 60 in group-oriented content, such as Midtown Patrol. I would like to use this opportunity to talk more about what is happening behind the scenes with it.</p>
+
+<p>First of all, <em>there was no difficulty scaling prior to these changes</em>. Green, Red, and Cosmic difficulty tiers were all using the same baseline values, which in most cases correspond to the Green difficulty. The only thing that was affected by difficulty tier selection before these changes was loot, so you were effectively getting Cosmic levels of loot for doing Green content. This was semi-balanced by the fact that many sources of damage and survivability were not working, but overall it was still heavily skewed towards being too easy. As procs and over time tickers were implemented, it became clear that leaving combat calculations as is would result in this situation becoming even more lopsided, so it was time to finally rip the bandaid off.</p>
+
+<p>Get your tinfoil hats ready, because we are about to expose a bit of a conspiracy. Have you ever wondered why you never see the exact health values of the enemies you fight in Marvel Heroes? There is a very good reason for this: all damage numbers you see are actually <em>fake</em>. When the game needs to make an enemy twice as tanky, it does not increase its health or defenses. Instead, <em>the player’s damage gets cut in half</em>, and the damage numbers that are sent to the client are manipulated to hide this multiplier. This applies only to player -&gt; mob damage, when enemies attack players or player-controlled entities you get more or less real damage with only the level scaling applied.</p>
+
+<p>The key thing here is where these multipliers are coming from. This is handled by a class called <code class="language-plaintext highlighter-rouge">TuningTable</code>, and each region has its own instance of it. The difficulty damage multiplier is calculated by the region’s <code class="language-plaintext highlighter-rouge">TuningTable</code> instance each time damage is applied to a target based on the following factors:</p>
+
+<ul>
+  <li>
+    <p>Whether the source of the damage is a player-owned entity (avatar, summon, team-up, etc.) or not.</p>
+  </li>
+  <li>
+    <p>The rank of the target (popcorn, boss, etc.).</p>
+  </li>
+  <li>
+    <p>The difficulty tier of the current region (Green / Red / Cosmic).</p>
+  </li>
+  <li>
+    <p>The difficulty index of the current region. This is used in modes such as Holo-Sim and X-Defense to gradually escalate the difficulty.</p>
+  </li>
+  <li>
+    <p>The number of nearby players. The exact radius of “nearby” differs depending on the region. In general, for private instances it is set to 100000 units, which covers pretty much the entire region, while in public combat zones it is set to 1200 units, which is roughly about the size of a screen.</p>
+  </li>
+  <li>
+    <p>Whether the region is a public combat zone (PCZ) or not.</p>
+  </li>
+</ul>
+
+<p>One important point to note here is how this is balanced in practice in group-oriented public combat zones, such as Midtown Patrol. The curves used in them start aggressive, but have heavy diminishing returns, which means that bosses will feel very tanky when fighting them solo, but as more players join the fight, their damage will relatively quickly outscale the fake “boss health” gains (which are actually player damage penalties).</p>
+
+<p>I have tested everything extensively, which included manually calculating the multipliers for various situations, and I can say with a high degree of confidence that the system appears to be working consistent with the game data. However, there have been some very vocal feedback from some testers that the game is now “unplayable”. To address this feedback, we have rearranged the features on our roadmap to get some of the additional sources of player power working sooner.</p>
+
+<h2 id="infinity-and-omega">Infinity and Omega</h2>
+
+<p>After evaluating the cost-benefit ratio of various missing sources of player power, with cost being the time it would take to implement them, and benefit being the increase in power they provide, I decided it made the most sense to push forward the two alternate advancement systems, Infinity and Omega. The main reason for this is because they rely mostly on the backend functionality we already have implemented, such as entity modifiers that are used for features like enemy ranks, which meant it took only a few days of work to get them up and running. At the same time, they are a major source of player power, although not quite as “infinite” as one of them implies.</p>
+
+<p>“But wasn’t Omega removed in BUE?” — some of you may ask. Well, yes and no: when the client connects to the server, it receives a <code class="language-plaintext highlighter-rouge">NetMessageLocalPlayer</code> that contains a  <code class="language-plaintext highlighter-rouge">NetStructGameOptions</code> that looks like this:</p>
+
+<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">message</span> <span class="nc">NetStructGameOptions</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">teamUpSystemEnabled</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">achievementsEnabled</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">omegaMissionsEnabled</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">veteranRewardsEnabled</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">multiSpecRewardsEnabled</span>    <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">giftingEnabled</span>    <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">characterSelectV2Enabled</span>    <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">communityNewsV2Enabled</span>    <span class="o">=</span> <span class="mi">9</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">leaderboardsEnabled</span>    <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">newPlayerExperienceEnabled</span>    <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">serverTimeOffsetUTC</span>    <span class="o">=</span> <span class="mi">13</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">useServerTimeOffset</span>    <span class="o">=</span> <span class="mi">14</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">missionTrackerV2Enabled</span>    <span class="o">=</span> <span class="mi">15</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">giftingAccountAgeInDaysRequired</span>    <span class="o">=</span> <span class="mi">16</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">giftingAvatarLevelRequired</span>    <span class="o">=</span> <span class="mi">17</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">giftingLoginCountRequired</span>    <span class="o">=</span> <span class="mi">18</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">infinitySystemEnabled</span>    <span class="o">=</span> <span class="mi">19</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">chatBanVoteAccountAgeInDaysRequired</span>    <span class="o">=</span> <span class="mi">20</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">chatBanVoteAvatarLevelRequired</span>    <span class="o">=</span> <span class="mi">21</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">chatBanVoteLoginCountRequired</span>    <span class="o">=</span> <span class="mi">22</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">isDifficultySliderEnabled</span>    <span class="o">=</span> <span class="mi">23</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">bool</span>    <span class="na">orbisTrophiesEnabled</span>    <span class="o">=</span> <span class="mi">24</span> <span class="p">[</span><span class="k">default</span> <span class="o">=</span> <span class="kc">false</span><span class="p">];</span>
+    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">platformType</span>    <span class="o">=</span> <span class="mi">25</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">NetMessageLocalPlayer</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">localPlayerEntityId</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">required</span> <span class="n">NetStructGameOptions</span>    <span class="na">gameOptions</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>One of the fields here is called <code class="language-plaintext highlighter-rouge">infinitySystemEnabled</code>. When it is set to <code class="language-plaintext highlighter-rouge">false</code>, not only does it disable the Infinity system, but it also reenables Omega in the state it was left in as of version 1.52. While this is some neat trivia, why bother implementing it right now? The reason is very simple: the vast majority of code for Infinity is literally copypasted Omega code with the word “Omega” replaced with “Infinity”, and I am not exaggerating this. The biggest difference between them is how points are calculated: Infinity uses a “squished” experience curve in which 10 Omega points are equivalent to 1 Infinity point, and each Infinity point you receive is colored to match various Infinity Stones. Another semi-major difference is the unlock requirement: Infinity is unlocked at level 60 account-wide, while Omega is unlocked per-hero at level 30. Everything else is pretty much the exact same thing code-wise, all the way to checking various prerequisite nodes (that are simply left blank in Infinity). So, by implementing one of them, it was very easy to get the other one working as well.</p>
+
+<p>While we are at it, here is another fun fact: despite being called “Infinity”, it is not actually infinite. The system is capped at 6 000 000 points, of which only 80 400 are actually spendable. This is still a heavy grind, especially when compared to Omega, which had a cap of 10 000 (equivalent to 1 000 when using the Infinity curve), but I would not be surprised to see people reach it years down the line after 1.0 is out and there are no more wipes.</p>
+
+<p>As for Omega, the exact state of its balance in the context of BUE remains to be evaluated. One idea that has been floating around is “uncapping” to match Infinity, but it needs to be extensively tested to make sure nothing breaks. In any case, even if it does not find extensive use in 1.52, this is still going to be useful for when get to backporting the server to version 1.48 (aka “pre-BUE”).</p>
+
+<p>With these two systems working (Infinity in particular), there is now both an additional long term grind to work on, and a way to brute force past the remaining unimplemented systems, such as talents, which require more time and effort to implement.</p>
+
+<h2 id="summons">Summons</h2>
+
+<p><em>AlexBond is back for this month’s report to talk about his work on summon powers, hotspots, and controlled agents.</em></p>
+
+<hr />
+
+<p>Hello everyone, this is AlexBond. In this report we are going to talk about summons.</p>
+
+<p>Summons are allies created by powers that help you in combat. If you ask a Marvel Heroes player to give an example of a summoner hero you will probably hear Squirrel Girl, Magik, or Doctor Doom; nobody is going to say Cyclops, Deadpool, or Nova. However, almost all heroes in the game are summoners. Why is that? Allow me to explain.</p>
+
+<p>Each power is a chain of different actions. When you play as Cyclops and activate the Optic Beam power (internally referred to as <code class="language-plaintext highlighter-rouge">ChanneledBeam</code>), a hotspot called <code class="language-plaintext highlighter-rouge">CyclopsChanneledEnergyBeamArea</code> is summoned. This hotspot has a triangle shape with a 10 degree angle and a length of 700 units. It is attached to Cyclops, and when you move the mouse cursor, he rotates towards it, and the attached hotspot follows. When the hotspot overlaps with other entities, it applies powers defined in the <code class="language-plaintext highlighter-rouge">AppliesPowers</code> field of its prototype: in this example in particular it applies <code class="language-plaintext highlighter-rouge">ChanneledEnergyBeamEffect</code>, which is the damage component, and <code class="language-plaintext highlighter-rouge">ChanneledEnergyBeamSlowEffect</code>, which is an additional status effect.</p>
+
+<p>Three systems needed to be implemented for all of this to work correctly: <em>summon powers</em>, <em>hotspots</em>, and <em>attached entities</em>.</p>
+
+<h3 id="summon-powers">Summon Powers</h3>
+
+<p>Each power prototype contains many different parameters, but the main one we are interested in is <code class="language-plaintext highlighter-rouge">SummonEntityContexts</code>:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-02/summons-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-02/summons-1.png" alt="Summons 1" /></a>
+</center>
+
+<p>It contains the settings we need to use to create a <code class="language-plaintext highlighter-rouge">SummonEntity</code>.</p>
+
+<p>In most cases, when a power is activated, it creates a <code class="language-plaintext highlighter-rouge">PowerPayload</code> instance. Summon powers register for the <code class="language-plaintext highlighter-rouge">OnDeliverPayload()</code> event, which we use to get the target that we are going to attach our future summon entity to. In <code class="language-plaintext highlighter-rouge">SummonPayloadEntity()</code> we calculate the number of entities that have already been summoned, and if the <code class="language-plaintext highlighter-rouge">KillPreviousSummons</code> flag is set, we kill existing ones to prevent infinite spawning. We get the number of summon entities to create from <code class="language-plaintext highlighter-rouge">SummonNumPerActivation</code>, compare it to <code class="language-plaintext highlighter-rouge">SummonMaxSimultaneous</code>, and then create the entities using <code class="language-plaintext highlighter-rouge">SummonEntityContext()</code>. We need to not only create the entities, but also calculate their position relative to the summoner, taking into account all the restrictions, offsets, collisions, and other parameters. All of this is handled by a function called <code class="language-plaintext highlighter-rouge">GetSummonPositions()</code>. After we get our spawn coordinates, we put our newly created entities into the world and attach them to the caster or the target based on the prototype flags if needed (<code class="language-plaintext highlighter-rouge">AttachSummonsToCaster</code> and <code class="language-plaintext highlighter-rouge">AttachSummonsToTarget</code> respectively).</p>
+
+<p>In most cases this entity is going to be an invisible area called a <em>hotspot</em> that will damage and/or apply other effects to whoever overlaps with it.</p>
+
+<h3 id="hotspots">Hotspots</h3>
+
+<p>In most cases hotspots are invisible to players (except for visual effects in rare cases). When they enter the world, they also begin interacting with the game’s physics system, which is processed on the server and the client in parallel. The physics system simulates movement of entities within the game world and invokes events such as <code class="language-plaintext highlighter-rouge">OnOverlapBegin()</code> and <code class="language-plaintext highlighter-rouge">OnOverlapEnd()</code>.</p>
+
+<p>The two main use cases for hotspots are mission triggers (<code class="language-plaintext highlighter-rouge">HandleOverlapBegin_Missions()</code>) and power triggers (<code class="language-plaintext highlighter-rouge">HandleOverlapBegin_Powers()</code> and <code class="language-plaintext highlighter-rouge">HandleOverlapEnd_PowerEvent()</code>). We have already covered missions in previous reports, and now it is time to talk about powers.</p>
+
+<p>Hotspots apply powers defined in the prototype in the following two fields:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">AppliesPowers</code></p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">AppliesIntervalPowers</code></p>
+  </li>
+</ul>
+
+<p>And this is where it becomes complex. There are many powers and many targets, targets can enter and exit the hotspot, and all of this needs to be tracked. We use a dictionary with target id as key and a structure called <code class="language-plaintext highlighter-rouge">PowerTargetMap</code> as value:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="n">Dictionary</span><span class="p">&lt;</span><span class="kt">ulong</span><span class="p">,</span> <span class="n">PowerTargetMap</span><span class="p">&gt;</span> <span class="n">_overlapPowerTargets</span><span class="p">;</span>
+
+<span class="k">public</span> <span class="k">struct</span> <span class="nc">PowerTargetMap</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="n">HotspotPowerMask</span> <span class="n">ActivePowers</span><span class="p">;</span>
+    <span class="k">public</span> <span class="n">HotspotPowerMask</span> <span class="n">IgnorePowers</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">HotspotPowerMask</code> is a bit field that can contain the state of up to 32 different powers. We use these masks to ensure that targets do not have effects applied to them multiple times, and the <code class="language-plaintext highlighter-rouge">HasConditionsForTarget()</code> function helps us prevent infinite condition stacks.</p>
+
+<p><code class="language-plaintext highlighter-rouge">AppliesIntervalPowers</code> works differently: it can either affect random targets if the <code class="language-plaintext highlighter-rouge">IntervalPowersRandomTarget</code> flag is set, or it can target all entities at the same time.</p>
+
+<p>When a new target begins overlapping with a hotspot’s bounds, it gets tracked using our dictionary, and all active powers are applied to it.</p>
+
+<p>As you can see, this is a pretty complex process that involves the interaction of many different systems and events. Let’s take a closer look at one of them.</p>
+
+<h3 id="attached-entities">Attached Entities</h3>
+
+<p>When an entity flagged as <code class="language-plaintext highlighter-rouge">IsAttachedToEntity</code> enters the world, it is attached to the <code class="language-plaintext highlighter-rouge">EntityPhysics</code> component of the specified entity, where it is added to the <code class="language-plaintext highlighter-rouge">AttachedEntities</code> collection.</p>
+
+<p>Every time the <code class="language-plaintext highlighter-rouge">PhysicsManager</code> processes entity movement, it calls <code class="language-plaintext highlighter-rouge">UpdateAttachedEntityPositions()</code>, which calls <code class="language-plaintext highlighter-rouge">ChangeRegionPosition()</code> for all entities in the <code class="language-plaintext highlighter-rouge">AttachedEntities</code> collection. Hotspots override <code class="language-plaintext highlighter-rouge">ChangeRegionPosition()</code> to take into account the offset it gets from <code class="language-plaintext highlighter-rouge">GetCenterOffset()</code> and the relative <code class="language-plaintext highlighter-rouge">SummonOffsetAngle</code>, which allows the beam to rotate around the user rather than its own center.</p>
+
+<p>With this our short overview of hotspots is over, and you should have a general understanding of how it all works. Now I would like to talk about another topic.</p>
+
+<h3 id="controlled-agents">Controlled Agents</h3>
+
+<p>While I was working on summon powers, I noticed that it was related to two other systems: <code class="language-plaintext highlighter-rouge">TeamUpAgent</code> and <code class="language-plaintext highlighter-rouge">ControlledAgent</code>. These two, along with <code class="language-plaintext highlighter-rouge">VanityPet</code> summons, all belong to the same group called <code class="language-plaintext highlighter-rouge">PersistentAgents</code>.</p>
+
+<p>When you transition within the same region using teleports (e.g. elevators in tower regions), your pets should transition with you (and not temporarily get stuck in the previous area like team-ups used to do). This is handled by the <code class="language-plaintext highlighter-rouge">RespawnPersistentAgents()</code> function. I had to overhaul our old team-up implementation for these new requirements. Now all three team-up modes are selectable, although not all functionality related to them is implemented at the time of writing. Let’s move over to controlled agents.</p>
+
+<p>There is a relatively small number of heroes that can control enemies and turn them into pets. Here is the full least of them:</p>
+
+<ul>
+  <li>
+    <p>Emma Frost (living enemies)</p>
+  </li>
+  <li>
+    <p>Rogue (same as Emma Frost via a stolen power)</p>
+  </li>
+  <li>
+    <p>Vision (robots)</p>
+  </li>
+  <li>
+    <p>Magik (demons)</p>
+  </li>
+</ul>
+
+<p>When you use a control power, the <code class="language-plaintext highlighter-rouge">ControlAgentAI</code> power event is invoked via <code class="language-plaintext highlighter-rouge">DoPowerEventActionControlAgentAI()</code>, which calls the <code class="language-plaintext highlighter-rouge">SetControlledAgent()</code> function that establishes control via <code class="language-plaintext highlighter-rouge">SetControlledAgent()</code>. This involves removing the existing controlled agent if needed (e.g. Magik) and binding the new one. The binding process includes placing the controlled entity into an inventory called <code class="language-plaintext highlighter-rouge">AvatarControlledEntities</code> belonging to the controlling avatar, setting the <code class="language-plaintext highlighter-rouge">AIMasterAvatarDbGuid</code> property on it to make it follow the avatar, and overriding its alliance to match the avatar. All boosts flagged as <code class="language-plaintext highlighter-rouge">DisableForControlledAgents</code> are removed, and we get an obedient pet.</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-02/summons-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-02/summons-2.png" alt="Summons 2" /></a>
+</center>
+
+<p>As it turns out, in version 1.52 it is not possible to change pets on the fly. I am not sure when exactly it was changed, but currently the data-defined requirement looks like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>HasEntityInInventory(Context=[Var2], Entity=[], Inventory=[Controlled]) ? False : True
+</code></pre></div></div>
+
+<p>This means that if our inventory with the <code class="language-plaintext highlighter-rouge">Controlled</code> label has any entity in it, it is impossible to control a new one. To get a new pet we first need to dismiss the existing one in the power panel:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-02/summons-3.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-02/summons-3.png" alt="Summons 3" /></a>
+</center>
+
+<p>Implementing all the systems we discussed above restored a lot of gameplay functionality: bosses are now more fun, enemies are more dangerous, and heroes are more playable (and summon-focused heroes are “playable” for the first time in a sense).</p>
+
+<p>Hopefully you found this interesting. Until we meet again in future reports, and have fun playing!</p>
+
+<hr />
+
+<p>That is all we have to share today. Time for us to get back to finishing 0.5.0!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">MHServerEmu Progress Report: January 2025</title><link href="https://crypto137.github.io/MHServerEmu/blog/2025/01/31/progress-report-january-2025.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: January 2025" /><published>2025-01-31T22:15:00+03:00</published><updated>2025-01-31T22:15:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2025/01/31/progress-report-january-2025</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2025/01/31/progress-report-january-2025.html"><![CDATA[<!--more-->
+
+<p><img src="/MHServerEmu/assets/blog/progress-report/2025-01/header.jpg" alt="MHServerEmu Progress Report - January 2025" /></p>
 
 <p>The first month of 2025 is almost over, and we have some MHServerEmu progress to share.</p>
 
@@ -2501,480 +2712,4 @@
 
 <hr />
 
-<p>And with that the third and final progress report of this spring is over. See you in the summer!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">MHServerEmu Progress Report: April 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/04/30/progress-report-april-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: April 2024" /><published>2024-04-30T19:00:00+03:00</published><updated>2024-04-30T19:00:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/04/30/progress-report-april-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/04/30/progress-report-april-2024.html"><![CDATA[<!--more-->
-
-<p><img src="/MHServerEmu/assets/blog/progress-report/2024-04/header.jpg" alt="MHServerEmu Progress Report - April 2024" /></p>
-
-<p>Another month has passed, and we have some more updates to share regarding the development of MHServerEmu.</p>
-
-<h2 id="i-serialize">I, Serialize</h2>
-
-<p>Communication is key in relationships, and the one between the client and the server is no exception. A very important aspect of computer communication is the process of serialization - describing a data structure or an object so that it can be restored at another time and/or place. Serialization is commonplace in games: every time you save or load, you are serializing or deserializing the state of the game. Refactoring and improving our server’s serialization capabilities is something I have spent the better part of April working on. Before we dive into the specifics of what exactly Gazillion concocted, let us take a look at the bigger picture first. Some of this has already been mentioned in previous reports, but this time we are diving deeper than ever before.</p>
-
-<p>One of the most popular serialization formats these days is JSON: it represents data as plain text, which makes it easily readable and convenient to edit, but also highly inefficient both in terms of bandwidth and serialization time. As mentioned in previous reports, the core technology that Marvel Heroes relies on for serialization is Google’s <a href="https://protobuf.dev/">Protocol Buffers</a> (protobufs). Here is how it works: first, you define a structure using its language:</p>
-
-<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">message</span> <span class="nc">NetStructItemSpec</span> <span class="p">{</span>
-    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">itemProtoRef</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">uint32</span>    <span class="na">itemLevel</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">rarityProtoRef</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">uint32</span>    <span class="na">seed</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="kt">uint32</span>    <span class="na">creditsAmount</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
-    <span class="k">repeated</span> <span class="n">NetStructAffixSpec</span>    <span class="na">affixSpecs</span>    <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">equippableBy</span>    <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Then, you run the structures you defined through a code generator that produces highly efficient, but also very repetitive and barely readable code in your desired programming language. You can add this code to your program as a library, and then call it when you need something serialized. An important aspect of the code produced this way is that it includes the so-called “descriptors” that contain real-time type information (RTTI) and can be parsed by special tools, such as <a href="https://github.com/dennwc/protod">protod</a>, to restore the original definitions. This is exactly what we did: we reconstructed the original protobuf structures from the compiled C++ client code, which we then used to generate a C# library that serializes data in a way the client can understand. Such language interoperability is one of the key features of protobufs.</p>
-
-<p>One way Gazillion uses protobufs is to implement a system that resembles the <a href="https://en.wikipedia.org/wiki/Command_pattern">command pattern</a>, and is the foundation of all network messages: requests are represented as objects that are serialized using protobufs, and then sent over a network. Here is an example of a server to client message that includes the <code class="language-plaintext highlighter-rouge">NetStructItemSpec</code> structure from the previous example, and is used to broadcast chat messages when players find rare items:</p>
-
-<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">message</span> <span class="nc">NetMessageBroadcastRareItem</span> <span class="p">{</span>
-    <span class="k">required</span> <span class="kt">string</span>    <span class="na">playerName</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="k">required</span> <span class="n">NetStructItemSpec</span>    <span class="na">item</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
-    <span class="k">required</span> <span class="n">ChatRoomTypes</span>    <span class="na">roomType</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>And this is where the intended use of protobufs ends and we get into the hackery territory. As you look through the defined messages, you begin to see things like this pop up:</p>
-
-<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">message</span> <span class="nc">NetMessageEntityCreate</span> <span class="p">{</span>
-    <span class="k">required</span> <span class="kt">bytes</span>    <span class="na">baseData</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">bytes</span>    <span class="na">archiveData</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="kd">message</span> <span class="nc">NetMessageLocomotionStateUpdate</span> <span class="p">{</span>
-    <span class="k">required</span> <span class="kt">bytes</span>    <span class="na">archiveData</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="kd">message</span> <span class="nc">NetMessageActivatePower</span> <span class="p">{</span>
-    <span class="k">required</span> <span class="kt">bytes</span>    <span class="na">archiveData</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="kd">message</span> <span class="nc">NetMessagePowerResult</span> <span class="p">{</span>
-    <span class="k">required</span> <span class="kt">bytes</span>    <span class="na">archiveData</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-04/hell.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-04/hell.jpg" alt="Gazillion Hackery" /></a></p>
-
-<p>To make sense of this, first, we need to understand how protobufs work under the hood. <em>Note: We are going to assume little-endian byte order unless noted otherwise.</em></p>
-
-<p>At the heart of protobufs lies the so-called <a href="https://protobuf.dev/programming-guides/encoding/">wire format</a>, which is used to encode your defined structures as binary data. The basic unit of information in protobufs is called a varint, which stands for <strong>var</strong>iable-width <strong>int</strong>eger. Typically, when you want to store a value, you use a data type with a certain amount of memory allocated to it, which dictates its bounds: a classic example of this is a signed 32-bit integer, which can store values from <code class="language-plaintext highlighter-rouge">-2147483648</code> to <code class="language-plaintext highlighter-rouge">2147483647</code>. When you store smaller values, you may need just one or two bytes, but a 32-bit signed integer is still going to use all four of them, even though most of the bits are going to be left unset. Protobufs solve this problem in two steps. First, when varints are encoded, the most significant bit in each byte is reserved as the “continuation bit” that determines whether there are more  bytes that follow it:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>10010110 00000001
-^ MSB    ^ MSB
-</code></pre></div></div>
-
-<p>When decoding, we continue to read bytes until we get to the one where the most significant bit is not set. This way we can encode a value equivalent to a 64-bit unsigned integer, and it is going to take from one to ten bytes, with smaller values using fewer bytes.</p>
-
-<p>If you were to use this approach to encode a signed integer though, you would run into an issue: since the most significant bit of an unencoded signed integer is used to determine whether it is negative or not, you are going to have go through a bunch of mostly useless zeroes to get to it, and you will end up using all ten bytes even for a value as small as <code class="language-plaintext highlighter-rouge">-1</code>. This is where the second part of the protobuf magic comes in: zig-zag encoding. The idea is that you mix positive and negative values together in a “zig-zag” pattern, with even numbers representing positive values, and odd numbers representing negative values:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Encoded      Decoded
-0            0
-1              -1
-2            1
-3              -2
-4            2
-</code></pre></div></div>
-
-<p>One last piece of the original protobuf puzzle we need to understand is how floating point values are encoded. Here a simple pointer hack is used: we just reinterpret the same four bytes used to store a 32-bit float as an unsigned 32-bit integer, and then we encode it using the method above.</p>
-
-<p>Now that we have experienced the tragic backstory flashback, we can take a look at Gazillion’s secret serialization sauce. It seems they were unhappy with how protobufs performed out of the box, so they created their own custom abstraction layer on top of the base protobuf wire format - <em>archives</em>. An archive is an object that combines a memory buffer with functionality for four modes of serialization:</p>
-
-<ul>
-  <li>
-    <p><strong>Migration</strong>: for server &lt;-&gt; server serialization.</p>
-  </li>
-  <li>
-    <p><strong>Database</strong>: for server &lt;-&gt; database serialization.</p>
-  </li>
-  <li>
-    <p><strong>Replication</strong>: for server &lt;-&gt; client serialization.</p>
-  </li>
-  <li>
-    <p><strong>Disk</strong>: for server &lt;-&gt; file serialization.</p>
-  </li>
-</ul>
-
-<p>Each mode can be used both for packing and unpacking, so in total we actually have eight different modes. To interact with an archive, we use the <code class="language-plaintext highlighter-rouge">Transfer()</code> method that has overloads for most common primitive types, such as <code class="language-plaintext highlighter-rouge">bool</code>, <code class="language-plaintext highlighter-rouge">int</code>, <code class="language-plaintext highlighter-rouge">float</code>, and so on, but also structures like <code class="language-plaintext highlighter-rouge">Vector3</code>, collections, and objects that implement the <code class="language-plaintext highlighter-rouge">ISerialize</code> interface:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">interface</span> <span class="nc">ISerialize</span>
-<span class="p">{</span>
-    <span class="k">public</span> <span class="kt">bool</span> <span class="nf">Serialize</span><span class="p">(</span><span class="n">Archive</span> <span class="n">archive</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Most <code class="language-plaintext highlighter-rouge">Transfer()</code> overloads act as wrappers than convert the passed value to or from an unsigned integer, and serialize it as a varint using the internal <code class="language-plaintext highlighter-rouge">Transfer_()</code> method:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="kt">bool</span> <span class="nf">Transfer</span><span class="p">(</span><span class="k">ref</span> <span class="kt">int</span> <span class="n">ioData</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">IsPacking</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="c1">// Convert int to uint and write it</span>
-        <span class="kt">uint</span> <span class="n">encodedData</span> <span class="p">=</span> <span class="n">CodedOutputStream</span><span class="p">.</span><span class="nf">EncodeZigZag32</span><span class="p">(</span><span class="n">ioData</span><span class="p">);</span>
-        <span class="k">return</span> <span class="nf">Transfer_</span><span class="p">(</span><span class="k">ref</span> <span class="n">encodedData</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">else</span>
-    <span class="p">{</span>
-        <span class="c1">// Read a uint and convert it back to int</span>
-        <span class="kt">uint</span> <span class="n">encodedData</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
-        <span class="kt">bool</span> <span class="n">success</span> <span class="p">=</span> <span class="nf">Transfer_</span><span class="p">(</span><span class="k">ref</span> <span class="n">encodedData</span><span class="p">);</span>
-        <span class="n">ioData</span> <span class="p">=</span> <span class="n">CodedInputStream</span><span class="p">.</span><span class="nf">DecodeZigZag32</span><span class="p">(</span><span class="n">encodedData</span><span class="p">);</span>
-        <span class="k">return</span> <span class="n">success</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>In addition to the protobuf wire format, Gazillion brought some of their own tricks to the table. For instance, along with the standard protobuf way of encoding floating point values, archives support another, more efficient, but less precise way:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="kt">bool</span> <span class="nf">TransferFloatFixed</span><span class="p">(</span><span class="k">ref</span> <span class="kt">float</span> <span class="n">ioData</span><span class="p">,</span> <span class="kt">int</span> <span class="n">precision</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">precision</span> <span class="p">=</span> <span class="n">precision</span> <span class="p">&lt;</span> <span class="m">0</span> <span class="p">?</span> <span class="m">1</span> <span class="p">:</span> <span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="n">precision</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">IsPacking</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="kt">uint</span> <span class="n">encodedData</span> <span class="p">=</span> <span class="n">CodedOutputStream</span><span class="p">.</span><span class="nf">EncodeZigZag32</span><span class="p">((</span><span class="kt">int</span><span class="p">)(</span><span class="n">ioData</span> <span class="p">*</span> <span class="n">precision</span><span class="p">));</span>
-        <span class="k">return</span> <span class="nf">Transfer_</span><span class="p">(</span><span class="k">ref</span> <span class="n">encodedData</span><span class="p">);</span>
-    <span class="p">}</span>
-    <span class="k">else</span>
-    <span class="p">{</span>
-        <span class="kt">uint</span> <span class="n">encodedData</span> <span class="p">=</span> <span class="m">0</span><span class="p">;</span>
-        <span class="kt">bool</span> <span class="n">success</span> <span class="p">=</span> <span class="nf">Transfer_</span><span class="p">(</span><span class="k">ref</span> <span class="n">encodedData</span><span class="p">);</span>
-        <span class="n">ioData</span> <span class="p">=</span> <span class="p">((</span><span class="kt">float</span><span class="p">)</span><span class="n">CodedInputStream</span><span class="p">.</span><span class="nf">DecodeZigZag32</span><span class="p">(</span><span class="n">encodedData</span><span class="p">))</span> <span class="p">/</span> <span class="n">precision</span><span class="p">;</span>
-        <span class="k">return</span> <span class="n">success</span><span class="p">;</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>A precision argument is passed, which represents the power of 2 by which the value is multiplied. The fractional part is then discarded, and the value is encoded as a regular signed integer using the zig-zag method. The process is reversed to get an approximation of the original value with the given precision. Here is an example of a real value being encoded:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Encode</span>
-<span class="kt">float</span> <span class="k">value</span> <span class="p">=</span> <span class="m">12.3689f</span><span class="p">;</span>
-<span class="k">value</span> <span class="p">=</span> <span class="k">value</span> <span class="p">*</span> <span class="p">(</span><span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">3</span><span class="p">);</span>                  <span class="c1">// 12.3689 * 8 = 98.9512</span>
-<span class="kt">uint</span> <span class="n">encodedValue</span> <span class="p">=</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span><span class="k">value</span><span class="p">;</span>           <span class="c1">// 98</span>
-
-<span class="c1">// Decode</span>
-<span class="k">value</span> <span class="p">=</span> <span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="n">encodedValue</span> <span class="p">/</span> <span class="p">(</span><span class="m">1</span> <span class="p">&lt;&lt;</span> <span class="m">3</span><span class="p">);</span>    <span class="c1">// 98 / 8 = 12.250</span>
-</code></pre></div></div>
-
-<p>So we end up with a value of <code class="language-plaintext highlighter-rouge">12.250</code>, which is an approximation of the original <code class="language-plaintext highlighter-rouge">12.3689</code>. The main use case for this kind of encoding is efficiently packing <code class="language-plaintext highlighter-rouge">Vector3</code> and <code class="language-plaintext highlighter-rouge">Orientation</code> structures, which consist of multiple <code class="language-plaintext highlighter-rouge">float</code> values, and reducing the amount of network traffic used by systems like locomotion.</p>
-
-<p>The final boss of these encoding strategies is the way <code class="language-plaintext highlighter-rouge">bool</code> values are encoded. This caused us a lot of headaches when we first started the development of this project. The boolean data type represents a binary value that can be either <code class="language-plaintext highlighter-rouge">true</code> or <code class="language-plaintext highlighter-rouge">false</code>. However, since the smallest addressable unit of memory in many computer architectures is a byte, which consists of eight bits, a <code class="language-plaintext highlighter-rouge">bool</code> value typically occupies eight times more memory than it actually needs.</p>
-
-<p>To deal with this inefficiency, Gazillion implemented a custom format for packing multiple boolean values into a single byte. When you first attempt to write a <code class="language-plaintext highlighter-rouge">bool</code> to an archive, it writes a byte and remembers the offset at which it was written. If the value is true, it writes <code class="language-plaintext highlighter-rouge">0x81</code>, otherwise <code class="language-plaintext highlighter-rouge">0x1</code>. The next time you try to write a <code class="language-plaintext highlighter-rouge">bool</code>, the archive goes back to the offset of the previously written bool byte, and packs the additional value into it. This continues until the archive packs up to five values to that byte, after which it writes a new byte and updates the offset. The end result you end up with is what we used to call “phantom bools”: when you read encoded data back, each boolean-packed byte contains up to four extra values in addition to the one that was being transfered in that <code class="language-plaintext highlighter-rouge">Transfer()</code> call. Here is how it ends up being structured:</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Bits  | Num Encoded | Hex  | Values
-10000 | 001         | 0x81 | true
-00000 | 001         | 0x1  | false
-11000 | 010         | 0xC2 | true, true
-01000 | 010         | 0x42 | false, true
-00000 | 011         | 0x3  | false, false, false
-10100 | 011         | 0xA3 | true, false, true
-11111 | 101         | 0xFD | true, true, true, true, true
-</code></pre></div></div>
-
-<p>Each primitive data type may also use alternative encoding methods depending on the mode of serialization. The examples above are all for the replication mode, which we have to reimplement as accurately as possible, because it is the mode used to communicate with the client. Since we have the full control of the backend, for other modes, such as database, we can either reuse replication encoding, or come up with some kind of custom solution.</p>
-
-<p>With the theory out of the way, we arrive at the practical application of archives. This is done via the previously mentioned <code class="language-plaintext highlighter-rouge">ISerialize</code> interface. It is implemented by objects that need to be serialized to archives, and when the stars align it looks like this:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="kt">bool</span> <span class="nf">Serialize</span><span class="p">(</span><span class="n">Archive</span> <span class="n">archive</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">bool</span> <span class="n">success</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
-    <span class="n">success</span> <span class="p">&amp;=</span> <span class="n">archive</span><span class="p">.</span><span class="nf">Transfer</span><span class="p">(</span><span class="k">ref</span> <span class="n">_currentCount</span><span class="p">);</span>
-    <span class="n">success</span> <span class="p">&amp;=</span> <span class="n">archive</span><span class="p">.</span><span class="nf">Transfer</span><span class="p">(</span><span class="k">ref</span> <span class="n">_totalCount</span><span class="p">);</span>
-    <span class="n">success</span> <span class="p">&amp;=</span> <span class="n">archive</span><span class="p">.</span><span class="nf">Transfer</span><span class="p">(</span><span class="k">ref</span> <span class="n">_timeStart</span><span class="p">);</span>
-    <span class="n">success</span> <span class="p">&amp;=</span> <span class="n">archive</span><span class="p">.</span><span class="nf">Transfer</span><span class="p">(</span><span class="k">ref</span> <span class="n">_timeEnd</span><span class="p">);</span>
-    <span class="n">success</span> <span class="p">&amp;=</span> <span class="n">archive</span><span class="p">.</span><span class="nf">Transfer</span><span class="p">(</span><span class="k">ref</span> <span class="n">_timePaused</span><span class="p">);</span>
-    <span class="k">return</span> <span class="n">success</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>This code handles both serialization and deserialization in all modes, it is easy to read and maintain, and in general it looks like a good time. However, the saying “no plan survives contact with the enemy” is very true here. A lot of <code class="language-plaintext highlighter-rouge">ISerialize</code> implementations in the game look a lot more like this:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="kt">bool</span> <span class="nf">Serialize</span><span class="p">(</span><span class="n">Archive</span> <span class="n">archive</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">bool</span> <span class="n">success</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
-
-    <span class="kt">uint</span> <span class="n">numElements</span> <span class="p">=</span> <span class="p">(</span><span class="kt">uint</span><span class="p">)</span><span class="n">_myList</span><span class="p">.</span><span class="n">Count</span><span class="p">;</span>
-    <span class="n">archive</span><span class="p">.</span><span class="nf">Transfer</span><span class="p">(</span><span class="k">ref</span> <span class="n">numElements</span><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">archive</span><span class="p">.</span><span class="n">IsPacking</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">archive</span><span class="p">.</span><span class="n">IsPersistent</span><span class="p">)</span>
-        <span class="p">{</span>
-            <span class="c1">// server -&gt; database serialization</span>
-        <span class="p">}</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">archive</span><span class="p">.</span><span class="n">IsReplication</span> <span class="p">&amp;&amp;</span> <span class="n">archive</span><span class="p">.</span><span class="n">ReplicationPolicy</span><span class="p">.</span><span class="nf">HasFlag</span><span class="p">(</span><span class="n">AOINetworkPolicyValues</span><span class="p">.</span><span class="n">ReplicateToProximity</span><span class="p">))</span>
-        <span class="p">{</span>
-            <span class="c1">// server -&gt; client serialization</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-    <span class="k">else</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">archive</span><span class="p">.</span><span class="n">IsPersistent</span><span class="p">)</span>
-        <span class="p">{</span>
-            <span class="c1">// database -&gt; server deserialization</span>
-        <span class="p">}</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">archive</span><span class="p">.</span><span class="n">IsReplication</span> <span class="p">&amp;&amp;</span> <span class="n">archive</span><span class="p">.</span><span class="n">ReplicationPolicy</span><span class="p">.</span><span class="nf">HasFlag</span><span class="p">(</span><span class="n">AOINetworkPolicyValues</span><span class="p">.</span><span class="n">ReplicateToProximity</span><span class="p">))</span>
-        <span class="p">{</span>
-            <span class="c1">// server -&gt; client deserialization</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="n">success</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Everything ends up being completely mixed up and coupled together, which makes it the opposite of a good time. However, these messy implementations provide us with a valuable insight into how the backend of the game, including database persistence, worked. Essentially, your account data, heroes, items, and so on would be serialized to an archive in the database mode to get what was pretty much a save file. This save file would then be saved to the database as a <a href="https://en.wikipedia.org/wiki/Object_storage">blob data type</a>.</p>
-
-<p>All the necessary migration between versions would be handled by the same <code class="language-plaintext highlighter-rouge">Serialize()</code> method during unpacking, meaning that implementations <em>also</em> had to include additional complexity overhead of all the patches ever released so that someone who played for a week in 2013 could still log in again in 2017, with all their progress preserved and migrated on login. Thankfully, we do not have any old saved data to account for, and even when we do implement the support for more versions of the game, we can handle this conversion with an external tool of some kind if the need arises.</p>
-
-<p><code class="language-plaintext highlighter-rouge">archiveData</code> byte arrays mentioned when I was talking about protobuf network messages are actually these same “save files”, but serialized in replication mode, which includes additional runtime information that is generally omitted from persistent storage, as well as some other differences. Some of these messages were actually standard protobuf structures prior to version 1.25, in which the developers did an optimization pass of their network protocol that included the conversion of some of the standard protobuf messages to archives.  Good examples of this are <code class="language-plaintext highlighter-rouge">NetMessageLocomotionStateUpdate</code> and <code class="language-plaintext highlighter-rouge">NetMessagePowerResult</code>: rather than representing an object, they are used as a more efficient way of packing runtime information. Here is an example of what <code class="language-plaintext highlighter-rouge">NetMessagePowerResult</code> looked like in version 1.24:</p>
-
-<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">message</span> <span class="nc">NetMessagePowerResult</span> <span class="p">{</span>
-    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">powerPrototypeId</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">targetEntityId</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">flags</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="kt">bool</span>    <span class="na">isSelfTarget</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">powerOwnerEntityId</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">ultimateOwnerEntityId</span>    <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">combinedOwnerEntityId</span>    <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="kt">float</span>    <span class="na">damagePhysical</span>    <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="kt">float</span>    <span class="na">damageEnergy</span>    <span class="o">=</span> <span class="mi">9</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="kt">float</span>    <span class="na">damageMental</span>    <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="kt">float</span>    <span class="na">healing</span>    <span class="o">=</span> <span class="mi">11</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="n">NetStructPoint3</span>    <span class="na">powerOwnerPosition</span>    <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="kt">int64</span>    <span class="na">powerAssetRefOverride</span>    <span class="o">=</span> <span class="mi">13</span><span class="p">;</span>
-    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">transferToEntityId</span>    <span class="o">=</span> <span class="mi">14</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>So what I have been spending most of April doing is painstakingly going through all classes the implement the <code class="language-plaintext highlighter-rouge">ISerialize</code> interface, untangling the mess, and making adjustments to structures of serializable objects as needed. All of this is a necessary step for implementing the area of interest (AOI) system that handles replication of the server-side simulation to clients, but this is a story for another time.</p>
-
-<h2 id="time-is-a-flat-circle">Time is a Flat Circle</h2>
-
-<p>Serialization is not the only issue I have been tackling lately. As we get more and more fundamental systems working, we get closer to the real meat of this project - the real-time simulation of the game world, and the “real-time” aspect of it is quite tricky.</p>
-
-<p>Probably the most ubiquitous programming pattern you can see in video games is the <a href="https://gameprogrammingpatterns.com/game-loop.html">game loop</a>. In its most simplest form it looks like this:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nf">ProcessInput</span><span class="p">();</span>    <span class="c1">// Get input from keyboard / mouse / controllers</span>
-    <span class="nf">Update</span><span class="p">();</span>          <span class="c1">// Update the simulation accordingly</span>
-    <span class="nf">Render</span><span class="p">();</span>          <span class="c1">// Render the new state of the simulation</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Since we are dealing with a server, there are some I/O differences, but the general idea is the same:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="nf">ProcessClientMessages</span><span class="p">();</span>    <span class="c1">// Player input is serialized and sent over a network</span>
-    <span class="nf">Update</span><span class="p">();</span>                   <span class="c1">// Update the simulation accordingly</span>
-    <span class="nf">SendUpdatesToClients</span><span class="p">();</span>     <span class="c1">// "Render" the new simulation state to clients</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>We still process player input, even though we receive it with a delay, we update the simulation accordingly, and then we “render” the results, but instead of outputting a frame buffer to a screen we send message packets over a network. Therefore, most common wisdom regarding game loops is applicable to our case as well.</p>
-
-<p>The big problem with this simple loop is that it runs as fast as your computer can run it. Therefore, the game is going to slow down or speed up depending on the processing power of the computer running it. It is not 1990 anymore, and our computers generally no longer have turbo buttons to account for this, so we have to deal with it in software.</p>
-
-<p>One common way of solving this is to introduce the so-called delta time - the time difference in seconds between the previous update and the current one:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">float</span> <span class="n">_lastFrameStartTime</span><span class="p">;</span>
-
-<span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">float</span> <span class="n">currentTime</span> <span class="p">=</span> <span class="nf">GetTime</span><span class="p">();</span>
-    <span class="c1">// Divide to convert milliseconds to seconds</span>
-    <span class="kt">float</span> <span class="n">delta</span> <span class="p">=</span> <span class="p">(</span><span class="n">currentTime</span> <span class="p">-</span> <span class="n">_lastFrameStartTime</span><span class="p">)</span> <span class="p">/</span> <span class="m">1000f</span><span class="p">;</span>
-    <span class="n">_lastFrameStartTime</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">;</span>
-
-    <span class="nf">ProcessInput</span><span class="p">();</span>
-    <span class="nf">Update</span><span class="p">(</span><span class="n">delta</span><span class="p">);</span>
-    <span class="nf">Render</span><span class="p">();</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>And then when we update something, we multiply our time-sensitive values by <code class="language-plaintext highlighter-rouge">delta</code> to account for how much time has passed:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">float</span> <span class="n">_position</span><span class="p">;</span>
-<span class="kt">float</span> <span class="n">_speed</span><span class="p">;</span>
-
-<span class="k">void</span> <span class="nf">Update</span><span class="p">(</span><span class="kt">float</span> <span class="n">delta</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">_position</span> <span class="p">+=</span> <span class="n">_speed</span> <span class="p">*</span> <span class="n">delta</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>So the less time has passed since the last update, the less distance we are going to cover in this update. This works great if the game is running locally, and it is the approach you are most likely familiar with if you have ever worked with popular game engines. However, it is not a one-size-fits-all solution. One issue with it is that most video games rely on single-precision floating-point numbers (floats) for a lot of their calculations, which are fast, but also subject to rounding errors. The faster your computer runs, the more updates that involve float calculations it does, and the more float calculations it does, the more its rounding error builds up. In online multiplayer games this leads to clients getting desynchronized from the server, which is something that should be minimized.</p>
-
-<p>To avoid this issue, a fixed update interval is used, commonly referred to as a “tick rate”. This is especially a hot topic in competitive shooters, where the tick rate can get as high as 120+ Hz (so 8.33 ms or less per simulation update). The rendering frequency in this case is generally decoupled from the main simulation, so it is possible to render the game at hundreds of frames per second even with a modest tick rate. The smoothness in this case is achieved by a combination of interpolation and independent simulation of systems that do not have synchronized, such as particle effects. A good example of this is <em>Overwatch</em>, which at launch ran at a modest (by competitive shooter standards) tick rate of around 21 Hz, and eventually it got upgraded to approximately 63 Hz in a later patch. The biggest downside of a low tickrate is that it “batches” events together, causing some things that occured separately to be processed simultaneously, such as you and your opponent shooting and killing each other.</p>
-
-<p>Marvel Heroes also uses this approach: internally it refers to its ticks as “frames”, and by default it runs at the “framerate” of exactly 20 Hz (50 ms per frame). The code that runs the simulation is shared by both the server and the client: the server runs it as a standalone thing, while in the client it is integrated into Unreal Engine, so essentially you have a mini-engine running inside Unreal. To keep the gameplay smooth and responsive, the client runs its own instance of the simulation and corrects it using the information that the server “renders” to it.</p>
-
-<p>So what do you do after you finish your fixed-time update? You wait until it is time for another update. The naive way to approach it is this:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="kt">float</span> <span class="n">TargetFrameTime</span> <span class="p">=</span> <span class="m">50.0f</span><span class="p">;</span>
-
-<span class="kt">float</span> <span class="n">_previousTime</span><span class="p">;</span>
-<span class="kt">float</span> <span class="n">_accumulatedTime</span><span class="p">;</span>
-
-<span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">float</span> <span class="n">currentTime</span> <span class="p">=</span> <span class="nf">GetTime</span><span class="p">();</span>
-    <span class="n">_accumulatedTime</span> <span class="p">+=</span> <span class="n">currentTime</span> <span class="p">-</span> <span class="n">_previousTime</span><span class="p">;</span>
-    <span class="n">_previousTime</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">_accumulatedTime</span> <span class="p">&gt;=</span> <span class="n">TargetFrameTime</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">_accumulatedTime</span> <span class="p">-=</span> <span class="n">TargetFrameTime</span><span class="p">;</span>
-        <span class="nf">DoFixedTimeUpdate</span><span class="p">();</span>    <span class="c1">// Process input, update state, send updates</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>While precise, doing it this way keeps the thread constantly busy, wasting power doing pretty much nothing. Thankfully, there is a handy tool provided to us by the operating system - sleep, which is a feature that lets the OS know that we are not currently doing anything, and the CPU can be used for something else, or it can stay idle if nothing else is going on. This provides us with a much more efficient, but still rather naive way of implementing this, which we previously used for MHServerEmu:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">float</span> <span class="n">currentTime</span> <span class="p">=</span> <span class="nf">GetTime</span><span class="p">();</span>
-    <span class="n">_accumulatedTime</span> <span class="p">+=</span> <span class="n">currentTime</span> <span class="p">-</span> <span class="n">_previousTime</span><span class="p">;</span>
-    <span class="n">_previousTime</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">_accumulatedTime</span> <span class="p">&lt;</span> <span class="n">TargetFrameTime</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="kt">float</span> <span class="n">sleepTime</span> <span class="p">=</span> <span class="n">TargetFrameTime</span> <span class="p">-</span> <span class="n">_accumulatedTime</span><span class="p">;</span>
-        <span class="c1">// Sleep() takes an integer number of milliseconds as its argument</span>
-        <span class="n">Thread</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">((</span><span class="kt">int</span><span class="p">)</span><span class="n">sleepTime</span><span class="p">);</span>
-        <span class="k">continue</span><span class="p">;</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Do the update if enough time has passed</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>So what is so naive about this? The fact that the thread scheduler treats what you tell it to do like the pirate code: it is more like guidelines than actual rules. The time you specify is actually the minimum amount of time the thread is going to sleep, and how much it overshoots this target depends on: your operating system and its version, your hardware, whether a high precision timer is enabled, ambient entropy levels, the state of Schrödinger’s cat, and who knows what else.</p>
-
-<p>This is a problem we are still working on solving, but the solution we are trying out at the time of writing is one of multiple used by the <a href="https://monogame.net/">MonoGame framework</a> (a modern offshoot of Microsoft’s XNA), which involves sleeping in smaller intervals with checks inbetween:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">while</span> <span class="p">(</span><span class="k">true</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="kt">float</span> <span class="n">currentTime</span> <span class="p">=</span> <span class="nf">GetTime</span><span class="p">();</span>
-    <span class="n">_accumulatedTime</span> <span class="p">+=</span> <span class="n">currentTime</span> <span class="p">-</span> <span class="n">_previousTime</span><span class="p">;</span>
-    <span class="n">_previousTime</span> <span class="p">=</span> <span class="n">currentTime</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">_accumulatedTime</span> <span class="p">&lt;</span> <span class="n">TargetFrameTime</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">TargetFrameTime</span> <span class="p">-</span> <span class="n">_accumulatedTime</span> <span class="p">&gt;=</span> <span class="m">2.0</span><span class="p">)</span>
-            <span class="n">Thread</span><span class="p">.</span><span class="nf">Sleep</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Wrap this in while loop to catch up if we missed some frames</span>
-    <span class="k">while</span> <span class="p">(</span><span class="n">_accumulatedTime</span> <span class="p">&gt;=</span> <span class="n">TargetFrameTime</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">_accumulatedTime</span> <span class="p">-=</span> <span class="n">TargetFrameTime</span><span class="p">;</span>
-        <span class="nf">DoFixedTimeUpdate</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>The results we have seen with this implementation range from “good enough” to “pretty great”. When testing on a virtual machine running Kubuntu, the overshoot was generally within our leeway of 2 ms, while on Windows 10 our measured sleep times seemed to be around 15 ms (given the requested 1 ms of sleep), which appears to match the default Windows timer resolution. For measuring this we have used the <code class="language-plaintext highlighter-rouge">Stopwatch</code> class provided by .NET. For now this seems to be accurate enough for our 50 ms window, but for potentially running a more precise simulation we are going to need a better solution.</p>
-
-<p>There are still some tricks we can try out, including those employed by MonoGame and its cousin <a href="https://fna-xna.github.io/">FNA</a>, such as importing and calling native Windows API functions related to timer resolutions, making use of <code class="language-plaintext highlighter-rouge">Thread.SpinWait()</code>, and others. As more gameplay systems become functional, we are also going to have to improve our catchup system: fixed-time update systems are prone to so-called “death spirals”, where your computer is unable to update the simulation fast enough, which leaves more work to do for the next update, and eventually it ends up getting completely stuck. There are strategies to mitigate and potentially recover from these, and it is something we are going to dive deeper in the future.</p>
-
-<h2 id="navi-population-and-physics">Navi, Population, and Physics</h2>
-
-<p><em>AlexBond is back yet again to discuss how things have been going on his front. Please see the <a href="/MHServerEmu/blog/2024/03/31/progress-report-march-2024.html">March report</a> for more context on the work he has been doing lately.</em></p>
-
-<hr />
-
-<p>Hey everyone, it’s AlexBond. This month has ended up being rather fruitful, although it may not seem this way at first. Let’s take a look.</p>
-
-<p>Here are the main things I have been working on:</p>
-
-<ul>
-  <li>
-    <p>Finishing up the NaviSystem</p>
-  </li>
-  <li>
-    <p>BlackOutZone</p>
-  </li>
-  <li>
-    <p>PropSets</p>
-  </li>
-  <li>
-    <p>AreaPopulation</p>
-  </li>
-  <li>
-    <p>SpawnSpec</p>
-  </li>
-  <li>
-    <p>PlayKismetSeq</p>
-  </li>
-  <li>
-    <p>EntityFilter Evaluate</p>
-  </li>
-  <li>
-    <p>PhysicsManager and NaviSweep</p>
-  </li>
-</ul>
-
-<p><strong>NaviSystem</strong> has been improved: all issues have been fixed, and we now have the <code class="language-plaintext highlighter-rouge">NaviMesh.Contains()</code> function that we can use to determine whether an object is contained within the playable area or not. One of the issues that has been fixed is the spawning of NPCs outside of the playable area. In addition, this has laid the foundation for processing game physics interactions.</p>
-
-<p>A <strong>BlackOutZone</strong> is a marker with a radius that defines a zone where enemy spawning is restricted. This information is contained within Cell markers. Some blackout zones are defined in missions or spawners, and NPCs can spawn only if the required mission is in the correct state. When all markers are placed via <code class="language-plaintext highlighter-rouge">SpawnBlackOutZone()</code>, we get another tool to detect intersections with a zone - <code class="language-plaintext highlighter-rouge">InBlackOutZone()</code>. This adds another check when spawning <em>ClusterEntities</em>.</p>
-
-<p><strong>PropSets</strong> are sets of random destructible objects that appear in an area, such as boxes and cars. Markers are picked using <code class="language-plaintext highlighter-rouge">GetRandomPropMarkerOfType()</code> from <code class="language-plaintext highlighter-rouge">PropShapeLists</code>, and then placed in the world. We now have even more cars and trash!</p>
-
-<p><strong>AreaPopulation</strong> is another way of spawning enemies in the game world, but in this case instead of markers we have groups and their weights. Each <em>area</em> has an <code class="language-plaintext highlighter-rouge">AreaPrototype.Population</code> field that contains <code class="language-plaintext highlighter-rouge">Themes.Enemies</code>, as well as population density parameters. We calculate the density of enemies that are already present in an area, and then we determine how many additional enemies we need to add to get to the defined threshold. To get a more accurate density value we use <code class="language-plaintext highlighter-rouge">CalcSpawnableArea()</code> via <code class="language-plaintext highlighter-rouge">NaviMesh</code> while taking into account space not occupied by blackout zones. This way enemies are distributed randomly and evenly along appropriate cells using <code class="language-plaintext highlighter-rouge">SpawnInCell()</code>. Examples of regions that rely on this spawning method include Training Camp, Daily Bugle, Classified Bovine Sector, almost all terminals, as well as other regions that previously seemed rather deserted.</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-04/alex-cows.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-04/alex-cows.jpg" alt="An Amoosing Sight" /></a></p>
-
-<p>Fun fact: the terminal version of Sinister Lab has a population override that prevents dinosaur enemies from spawning there, even though they are present in the story mode version of this region. Some players didn’t seem to remember this.</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-04/alex-browser.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-04/alex-browser.png" alt="Population Override" /></a></p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-04/alex-dinos.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-04/alex-dinos.jpg" alt="Life Finds a Way" /></a></p>
-
-<p><strong>SpawnSpec</strong> is a class responsible for spawning all groups of enemies, including regular NPCs that are typically tied to missions or their own spawners. By merging the spawning system into the SpawnSpec class we have finally been able to get rid of issues with objects hovering in the air and getting stuck in the ground. One remaining problem is that because many destructible props currently spawn after enemies, the system is unable to properly detect collisions, which leads to enemies getting stuck in cars and barrels. This is going to be resolved on its own once spawners get their own timers and events for doing their work.</p>
-
-<p><strong>PlayKismetSeq</strong> is a command that can be sent as a message to the client to start a scripted Unreal Engine cutscene. For example, I have added a trigger for such sequence to the Raft, and now you can see the Quinjet landing when you load into the region. This also includes an animation of Juggernaut running away.</p>
-
-<p><em>Editor’s Note:  Kismet is the name of the visual scripting language that was available in Unreal Engine 3. Those of you who have experience with versions 4 and 5 are most likely familiar with Blueprints: Kismet is an earlier iteration of the same concept. For more information on Kismet see the <a href="https://docs.unrealengine.com/udk/Three/KismetHome.html">official documentation</a>. And now, back to our regularly scheduled programming.</em></p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-04/alex-kismet.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-04/alex-kismet.jpg" alt="Reporting for Duty!" /></a></p>
-
-<p>After that I started investigating what triggers these sequences, and that led me to <em>hotspots</em> and <em>MissionConditionPrototype</em>.</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-04/alex-browser-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-04/alex-browser-2.png" alt="Population Override" /></a></p>
-
-<p>Everything turned out to be more complicated than I expected, and I ended up working on implementing mission logic and game physics…</p>
-
-<p><strong>EntityFilters</strong> are sets of conditions for triggering mission events. To get the result of a condition it has to be determined using the <code class="language-plaintext highlighter-rouge">Evaluate()</code> function, as well as a cached <code class="language-plaintext highlighter-rouge">EntityTrackingContextMap</code> in the <strong>InteractionManager</strong>. This function is coupled with lots of various systems: regions, areas, entities, missions. I have implemented all the base logic, and this foundation is going to come in handy in the future.</p>
-
-<p>The <strong>PhysicsManager</strong> calculates displacements and collisions. The server runs <code class="language-plaintext highlighter-rouge">PhysicsResolveEntities()</code> every frame and checks all active entities for collisions. Internally displacements are called <em>sweeps</em>, and they are handled by the <em>NaviSweep</em> class. NaviSweep consists of numerous real time calculations. After studying some of them, we were able to figure out the source of inspiration for many of them: the book <a href="https://www.amazon.com/Real-Time-Collision-Detection-Interactive-Technology/dp/1558607323">Real-Time Collision Detection by Christer Ericson</a>. Many of the functions used in the game are taken from this book word for word, and it has helped us to make sense of everything. Below is a figure from the book that explains how the <code class="language-plaintext highlighter-rouge">Sphere.Sweep(Aabb)</code> function works.</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-04/alex-rtcd.png"><img src="/MHServerEmu/assets/blog/progress-report/2024-04/alex-rtcd.png" alt="Real-Time Collision Detection by Christer Ericson" /></a></p>
-
-<p><em>PhysicsManager</em> and <em>NaviSweep</em> do a lot of projection and collision detection, but the end result of all these calculations is the triggering of these three events:</p>
-
-<ul>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">OnCollide()</code></p>
-  </li>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">OnOverlapBegin()</code></p>
-  </li>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">OnOverlapEnd()</code></p>
-  </li>
-</ul>
-
-<p>We now have triggers, we can check conditions with <code class="language-plaintext highlighter-rouge">Evaluate()</code>, but we still don’t have an <em>avatar</em> that is going to interact with all of these.</p>
-
-<p>For an avatar (a playable character) to be able to enter the physical world and interact with it, it requires a working <em>Locomotor</em> system.</p>
-
-<p>The server runs <code class="language-plaintext highlighter-rouge">LocomoteEntities()</code> every frame to calculate all types of movements in the game. The Locomotor system is responsible for things such as: moving enemies with <code class="language-plaintext highlighter-rouge">MoveTo()</code>, finding their paths with <code class="language-plaintext highlighter-rouge">GeneratePath()</code>, rotating them with <code class="language-plaintext highlighter-rouge">LookAt()</code>, processing flight, various restrictions, velocity, synchronizing these movements between the server and the client with <code class="language-plaintext highlighter-rouge">SetSyncState()</code>, as well as interacting with the <strong>NaviPath</strong> system. And this is what I am going to be working on next month!</p>
-
-<hr />
-
-<p>We hope you enjoyed this report, see you again next time!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry></feed>
+<p>And with that the third and final progress report of this spring is over. See you in the summer!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry></feed>
