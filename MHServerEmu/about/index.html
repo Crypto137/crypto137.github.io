@@ -61,21 +61,24 @@
 
 <p>We are not remaking the game. We are restoring it to the state it was in before it was shut down.</p>
 
-<p>Marvel Heroes was built on a client-server architecture, which means the game consists of an Unreal Engine 3 based client app that runs on your PC and a remote server that the client connects to. We are using the original client as is without any modifications, and we are <a href="https://en.wikipedia.org/wiki/Reverse_engineering">reverse engineering</a> the server software using the information available in the client.</p>
+<p>Marvel Heroes was built using a client-server architecture, which means the game consists of an Unreal Engine 3 based client application that runs on your PC and a remote server that the client connects to. We are using the original client as is without any modifications, and we are <a href="https://en.wikipedia.org/wiki/Reverse_engineering">reverse engineering</a> the server software using the information available in the client.</p>
 
-<p>This is possible due to some of the choices made during the development of the game. Even though the “netcode” is server-authoritative, meaning the server runs the game and has the final say in all cases, the client features significant prediction capabilities to keep the gameplay smooth. For that purpose it shares a lot of the code, as well as all game data, with the server. So copies of all the original stat values, drop rates, formulas, and so on, as well as some of the logic that processes them, are in the client.</p>
+<p>This is possible due to some of the choices made during the development of the game. Even though the “netcode” is server-authoritative, meaning the server runs the game and has the final say in all cases, the client features significant prediction capabilities to keep the gameplay smooth. For this purpose it shares a lot of the code, as well as all game data, with the server. So copies of all the original stat values, drop rates, formulas, and so on, as well as a lot of the logic that processes them, are in the client.</p>
 
 <p>All of this is completely custom technology developed by Gazillion, and Unreal Engine acts as a sort of graphical wrapper. Porting the client to another engine, such as Unreal Engine 5, is completely outside the scope of this project.</p>
 
 <h3 id="what-versions-of-the-game-do-you-plan-to-support">What versions of the game do you plan to support?</h3>
 
-<p>Currently we are working on version 1.52, released in September 2017. This is the version that was live when the game was shut down. Eventually we plan to move onto 1.53 from November 2017, which was available on the Test Center, but never released.</p>
+<p>Currently we are working on version 1.52, released in September 2017. This is the version that was live when the game was shut down.</p>
 
-<p>After we get post-BUE builds working, we plan on going back and trying to implement support for pre-BUE versions as well. The prime candidates for that in the order or priority are:</p>
+<p>After we get version 1.52 fully working, we plan on going back and trying to implement support for other versions as well. The prime candidates for that in the order or priority are:</p>
 
 <ul>
   <li>
     <p>1.48 - the final pre-BUE version from December 2016.</p>
+  </li>
+  <li>
+    <p>1.53 - the final test center build from November 2017.</p>
   </li>
   <li>
     <p>1.10 - the “vanilla” version from June 2013, around the time the game was first launched.</p>
@@ -90,11 +93,7 @@
 
 <h3 id="how-can-i-help">How can I help?</h3>
 
-<p>If you would like to contribute as a developer, right now we are mostly looking for help with reverse engineering the client and reimplementing its server-related functionality in C# / .NET.</p>
-
-<p>We also looking for any game network traffic captures (also known as packet dumps) made with a tool such as Wireshark before the game servers were shut down.</p>
-
-<p>Another thing you might be able to contribute is some of the rarer versions of the game client that are not on Steam:</p>
+<p>We are currently not looking for help with the development of the server emulator. However, we are looking for some of the rarer versions of the game client that are not on Steam:</p>
 
 <ul>
   <li>
@@ -110,7 +109,11 @@
 
 <p>Please keep in mind that we are looking for complete copies of all client files, and not installers or leftover files.</p>
 
-<p>If you believe you can help us with any of the above, feel free to contact us on <a href="https://discord.gg/hjR8Bj52t3">Discord</a>.</p>
+<p>We are also looking for decrypted dumps of any versions of the PS4 / Xbox One client.</p>
+
+<p>These versions of the game client are not critical for the server development process, buy they will allow us to more thoroughly preserve Marvel Heroes.</p>
+
+<p>If you believe you can help us with this, feel free to contact us on <a href="https://discord.gg/hjR8Bj52t3">Discord</a>.</p>
 
   </div>
 
