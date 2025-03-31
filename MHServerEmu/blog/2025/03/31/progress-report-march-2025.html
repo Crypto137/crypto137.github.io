@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: March 2025 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: March 2025" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2025/03/31/progress-report-march-2025.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2025/03/31/progress-report-march-2025.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-03-31T05:15:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: March 2025" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-03-31T05:15:00+03:00","datePublished":"2025-03-31T05:15:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: March 2025","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2025/03/31/progress-report-march-2025.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2025/03/31/progress-report-march-2025.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: March 2025</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2025-03-31T05:15:00+03:00" itemprop="datePublished">Mar 31, 2025
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2025-03/header.jpg" alt="MHServerEmu Progress Report - March 2025" /></p>
+
+<p>It’s a bird! It’s a plane! It’s an MHServerEmu Progress Report!</p>
+
+<h2 id="060-and-beyond">0.6.0 and Beyond</h2>
+
+<p>We have been doing quarterly stable releases for a whole year now, and this month we released version 0.5.0. As soon as it was out, we began working on the next one, 0.6.0, which is now available via nightly builds.</p>
+
+<p>There are two major features planned for 0.6.0: the implementation of the long awaited power customization via talents, and a fundamental overhaul of our server architecture that is going to allow us to bring some of the “MMOness” back into the game. After doing an informal poll on our Discord server, we decided to prioritize additional work on powers, as it was what the majority of people wanted to see.</p>
+
+<p>We will share more details on the architecture overhaul in future reports, but the short version of it is that the current architecture was designed as temporary scaffolding to allow us to work on the gameplay side of things as soon as possible. The vast majority of gameplay code is going to remain the same, but everything around it, such as game instance management, chat functionality, and other social-oriented features, will be undergoing major changes. It is not going to make much of a difference for people playing on locally hosted servers, but it will be crucial for public servers that intend to replicate the game’s original, more social, experience.</p>
+
+<h2 id="talents">Talents</h2>
+
+<p>Although many players seem to associate talents with the Biggest Update Ever (BUE), it is actually a much older system. First introduced as <em>specialization powers</em> in version 1.35, this system has been in Marvel Heroes since the release of Doctor Doom as a playable hero on the game’s second anniversary in 2015. We happen to have a highly experimental server implementation for this exact version of the game, which we can use to show what the UI for this feature looked like back then:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-03/specialization-powers.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-03/specialization-powers.jpg" alt="Specialization Powers" /></a></p>
+
+<p>The underlying code that runs this system remained mostly the same, and in some cases talents are still referred to as specialization powers (e.g. <code class="language-plaintext highlighter-rouge">SpecializationPowerPrototype</code>). While it is good for pre-BUE support later down the line, it also meant more work needed to be done on the backend of the power system now.</p>
+
+<p>This is a good opportunity to talk about the <em>power progression</em> system and what was the actual extent of changes brought by BUE. You may have noticed that it was possible to use travel and ultimate powers from level 1, even though they are supposed to unlock at higher levels. Team-ups were also using powers that were supposed to be locked for them. The reason for this is that we did not have a proper implementation of the power progression system and simply assigned all powers to avatars and team-ups. The only thing preventing you from using everything from level 1 was client-side validation, and team-ups did not have this “problem”.</p>
+
+<p>There was a reason why we did not work on power progression until we had to do it. Even though BUE seemingly got rid of power ranks, the entire backend is still very much rank-driven and does all the necessary calculations, taking into account various modifiers to power ranks, only to arrive at rank 0 or 1 for everything but ultimate powers. What BUE actually did was set the starting rank of all powers to 1, remove point assignment and rank-modifying affixes from gear, and rescale everything accordingly. For us implementing power progression was a not insignificant amount of work, most of which is going to be pretty much invisible until we support pre-BUE versions of the game. However, since talents are just specialization powers with a new coat of paint, they relied on this underlying system, so it needed to be done.</p>
+
+<p>As a result of implementing power progression, travel and ultimate powers now become usable when they are supposed to, and team-ups unlock powers gradually as they level up. However, this is not the full extent of these changes: it is now also possible to upgrade your ultimate power’s rank using character tokens, and team-up procs that can activate when the team-up is away are now properly assigned to avatars.</p>
+
+<p>Another vital piece of the talent puzzle is <em>mapped powers</em>. This is not a new system either: it was introduced at least as far back as September 2014 when Rogue was released as a playable hero in version 1.26, and it is the foundation of her power stealing mechanic. Mapping a power means replacing it with another one, while also keeping the original power’s rank. The system itself is not very complicated, but it required doing an overhaul of our <em>ability key mapping</em> implementation, which was more in-depth. Ability key mapping is what the game calls action bars, and each “ability” can be either a power or an item. This system was built with various other features in mind, including having multiple switchable bars (unused in BUE), power specs, and tranform mode powers that replace all of your buttons. All of them had to be accounted for.</p>
+
+<p>Speaking of transform mode powers, there are only two of them in version 1.52 (Rocket Raccoon’s Mechfall and Rogue’s Final Form), and both of them now work thanks to these backend improvements.</p>
+
+<p>There is also one thing I would like to note regarding ability key mappings in version 1.52, because we have received numerous bug reports about this. When you level up, the client automatically slots powers into free slots, even if they were not unlocked by reaching that specific level. This means powers will always be reslotted into their designated slots on level up, as long as these slots are not occupied by other powers. Although this is arguably not intuitive behavior, it is done by the client on its own, so to avoid desyncs we have to do the same server-side.</p>
+
+<p>With power progression and mapped powers implemented, talents were pretty much ready to go. The rest of the functionality, like changing how a power behaves, is done using the same proc and condition based “scripting” system we discussed in previous reports, so it pretty much just worked all of a sudden. Now the power system is almost feature complete, with only a few minor things still missing, like shared health pools used by one of the boss encounters in the Muspelheim raid. We will take care of these smaller features at some point before 1.0, but for now we will be moving on to other, higher priority features.</p>
+
+<h2 id="prestige">Prestige</h2>
+
+<p>Talents ended up being implemented faster than expected, which gave me some time to work on minor features that were originally scheduled for 0.7.0: Hero Synergies and Prestige. Synergies are not very interesting to talk about, since they are simply stat bonuses, but with Prestige there are some curious aspects to discuss.</p>
+
+<p>Prestiging a hero is more involved than just resetting their level. You also need to:</p>
+
+<ul>
+  <li>
+    <p>Validate the prestige consumable item interaction.</p>
+  </li>
+  <li>
+    <p>Do a full respec, including unassigning mapped powers and talents.</p>
+  </li>
+  <li>
+    <p>Check restrictions of all equipped items and unequip them, handling potentially running out of space in the general inventory.</p>
+  </li>
+  <li>
+    <p>Reset the progress of missions that save their state per avatar.</p>
+  </li>
+  <li>
+    <p>Grant prestige loot (more on that later).</p>
+  </li>
+  <li>
+    <p>Recalculate the number of avatars at the new prestige level to update achievements.</p>
+  </li>
+  <li>
+    <p>Do a teleport to the starting region.</p>
+  </li>
+</ul>
+
+<p>As you can see, there are many different systems interacting to make this single thing happen. Because all of this occurs at the same time, there were some timing-related issues to solve, particularly related to modifying the inventory at the same time as teleporting, which triggers a save.</p>
+
+<p>While many people remember one of the main Prestige rewards being additional copies of the starting costume, this was actually changed in BUE. Here is how Asros, one of the developers working at Gazillion at the time, explained why this change was made on the game’s <a href="https://web.archive.org/web/20170109140148/http://forums.marvelheroes.com/discussion/comment/3999141#Comment_3999141">official forums</a>:</p>
+
+<blockquote>
+  <p>[…]</p>
+
+  <p>Costumes and costume revenue is a very important part of our business. We understand that there are many free to play players out there who will be disappointed in this decision. We feel very strongly that going forward, purely cosmetic things like costumes, for the most part(achievements/log in gifts as exceptions), should be cash shop items. Sometimes we have to make unpopular decisions for the betterment of the long term health of the game and the company. The reason for the free defaults was to make prestiging easier for players who had high level costume cores attached. Now with the changes to catalyst system, that is no longer a necessity.</p>
+
+  <p>[…]</p>
+</blockquote>
+
+<p>Gazillion ended up replacing the starting costume with the bonus item find (BIF) loot table (<code class="language-plaintext highlighter-rouge">Loot/Tables/BonusItemFind/BonusItemFindTable.prototype</code>), which is the table also used by S.H.I.E.L.D. Supply Drops. The bad news is that it did not end up being good for the “long term health of the game”. The good news is we do not have financial obligations, so I have added a new setting called <code class="language-plaintext highlighter-rouge">GrantStartingCostumeForPrestige</code> that returns the original reward. Once crafting is working, this will be very useful for all of your costume blending needs.</p>
+
+<p>Now that we have Prestige working, there have been some requests from the community to be able to continue leveling up past Prestige level 6 (Cosmic), which is the cap in version 1.52. Gazillion was actually working on extending the Prestige system with something called the Omega Prestige:</p>
+
+<style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style>
+<div class="embed-container">    <iframe title="YouTube video player" width="640" height="390" src="//www.youtube.com/embed/r5LQfV8VQ3Y" frameborder="0" allowfullscreen=""></iframe></div>
+
+<p>Omega Prestige was available in the console versions of the game for some heroes, and the code for it exists in PC test center builds of version 1.53. None of it is available in 1.52, but we have come up with an alternative.</p>
+
+<p>Ultimate Prestige (named by popular vote on our Discord server) is going to be a custom system that will allow you to reset your Prestige level back to 0 (White). We even came up with a way to display your Prestige reset count in the client’s UI:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-03/ultimate-prestige.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-03/ultimate-prestige.jpg" alt="Ultimate Prestige" /></a></p>
+
+<p>Ultimate Prestige will be effectively uncapped, allowing you to level up your favorite hero over and over for as long as you desire. This system is going to be completely optional: server owners will be able to completely disable it in server settings, and we also plan to make the Prestige reset count hideable, in case you do not want everybody around you to know just how much fun you are having with your Squirrel Girl.</p>
+
+<h2 id="prototype-patcher">Prototype Patcher</h2>
+
+<p><em>AlexBond is back again to talk about his latest endeavor - patching the game’s data files server-side.</em></p>
+
+<hr />
+
+<p>Hello everyone, this is AlexBond.</p>
+
+<p>After the recent large power update we discovered more bugs that existed in the original game, which we usually call <em>Gazillion issues</em>. One example of such issue is related to Emma Frost’s controlled minions. As it turns out, when Gazillion reworked mobs as part of their story overhaul, they forgot to flag the new mob alliances as hostile for controlled entities, which means entities controlled by Emma, Vision, Magik, and Rogue are not going to attack enemies belonging to these alliances. These enemies are encountered in the first chapter of the story, so it is not as noticable as it could have been.</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-03/patcher-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-03/patcher-1.png" alt="Prototype Patcher 1" /></a>
+</center>
+
+<p>New alliances:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-03/patcher-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-03/patcher-2.png" alt="Prototype Patcher 2" /></a>
+</center>
+
+<p>To fix issues such as these I came up with an idea to implement a system called <em>Prototype Patch Manager</em>, which can be used to change prototype data when it is being loaded on the server. This allows us to fix numerous bugs without having to rely on hardcoded fixes.</p>
+
+<p>All patches are stored in JSON files in the following subdirectory: <code class="language-plaintext highlighter-rouge">Data\Game\Patches</code>.</p>
+
+<p>For example, the patch to fix the issue with Emma Frost looks like this:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"Enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Prototype"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Entity/Alliances/Overrides/Controlled.prototype"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"HostileTo[]"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Add [GangBiker, GangShocker, GangHellbane, GangElectro, EnemyToEveryone] to Controlled Keywords"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ValueType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PrototypeId[]"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Value"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mi">3046566727234031236</span><span class="p">,</span><span class="w"> </span><span class="mi">11722709847486435174</span><span class="p">,</span><span class="w"> </span><span class="mi">1849637429396115378</span><span class="p">,</span><span class="w"> </span><span class="mi">3414168095237017445</span><span class="p">,</span><span class="w"> </span><span class="mi">4627307232939675976</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">Prototype</code> is the file path of the prototype we want to modify.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">Path</code> is the internal path inside the prototype that points to the required value or array (arrays are specified using <code class="language-plaintext highlighter-rouge">[]</code>).</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">ValueType</code> is the type of the value we are going to change. For prototype references this is going to be <code class="language-plaintext highlighter-rouge">PrototypeId</code>, but for embedded prototype instances you need to use  <code class="language-plaintext highlighter-rouge">PrototypeDataRef</code>.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">Value</code> is a general purpose field that can contain various types, like numerical values, strings, or JSON objects.</p>
+  </li>
+</ul>
+
+<p>Thanks to these patches, we can fix bugs that existed in the original game, bring back events that require loot table modifications, and much more.</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-03/patcher-3.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-03/patcher-3.jpg" alt="Prototype Patcher 3" /></a>
+</center>
+
+<p>We can also add back entities that were removed from the game by repurposing unused markers. For instance, these patches add Cloak and Dagger to the Avengers Tower:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"Enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Prototype"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Resource/Cells/DistrictCells/Avengers_Tower/AvengersTowerNPE_HUB.cell"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MarkerSet.Markers[27].EntityGuid"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Add Dagger"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ValueType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PrototypeGuid"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Value"</span><span class="p">:</span><span class="w"> </span><span class="mi">6158563480682235387</span><span class="w">
+</span><span class="p">}</span><span class="err">,</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="nl">"Enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Prototype"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Resource/Cells/DistrictCells/Avengers_Tower/AvengersTowerNPE_HUB.cell"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MarkerSet.Markers[27].Position"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Change Dagger position"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ValueType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Vector3"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Value"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"> </span><span class="mf">-694.76</span><span class="p">,</span><span class="w"> </span><span class="mf">2003.63</span><span class="p">,</span><span class="w"> </span><span class="mf">160.97</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="err">,</span><span class="w">
+</span><span class="p">{</span><span class="w">
+    </span><span class="nl">"Enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Prototype"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Resource/Cells/DistrictCells/Avengers_Tower/AvengersTowerNPE_HUB.cell"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MarkerSet.Markers[28].EntityGuid"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Add Cloak"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ValueType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PrototypeGuid"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Value"</span><span class="p">:</span><span class="w"> </span><span class="mi">13282508175937904349</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Meet the new guests!</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-03/patcher-4.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-03/patcher-4.jpg" alt="Prototype Patcher 4" /></a>
+</center>
+
+<p>In addition to modifying the values of existing fields, there is also a more complex system that can be used to add new embedded prototypes. For example, we can create a loot table that would drop Carnival Beads by repurposing the unused <code class="language-plaintext highlighter-rouge">TestItemsLootTable</code>:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"Enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Prototype"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Loot/Tables/Test/TestItemsLootTable.prototype"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Choices[0].Choices[]"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Add [MGBeads, MGBeads2] as LootDropItemPrototype"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ValueType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Prototype[]"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Value"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"ParentDataRef"</span><span class="p">:</span><span class="w"> </span><span class="mi">1071992662862269383</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Item"</span><span class="p">:</span><span class="w"> </span><span class="mi">7800473051294539167</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Weight"</span><span class="p">:</span><span class="w"> </span><span class="mi">50</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"ParentDataRef"</span><span class="p">:</span><span class="w"> </span><span class="mi">1071992662862269383</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Item"</span><span class="p">:</span><span class="w"> </span><span class="mi">10014849647161122257</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"Weight"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>To add a new <code class="language-plaintext highlighter-rouge">Prototype</code> you need to specify its <code class="language-plaintext highlighter-rouge">ParentDataRef</code>, usually it is a <code class="language-plaintext highlighter-rouge">*.defaults</code> prototype:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-03/patcher-5.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-03/patcher-5.png" alt="Prototype Patcher 5" /></a>
+</center>
+
+<p><code class="language-plaintext highlighter-rouge">ParentDataRef</code> is followed by fields inside this class (<code class="language-plaintext highlighter-rouge">Item</code>, <code class="language-plaintext highlighter-rouge">Weight</code>) that we override from defaults. In order for the <code class="language-plaintext highlighter-rouge">TestItemsLootTable</code> to work and bosses to drop what we want, we need to add this table’s id (<code class="language-plaintext highlighter-rouge">14120665269944980064</code>) to the global <code class="language-plaintext highlighter-rouge">SpecialEventsTable</code>:</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"Enabled"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Prototype"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Loot/Tables/Mob/Bosses/SpecialEventsTable.prototype"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Path"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Choices[]"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Add TestItemsLootTable for CarnivalEvent"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ValueType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PrototypeDataRef"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"Value"</span><span class="p">:</span><span class="w"> </span><span class="mi">14120665269944980064</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Now we can defeat Black Cat and get our Carnival Beads:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-03/patcher-6.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-03/patcher-6.jpg" alt="Prototype Patcher 6" /></a>
+</center>
+
+<p>I have made patches for multiple such events, Mardi Gras is just an example for people who want to try doing it themselves.</p>
+
+<p>It is also possible to modify missions like this in a limited fashion, including bringing some of them back. When making changes to mission prototypes, here is what is important to keep in mind:</p>
+
+<ul>
+  <li>
+    <p>The client is going to complain and not refresh objectives if the mission was disabled. However, the mission will work and you will be able to get rewards.</p>
+  </li>
+  <li>
+    <p>You cannot modify elements related to visibility and interaction. They have to be in sync between the client and the server.</p>
+  </li>
+  <li>
+    <p>If data is used only by the server, it is safe to modify.</p>
+  </li>
+</ul>
+
+<p>Hopefuly somebody will use these tools to bring back something that was disabled (intentionally or by mistake).</p>
+
+<p>And with that it is time to say goodbye for now. Good luck leveling up <del>NoLifer</del> Ultimate Prestige!</p>
+
+<hr />
+
+<p>This is it for this progress report. See you all next time!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2025/03/31/progress-report-march-2025.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>
