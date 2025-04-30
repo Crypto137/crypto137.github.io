@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: April 2025 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: April 2025" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2025/04/30/progress-report-april-2025.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2025/04/30/progress-report-april-2025.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-04-30T06:15:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: April 2025" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-04-30T06:15:00+03:00","datePublished":"2025-04-30T06:15:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: April 2025","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2025/04/30/progress-report-april-2025.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2025/04/30/progress-report-april-2025.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: April 2025</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2025-04-30T06:15:00+03:00" itemprop="datePublished">Apr 30, 2025
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2025-04/header.jpg" alt="MHServerEmu Progress Report - April 2025" /></p>
+
+<p>Here is another MHServerEmu Progress Report for you.</p>
+
+<h2 id="current-status">Current Status</h2>
+
+<p>Compared to the crazy ride of February and March, when a lot of features just started working of all of a sudden, April has definitely been a slower month, but things are still happening in the background. After implementing login rewards early in the month, I took a break, during which Alex continued to work on bug fixes, optimization, and minor improvements. When I returned from my break, Alex shifted to digging into the Unreal side of the game again, while I started working on the big server architecture overhaul I mentioned a number of times over the past few months.</p>
+
+<h2 id="architecture-overhaul">Architecture Overhaul?</h2>
+
+<p>When we talk about server architecture, it is important to mention how MHServerEmu differs from what Gazillion had back when they were running the game. While MHServerEmu is a single monolithic all-in-one package that does <em>almost</em> everything, Gazillion had an entire cluster of servers that handled various aspects of the overall online service. Here is a diagram I did back in October 2023 based on the network protocol embedded in the client:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-04/gazillion-server-cluster.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-04/gazillion-server-cluster.png" alt="Gazillion Server Cluster" /></a></p>
+
+<p>Based on our packet captures, at the very least GameInstanceServer (GIS) and FrontendServer (FES) were horizontally scalable, meaning Gazillion had more than one GIS and FES and could add more as needed.</p>
+
+<p>This kind of architecture makes a lot of sense if your goal is to have a single centralized service and have it scale up to potentially tens and hundreds of thousands of players. However, the preservation aspect has been a top priority for me since the inception of this project, and having a single centralized service may be the worst way of preserving an online game, especially when you are talking about a game based on IP licensed from a notoriously litigious company. This is why I opted for a monolithic self-contained server approach: while it is not as scalable, it makes the server significantly easier to set up (effectively as easy as installing a mod for a single player game), and when you host it locally yourself, there is no practical way to “take it away” anymore.</p>
+
+<p>Despite MHServerEmu being a single server, its architecture still mirrors Gazillion’s server cluster with functionality originally delegated to separate servers now running as “services” on different threads of the same process. Up until this point the vast majority of our efforts went into implementing GIS functionality, which is what handles practically all gameplay-related processing. Implementations of other services have been little more than stubs, doing just the bare minimum required to get a player into a game instance.</p>
+
+<p>As the gameplay side got closer to a feature complete state, we have seen increases in player numbers on some of the more popular community-hosted servers, in some cases reaching hundreds of concurrent players. The existing implementations of many of these supporting services were practically just scaffolding, and some of them were creaking at the seams, because they were doing the work they were never really designed to do. One good example of this was our old implementation of the frontend server, which processes raw client connections and routes received data to various backend services. Because the old implementation was quickly hacked together to handle a locally connected client, it had issues handling data from unreliable connections, such as those that involved Wi-Fi on the client side, which resulted in some players being frequently disconnected from the server.</p>
+
+<p>I did my best to do quick fixes as issues arised, which resulted in things like the current instancing solution you can see on some of the community-hosted servers. However, now that gameplay was in a reasonably decent state, it was time to take another good look at the supporting services and the overall architecture.</p>
+
+<h2 id="frontend-improvements">Frontend Improvements</h2>
+
+<p>Because we have been relying on quick fixes for non-gameplay related functionality so far, a web of technical debt started to accumulate, and it needed to be untangled.</p>
+
+<p>The first area I looked at this month was the aforementioned Frontend. I have identified the following issues with it:</p>
+
+<ul>
+  <li>
+    <p>Other services depended on the concrete <code class="language-plaintext highlighter-rouge">FrontendClient</code> implementation. This made it impossible to, for example, do an alternative Frontend implementation that could potentially run as a separate process, if the need ever arises.</p>
+  </li>
+  <li>
+    <p>The protocol of an incoming message depends on the current state of the connection, meaning that messages cannot be deserialized as soon as they arrive. Previously new buffers were allocated for every single incoming message to store them until they could be deserialized, resulting in increased garbage collection (GC) pressure and more frequent GC-related stuttering.</p>
+  </li>
+  <li>
+    <p>Packet parsing was not buffered, meaning that if a packet arrived in fragments across multiple data transmissions, it could not be parsed, and the client was forced to disconnect. This is the previously described Wi-Fi issue.</p>
+  </li>
+  <li>
+    <p>The authentication process was not implemented as strictly as it should have been, which gave some leeway to unauthenticated and potentially malicious clients.</p>
+  </li>
+  <li>
+    <p>The Frontend had no rate limiting, making it highly susceptible to potential DoS attacks.</p>
+  </li>
+</ul>
+
+<p>Here is a summary of what I have done this month to address these issues:</p>
+
+<ul>
+  <li>
+    <p>Other services can now interact with the Frontend through an abstract <code class="language-plaintext highlighter-rouge">IFrontendClient</code> interface, which provides flexibility in how Frontend is implemented. There is still some remaining concrete frontend implementation dependency, primarily in the Player Manager service, which will eventually be cleaned up. The end goal is to make all services completely independent from the concrete frontend implementation we have.</p>
+  </li>
+  <li>
+    <p>The entire message handling pipeline has been overhauled:</p>
+
+    <ul>
+      <li>
+        <p>Message buffers are now pooled and reused.</p>
+      </li>
+      <li>
+        <p>Messages are now routed asynchronously on thread pool threads as they arrive rather than on a single dedicated thread, resulting in reduced latency.</p>
+      </li>
+      <li>
+        <p>Various smaller optimizations have been made, such as replacing <code class="language-plaintext highlighter-rouge">lock</code> with <code class="language-plaintext highlighter-rouge">SpinLock</code> when swapping queues and reducing the number of protocol table dictionary lookups.</p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Packet parsing has been completely rewritten to allow it to persist state between data receives and reconstruct fragmented packets.</p>
+  </li>
+  <li>
+    <p>The authentication process is now more rigid, and clients are disconnected when they attempt to do something unexpected.</p>
+  </li>
+  <li>
+    <p>The frontend now limits incoming data from each connected client using an implemenation of the <a href="https://en.wikipedia.org/wiki/Token_bucket">token bucket</a> algorithm.</p>
+  </li>
+</ul>
+
+<p>These Frontend changes are now available in nightly builds. As expected, there were some early issues to iron out, like this one small mistake that lead to a single malformed packet from an unauthenticated client causing a total server crash with 3 GB of logs (oops). But now that they were taken care of, the Frontend is in a much better state in terms of performance, reliability, and modularity.</p>
+
+<h2 id="chat-improvements">Chat Improvements</h2>
+
+<p>The next big area of technical debt we have is the Player Manager, which is a service that is supposed to load balance connected clients across different game instances and manage related features, like ensuring all member of a party end up in the same region instance. However, before meaningful improvements can be made to it, two main issues need to be solved:</p>
+
+<ul>
+  <li>
+    <p>Our old implementation of the service system allowed only very limited communication between services, mostly related to routing client message. This was insufficient for the Player Manager, which requires extensive bidirectional communication with game instances.</p>
+  </li>
+  <li>
+    <p>The chat command system, which dates back to August 2023 and is some of the oldest server code we still use, was tightly coupled with the existing concrete Player Manager implementation.</p>
+  </li>
+</ul>
+
+<p>The communication issue was relatively easy to solve: we now have a more flexible event-like system, which can be extended with new message types as needed. We will be monitoring its performance, especially in relation to GC pressure under heavy load, but overall it seems to be doing the job we need so far.</p>
+
+<p>The chat command problem is trickier to deal with however. Not only was our code left mostly untouched since August 2023, it was also heavily based on the command system from a work-in-progress Diablo III server emulator called Mooege, which was written back in 2011. The command system needed a total overhaul, which also required all command implementations to be adjusted accordingly. To make matters worse, in order to decouple everything from the Player Manager, we needed to overhaul our chat implementation, which was another overextended service stub.</p>
+
+<p>The first order of business was improving the foundation, which was chat. Chat messages need to go through quite a journey to arrive to other players:</p>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">Client</code> -&gt; <code class="language-plaintext highlighter-rouge">FES</code> -&gt; <code class="language-plaintext highlighter-rouge">PlayerManager</code> -&gt; <code class="language-plaintext highlighter-rouge">GIS</code> -&gt; <code class="language-plaintext highlighter-rouge">Game</code> -&gt; <code class="language-plaintext highlighter-rouge">GroupingManager</code> -&gt; <code class="language-plaintext highlighter-rouge">Client</code></p>
+</blockquote>
+
+<p>The key service in this chain is the Grouping Manager, which is effectively the “chat service”. Previously we immediately routed chat messages from games to the Grouping Manager, which was problematic for a number of reasons. First, the Grouping Manager has no access to game state, so it has no idea what players are “nearby” to filter recipients in say and emote channels, or what prestige level each player is at to color their names accordingly. Second, command parsing happened at the Grouping Manager level, so if a command needed to do something game-related, which is very often the case, it needed to go through the Player Manager to get a reference to a game that the client was in. This coupled the Grouping Manager, the command system, the Player Manager, and game instance management in a single messy blob.</p>
+
+<p>To solve this, initial chat message handling now happens at the game level, which gives us the opportunity to include necessary game state data before forwarding them to the Grouping Manager, or even avoid forwarding altogether if the message is successfully parsed as a command. This in turn gives commands direct access to game instances that invoked them, which circumvents the entire roundabout trip through the Player Manager.</p>
+
+<p>Thanks to this, proximity and region based chat channels now work as they should, and players on community-hosted public servers now have to use the <code class="language-plaintext highlighter-rouge">Social</code>, <code class="language-plaintext highlighter-rouge">Trade</code>, and <code class="language-plaintext highlighter-rouge">LFG</code> channels for cross-region communication, just like back in the day. One side effect of implementing proximity chat is that the Nearby tab of the social panel now displays nearby players:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-04/nearby.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-04/nearby.jpg" alt="Gazillion Server Cluster" /></a></p>
+
+<p>There appear to be some issues related to updating the status of players in the Nearby tab, which may or may not be client-side UI issues. We will be further looking into it as part of the bigger community system update, which will include implementing other tabs and broadcasting player status data across different game instances. For now we still have some command system improvements to do.</p>
+
+<h2 id="command-improvements">Command Improvements</h2>
+
+<p>As part of this command system overhaul, I wanted to not only get rid of unnecessary dependencies on other services, but also make improvements to some long-standing issues with maintaining command implementations:</p>
+
+<ul>
+  <li>
+    <p>There was too much boilerplate code for validating invokers and arguments.</p>
+  </li>
+  <li>
+    <p>The existing help functionality was too inconvenient to use, and updating the <a href="https://github.com/Crypto137/MHServerEmu/blob/master/docs/ServerEmu/ServerCommands.md">command list</a> in our documentation took too much effort to do manually, leading to it always being out of date.</p>
+  </li>
+</ul>
+
+<p>My plan for tackling both of these problems was to make validation more data-driven and provide the necessary data to the command system using C# attributes, which we already used to define commands.</p>
+
+<p>For example, this is what the <code class="language-plaintext highlighter-rouge">!region warp</code> command looked like previously:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nf">Command</span><span class="p">(</span><span class="s">"warp"</span><span class="p">,</span> <span class="s">"Warps the player to another region.\nUsage: region warp [name]"</span><span class="p">,</span> <span class="n">AccountUserLevel</span><span class="p">.</span><span class="n">Admin</span><span class="p">)]</span>
+<span class="k">public</span> <span class="kt">string</span> <span class="nf">Warp</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">@params</span><span class="p">,</span> <span class="n">FrontendClient</span> <span class="n">client</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">client</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">"You can only invoke this command from the game."</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">@params</span><span class="p">.</span><span class="n">Length</span> <span class="p">==</span> <span class="m">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">"Invalid arguments. Type 'help region warp' to get help."</span><span class="p">;</span>
+
+    <span class="c1">// Implementation</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>And here is the same command with the current version of attribute-based validation:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nf">Command</span><span class="p">(</span><span class="s">"warp"</span><span class="p">,</span> <span class="s">"Warps the player to another region.\nUsage: region warp [name]"</span><span class="p">)]</span>
+<span class="p">[</span><span class="nf">CommandUserLevel</span><span class="p">(</span><span class="n">AccountUserLevel</span><span class="p">.</span><span class="n">Admin</span><span class="p">)]</span>
+<span class="p">[</span><span class="nf">CommandInvokerType</span><span class="p">(</span><span class="n">CommandInvokerType</span><span class="p">.</span><span class="n">Client</span><span class="p">)]</span>
+<span class="p">[</span><span class="nf">CommandParamCount</span><span class="p">(</span><span class="m">1</span><span class="p">)]</span>
+<span class="k">public</span> <span class="kt">string</span> <span class="nf">Warp</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">@params</span><span class="p">,</span> <span class="n">NetClient</span> <span class="n">client</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Implementation</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Not only is there slightly less copying and pasting boilerplate code, but now we can use the data provided in these attributes to automatically generate the documentation we need.</p>
+
+<p>At the time of writing this the command system overhaul is what I am actively working on, and it should be ready to be rolled out relatively soon.</p>
+
+<h2 id="looking-ahead">Looking Ahead</h2>
+
+<p>This is just the beginning for this architecture overhaul project. The remaining major goals for May include:</p>
+
+<ul>
+  <li>
+    <p>Overhauling the Player Manager, which would potentially include more frequent database write operations (i.e. less egregious rollbacks when the server is having issues), as well as the first round of load balancing improvements.</p>
+  </li>
+  <li>
+    <p>Integrating the leaderboard system implementation that has been sitting in a nearly finished state for months. This requires other architectural changes to be done first.</p>
+  </li>
+</ul>
+
+<p>After finishing these, I will be shifting my focus to getting version 0.6.0 ready for release in early June, hopefully in time for the game’s 12th anniversary on June 4th. We will be talking about our plans for 0.7.0 and the updated roadmap to 1.0.0 at some point after that.</p>
+
+<hr />
+
+<p>Time to go back to work, see you next time!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2025/04/30/progress-report-april-2025.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>

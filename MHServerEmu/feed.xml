@@ -1,4 +1,184 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2025-03-31T05:17:25+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: March 2025</title><link href="https://crypto137.github.io/MHServerEmu/blog/2025/03/31/progress-report-march-2025.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: March 2025" /><published>2025-03-31T05:15:00+03:00</published><updated>2025-03-31T05:15:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2025/03/31/progress-report-march-2025</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2025/03/31/progress-report-march-2025.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2025-03/header.jpg" alt="MHServerEmu Progress Report - March 2025" /></p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2025-04-30T06:17:52+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: April 2025</title><link href="https://crypto137.github.io/MHServerEmu/blog/2025/04/30/progress-report-april-2025.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: April 2025" /><published>2025-04-30T06:15:00+03:00</published><updated>2025-04-30T06:15:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2025/04/30/progress-report-april-2025</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2025/04/30/progress-report-april-2025.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2025-04/header.jpg" alt="MHServerEmu Progress Report - April 2025" /></p>
+
+<p>Here is another MHServerEmu Progress Report for you.</p>
+
+<h2 id="current-status">Current Status</h2>
+
+<p>Compared to the crazy ride of February and March, when a lot of features just started working of all of a sudden, April has definitely been a slower month, but things are still happening in the background. After implementing login rewards early in the month, I took a break, during which Alex continued to work on bug fixes, optimization, and minor improvements. When I returned from my break, Alex shifted to digging into the Unreal side of the game again, while I started working on the big server architecture overhaul I mentioned a number of times over the past few months.</p>
+
+<h2 id="architecture-overhaul">Architecture Overhaul?</h2>
+
+<p>When we talk about server architecture, it is important to mention how MHServerEmu differs from what Gazillion had back when they were running the game. While MHServerEmu is a single monolithic all-in-one package that does <em>almost</em> everything, Gazillion had an entire cluster of servers that handled various aspects of the overall online service. Here is a diagram I did back in October 2023 based on the network protocol embedded in the client:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-04/gazillion-server-cluster.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-04/gazillion-server-cluster.png" alt="Gazillion Server Cluster" /></a></p>
+
+<p>Based on our packet captures, at the very least GameInstanceServer (GIS) and FrontendServer (FES) were horizontally scalable, meaning Gazillion had more than one GIS and FES and could add more as needed.</p>
+
+<p>This kind of architecture makes a lot of sense if your goal is to have a single centralized service and have it scale up to potentially tens and hundreds of thousands of players. However, the preservation aspect has been a top priority for me since the inception of this project, and having a single centralized service may be the worst way of preserving an online game, especially when you are talking about a game based on IP licensed from a notoriously litigious company. This is why I opted for a monolithic self-contained server approach: while it is not as scalable, it makes the server significantly easier to set up (effectively as easy as installing a mod for a single player game), and when you host it locally yourself, there is no practical way to “take it away” anymore.</p>
+
+<p>Despite MHServerEmu being a single server, its architecture still mirrors Gazillion’s server cluster with functionality originally delegated to separate servers now running as “services” on different threads of the same process. Up until this point the vast majority of our efforts went into implementing GIS functionality, which is what handles practically all gameplay-related processing. Implementations of other services have been little more than stubs, doing just the bare minimum required to get a player into a game instance.</p>
+
+<p>As the gameplay side got closer to a feature complete state, we have seen increases in player numbers on some of the more popular community-hosted servers, in some cases reaching hundreds of concurrent players. The existing implementations of many of these supporting services were practically just scaffolding, and some of them were creaking at the seams, because they were doing the work they were never really designed to do. One good example of this was our old implementation of the frontend server, which processes raw client connections and routes received data to various backend services. Because the old implementation was quickly hacked together to handle a locally connected client, it had issues handling data from unreliable connections, such as those that involved Wi-Fi on the client side, which resulted in some players being frequently disconnected from the server.</p>
+
+<p>I did my best to do quick fixes as issues arised, which resulted in things like the current instancing solution you can see on some of the community-hosted servers. However, now that gameplay was in a reasonably decent state, it was time to take another good look at the supporting services and the overall architecture.</p>
+
+<h2 id="frontend-improvements">Frontend Improvements</h2>
+
+<p>Because we have been relying on quick fixes for non-gameplay related functionality so far, a web of technical debt started to accumulate, and it needed to be untangled.</p>
+
+<p>The first area I looked at this month was the aforementioned Frontend. I have identified the following issues with it:</p>
+
+<ul>
+  <li>
+    <p>Other services depended on the concrete <code class="language-plaintext highlighter-rouge">FrontendClient</code> implementation. This made it impossible to, for example, do an alternative Frontend implementation that could potentially run as a separate process, if the need ever arises.</p>
+  </li>
+  <li>
+    <p>The protocol of an incoming message depends on the current state of the connection, meaning that messages cannot be deserialized as soon as they arrive. Previously new buffers were allocated for every single incoming message to store them until they could be deserialized, resulting in increased garbage collection (GC) pressure and more frequent GC-related stuttering.</p>
+  </li>
+  <li>
+    <p>Packet parsing was not buffered, meaning that if a packet arrived in fragments across multiple data transmissions, it could not be parsed, and the client was forced to disconnect. This is the previously described Wi-Fi issue.</p>
+  </li>
+  <li>
+    <p>The authentication process was not implemented as strictly as it should have been, which gave some leeway to unauthenticated and potentially malicious clients.</p>
+  </li>
+  <li>
+    <p>The Frontend had no rate limiting, making it highly susceptible to potential DoS attacks.</p>
+  </li>
+</ul>
+
+<p>Here is a summary of what I have done this month to address these issues:</p>
+
+<ul>
+  <li>
+    <p>Other services can now interact with the Frontend through an abstract <code class="language-plaintext highlighter-rouge">IFrontendClient</code> interface, which provides flexibility in how Frontend is implemented. There is still some remaining concrete frontend implementation dependency, primarily in the Player Manager service, which will eventually be cleaned up. The end goal is to make all services completely independent from the concrete frontend implementation we have.</p>
+  </li>
+  <li>
+    <p>The entire message handling pipeline has been overhauled:</p>
+
+    <ul>
+      <li>
+        <p>Message buffers are now pooled and reused.</p>
+      </li>
+      <li>
+        <p>Messages are now routed asynchronously on thread pool threads as they arrive rather than on a single dedicated thread, resulting in reduced latency.</p>
+      </li>
+      <li>
+        <p>Various smaller optimizations have been made, such as replacing <code class="language-plaintext highlighter-rouge">lock</code> with <code class="language-plaintext highlighter-rouge">SpinLock</code> when swapping queues and reducing the number of protocol table dictionary lookups.</p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Packet parsing has been completely rewritten to allow it to persist state between data receives and reconstruct fragmented packets.</p>
+  </li>
+  <li>
+    <p>The authentication process is now more rigid, and clients are disconnected when they attempt to do something unexpected.</p>
+  </li>
+  <li>
+    <p>The frontend now limits incoming data from each connected client using an implemenation of the <a href="https://en.wikipedia.org/wiki/Token_bucket">token bucket</a> algorithm.</p>
+  </li>
+</ul>
+
+<p>These Frontend changes are now available in nightly builds. As expected, there were some early issues to iron out, like this one small mistake that lead to a single malformed packet from an unauthenticated client causing a total server crash with 3 GB of logs (oops). But now that they were taken care of, the Frontend is in a much better state in terms of performance, reliability, and modularity.</p>
+
+<h2 id="chat-improvements">Chat Improvements</h2>
+
+<p>The next big area of technical debt we have is the Player Manager, which is a service that is supposed to load balance connected clients across different game instances and manage related features, like ensuring all member of a party end up in the same region instance. However, before meaningful improvements can be made to it, two main issues need to be solved:</p>
+
+<ul>
+  <li>
+    <p>Our old implementation of the service system allowed only very limited communication between services, mostly related to routing client message. This was insufficient for the Player Manager, which requires extensive bidirectional communication with game instances.</p>
+  </li>
+  <li>
+    <p>The chat command system, which dates back to August 2023 and is some of the oldest server code we still use, was tightly coupled with the existing concrete Player Manager implementation.</p>
+  </li>
+</ul>
+
+<p>The communication issue was relatively easy to solve: we now have a more flexible event-like system, which can be extended with new message types as needed. We will be monitoring its performance, especially in relation to GC pressure under heavy load, but overall it seems to be doing the job we need so far.</p>
+
+<p>The chat command problem is trickier to deal with however. Not only was our code left mostly untouched since August 2023, it was also heavily based on the command system from a work-in-progress Diablo III server emulator called Mooege, which was written back in 2011. The command system needed a total overhaul, which also required all command implementations to be adjusted accordingly. To make matters worse, in order to decouple everything from the Player Manager, we needed to overhaul our chat implementation, which was another overextended service stub.</p>
+
+<p>The first order of business was improving the foundation, which was chat. Chat messages need to go through quite a journey to arrive to other players:</p>
+
+<blockquote>
+  <p><code class="language-plaintext highlighter-rouge">Client</code> -&gt; <code class="language-plaintext highlighter-rouge">FES</code> -&gt; <code class="language-plaintext highlighter-rouge">PlayerManager</code> -&gt; <code class="language-plaintext highlighter-rouge">GIS</code> -&gt; <code class="language-plaintext highlighter-rouge">Game</code> -&gt; <code class="language-plaintext highlighter-rouge">GroupingManager</code> -&gt; <code class="language-plaintext highlighter-rouge">Client</code></p>
+</blockquote>
+
+<p>The key service in this chain is the Grouping Manager, which is effectively the “chat service”. Previously we immediately routed chat messages from games to the Grouping Manager, which was problematic for a number of reasons. First, the Grouping Manager has no access to game state, so it has no idea what players are “nearby” to filter recipients in say and emote channels, or what prestige level each player is at to color their names accordingly. Second, command parsing happened at the Grouping Manager level, so if a command needed to do something game-related, which is very often the case, it needed to go through the Player Manager to get a reference to a game that the client was in. This coupled the Grouping Manager, the command system, the Player Manager, and game instance management in a single messy blob.</p>
+
+<p>To solve this, initial chat message handling now happens at the game level, which gives us the opportunity to include necessary game state data before forwarding them to the Grouping Manager, or even avoid forwarding altogether if the message is successfully parsed as a command. This in turn gives commands direct access to game instances that invoked them, which circumvents the entire roundabout trip through the Player Manager.</p>
+
+<p>Thanks to this, proximity and region based chat channels now work as they should, and players on community-hosted public servers now have to use the <code class="language-plaintext highlighter-rouge">Social</code>, <code class="language-plaintext highlighter-rouge">Trade</code>, and <code class="language-plaintext highlighter-rouge">LFG</code> channels for cross-region communication, just like back in the day. One side effect of implementing proximity chat is that the Nearby tab of the social panel now displays nearby players:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-04/nearby.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-04/nearby.jpg" alt="Gazillion Server Cluster" /></a></p>
+
+<p>There appear to be some issues related to updating the status of players in the Nearby tab, which may or may not be client-side UI issues. We will be further looking into it as part of the bigger community system update, which will include implementing other tabs and broadcasting player status data across different game instances. For now we still have some command system improvements to do.</p>
+
+<h2 id="command-improvements">Command Improvements</h2>
+
+<p>As part of this command system overhaul, I wanted to not only get rid of unnecessary dependencies on other services, but also make improvements to some long-standing issues with maintaining command implementations:</p>
+
+<ul>
+  <li>
+    <p>There was too much boilerplate code for validating invokers and arguments.</p>
+  </li>
+  <li>
+    <p>The existing help functionality was too inconvenient to use, and updating the <a href="https://github.com/Crypto137/MHServerEmu/blob/master/docs/ServerEmu/ServerCommands.md">command list</a> in our documentation took too much effort to do manually, leading to it always being out of date.</p>
+  </li>
+</ul>
+
+<p>My plan for tackling both of these problems was to make validation more data-driven and provide the necessary data to the command system using C# attributes, which we already used to define commands.</p>
+
+<p>For example, this is what the <code class="language-plaintext highlighter-rouge">!region warp</code> command looked like previously:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nf">Command</span><span class="p">(</span><span class="s">"warp"</span><span class="p">,</span> <span class="s">"Warps the player to another region.\nUsage: region warp [name]"</span><span class="p">,</span> <span class="n">AccountUserLevel</span><span class="p">.</span><span class="n">Admin</span><span class="p">)]</span>
+<span class="k">public</span> <span class="kt">string</span> <span class="nf">Warp</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">@params</span><span class="p">,</span> <span class="n">FrontendClient</span> <span class="n">client</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">client</span> <span class="p">==</span> <span class="k">null</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">"You can only invoke this command from the game."</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">@params</span><span class="p">.</span><span class="n">Length</span> <span class="p">==</span> <span class="m">0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s">"Invalid arguments. Type 'help region warp' to get help."</span><span class="p">;</span>
+
+    <span class="c1">// Implementation</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>And here is the same command with the current version of attribute-based validation:</p>
+
+<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="nf">Command</span><span class="p">(</span><span class="s">"warp"</span><span class="p">,</span> <span class="s">"Warps the player to another region.\nUsage: region warp [name]"</span><span class="p">)]</span>
+<span class="p">[</span><span class="nf">CommandUserLevel</span><span class="p">(</span><span class="n">AccountUserLevel</span><span class="p">.</span><span class="n">Admin</span><span class="p">)]</span>
+<span class="p">[</span><span class="nf">CommandInvokerType</span><span class="p">(</span><span class="n">CommandInvokerType</span><span class="p">.</span><span class="n">Client</span><span class="p">)]</span>
+<span class="p">[</span><span class="nf">CommandParamCount</span><span class="p">(</span><span class="m">1</span><span class="p">)]</span>
+<span class="k">public</span> <span class="kt">string</span> <span class="nf">Warp</span><span class="p">(</span><span class="kt">string</span><span class="p">[]</span> <span class="n">@params</span><span class="p">,</span> <span class="n">NetClient</span> <span class="n">client</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="c1">// Implementation</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Not only is there slightly less copying and pasting boilerplate code, but now we can use the data provided in these attributes to automatically generate the documentation we need.</p>
+
+<p>At the time of writing this the command system overhaul is what I am actively working on, and it should be ready to be rolled out relatively soon.</p>
+
+<h2 id="looking-ahead">Looking Ahead</h2>
+
+<p>This is just the beginning for this architecture overhaul project. The remaining major goals for May include:</p>
+
+<ul>
+  <li>
+    <p>Overhauling the Player Manager, which would potentially include more frequent database write operations (i.e. less egregious rollbacks when the server is having issues), as well as the first round of load balancing improvements.</p>
+  </li>
+  <li>
+    <p>Integrating the leaderboard system implementation that has been sitting in a nearly finished state for months. This requires other architectural changes to be done first.</p>
+  </li>
+</ul>
+
+<p>After finishing these, I will be shifting my focus to getting version 0.6.0 ready for release in early June, hopefully in time for the game’s 12th anniversary on June 4th. We will be talking about our plans for 0.7.0 and the updated roadmap to 1.0.0 at some point after that.</p>
+
+<hr />
+
+<p>Time to go back to work, see you next time!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">MHServerEmu Progress Report: March 2025</title><link href="https://crypto137.github.io/MHServerEmu/blog/2025/03/31/progress-report-march-2025.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: March 2025" /><published>2025-03-31T05:15:00+03:00</published><updated>2025-03-31T05:15:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2025/03/31/progress-report-march-2025</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2025/03/31/progress-report-march-2025.html"><![CDATA[<!--more-->
+
+<p><img src="/MHServerEmu/assets/blog/progress-report/2025-03/header.jpg" alt="MHServerEmu Progress Report - March 2025" /></p>
 
 <p>It’s a bird! It’s a plane! It’s an MHServerEmu Progress Report!</p>
 
@@ -2441,384 +2621,4 @@
 
 <hr />
 
-<p>Back to work now. See you in August!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">MHServerEmu Progress Report: June 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/06/30/progress-report-june-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: June 2024" /><published>2024-06-30T04:20:00+03:00</published><updated>2024-06-30T04:20:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/06/30/progress-report-june-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/06/30/progress-report-june-2024.html"><![CDATA[<!--more-->
-
-<p><img src="/MHServerEmu/assets/blog/progress-report/2024-06/header.jpg" alt="MHServerEmu Progress Report - June 2024" /></p>
-
-<p>June has been jam-packed full of developments, and we have a lot to cover.</p>
-
-<h2 id="mhserveremu-2-electric-boogaloo">MHServerEmu 2: Electric Boogaloo</h2>
-
-<p>This month we released the second stable release of MHServerEmu - <a href="https://github.com/Crypto137/MHServerEmu/releases/tag/0.2.0">version 0.2.0</a>. This release contains all the backend work we had been working on since <a href="/MHServerEmu/blog/2024/03/31/progress-report-march-2024.html">March</a>, including, but not limited to:</p>
-
-<ul>
-  <li>
-    <p>General server architecture improvements.</p>
-  </li>
-  <li>
-    <p>An overhaul of the serialization system.</p>
-  </li>
-  <li>
-    <p>An implementation of navi, locomotion, and physics systems.</p>
-  </li>
-  <li>
-    <p>An overhaul of the entity management system.</p>
-  </li>
-  <li>
-    <p>An implementation of the inventory system.</p>
-  </li>
-  <li>
-    <p>An implementation of the game event system.</p>
-  </li>
-  <li>
-    <p>A significantly upgraded version of the area of interest system.</p>
-  </li>
-  <li>
-    <p>Most of the backend for the AI system.</p>
-  </li>
-</ul>
-
-<p>We have barely scratched the surface of what is now possible. One significant improvement that happened almost as a side effect of all of this is that now you can see and interact with other players in the game world.</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-06/multiplayer.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-06/multiplayer.jpg" alt="Multiplayer" /></a></p>
-
-<p>And in just a few days we were able to build a very rough early iteration of the loot system (<em>disclaimer: quantity exaggerated for dramatic purposes, may not match what you see in the final product</em>):</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-06/loot.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-06/loot.jpg" alt="Loot" /></a></p>
-
-<p>As soon as 0.2.0 was out, we started work on version 0.3.0. Our current tentative target for its release is September 2024, but you can check out all the latest features we are working on early via <a href="https://nightly.link/Crypto137/MHServerEmu/workflows/nightly-release-windows-x64/master?preview">nightly builds</a> or by building the source code yourself. Now that a significant bulk of the backend work is out of the way, we can focus more on aspects you can actually see in the game. One good example of this you can check out yourself right now in nightly 0.3.0 builds is an early iteration of pets and team-ups that rely on navi, locomotion and AI systems for pathfinding, physically moving around, and being aware that they need to follow their owner respectively.</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-06/pets.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-06/pets.jpg" alt="Pets" /></a></p>
-
-<h2 id="i-am-running-out-of-interesting-puns">I Am Running Out of Interesting Puns</h2>
-
-<p>This month our implementation of the area of interest (AOI) system received a major upgrade, which literally made visible the results of our work on other systems. Now that it is mostly working, we can dive deeper into the specifics.</p>
-
-<p>First, a quick recap. Marvel Heroes is a server-authoritative game, meaning the entire game simulation (where everything is, what powers everyone is using, how much health everyone has, and so on) runs on the server. The server is the ultimate dungeon master, aware of everything happening to everyone. The client program you are using to play the game also has a simulation of its own that runs in parallel based on the data it receives from the server. However, the data clients receive is just a small slice of the overall server pie, and each client’s slice if referred to as its area of interest.</p>
-
-<p>Putting it into more concrete terms, the <code class="language-plaintext highlighter-rouge">AreaOfInterest</code> class in the server code determines what data needs to go to the client it is bound to and keeps track of things the client is already aware of. The data managed by AOI can be separated into two categories: environment (a region with its areas and cells) and entities (game objects that populate the region).</p>
-
-<p>Everything starts with entities. When a client logs into a game server, a <code class="language-plaintext highlighter-rouge">Player</code> entity is created for it that gets bound to an <code class="language-plaintext highlighter-rouge">AreaOfInterest</code> instance. This entity does not physically exist in the game world and is used to represent the player’s account: what heroes are unlocked, how much of each currency there is, when was the last time this player logged in, and so on. Hero and team-up unlocks are internally represented as “items” held in various hidden inventories, such as <code class="language-plaintext highlighter-rouge">PlayerAvatarLibrary</code> and <code class="language-plaintext highlighter-rouge">PlayerTeamUpLibrary</code> (see <a href="/MHServerEmu/blog/2024/05/31/progress-report-may-2024.html">the previous report</a> for more on that).</p>
-
-<p>This player entity is automatically <em>considered</em> by the area of interest it is bound to. Consideration is a process of determining what (if any) <em>interest policies</em> (also referred to as <em>replication channels</em>) a specific entity has in relation to an area of interest. If an area of interest determines that an entity matches one or more interest policies, it starts tracking the entity and notifies the client by sending network messages containing information about this entity. The client uses this information to create a copy of this entity in its local simulation. When an entity loses all of its replication policies, it is removed from the AOI and the client simulation. In addition to player entity creation, consideration can be triggered by other events, such moving around the game world, but more on that later.</p>
-
-<p>In total there are five possible replication policies: <code class="language-plaintext highlighter-rouge">Owner</code>, <code class="language-plaintext highlighter-rouge">Proximity</code>, <code class="language-plaintext highlighter-rouge">Discovery</code>, <code class="language-plaintext highlighter-rouge">Party</code>, and <code class="language-plaintext highlighter-rouge">Trader</code>. When the player entity is considered by its AOI, it always enters it with the <code class="language-plaintext highlighter-rouge">Owner</code> policy. Then, the AOI recursively considers all entities stored in the player’s various inventories, which is how avatars and team-ups owned by the player with all of their equipment enter the AOI. Entities that enter the AOI by being present in the player entity’s inventories also have the <code class="language-plaintext highlighter-rouge">Owner</code> interest policy.</p>
-
-<p>With this initialization step done, the server proceeds to put one of the player’s avatars at a specific <code class="language-plaintext highlighter-rouge">RegionLocation</code>, which includes a region instance id, coordinates within this region instance, and the initial orientation of the avatar. The AOI scans the environment within a certain radius around this location to determine what cells the client needs to load. The server then sends a message packet that instructs the client to put up a loading screen and load all determined cells. For every loaded cell the client sends a notification message to the server. The server tracks these notifications, and when all requested cells are loaded, it instructs the client to remove the loading screen, and player’s selected avatar enters the world at the required region location.</p>
-
-<p>When the avatar enters world, it and everything within a certain radius is considered for a <code class="language-plaintext highlighter-rouge">Proximity</code> policy. Some entities do not get the <code class="language-plaintext highlighter-rouge">Proximity</code> policy despite being physically near the player’s avatar in the game world. One good example of this is loot, which is restricted to the player it dropped for until it is picked up. As the player’s avatar moves around the game world, the AOI periodically scans the proximity to determine cells and entities that need to be added or removed.</p>
-
-<p>Here is what it looks like if we artificially reduce the proximity radius:</p>
-
-<div><video controls="" width="100%" /><source src="/MHServerEmu/assets/blog/progress-report/2024-06/proximity.webm" type="video/webm" /></div>
-
-<p>When entities in proximity are considered, the contents of their inventories are considered in a similar fashion to the player, and there is a set of conditions that determines when an entity stored in an inventory can enter an area of interest. This is what ultimately allows you to see items equipped on nearby players, such as their costumes and artifacts with fancy visual effects, while avoiding the necessity of loading items stored in their stashes like a certain other game.</p>
-
-<p>In some cases when an entity enters proximity and/or satisfies some other condition, it also gains a <code class="language-plaintext highlighter-rouge">Discovery</code> policy, which allows it to remain in the client’s simulation even after it leaves proximity. For example, this is how the client can draw map icons for NPCs and waypoints even when they are no longer in proximity.</p>
-
-<p>There are two special cases that have their own replication policies: <code class="language-plaintext highlighter-rouge">Party</code> and <code class="language-plaintext highlighter-rouge">Trade</code>. What makes them different from the other three is that they are the only cases when player entities belonging to other clients can enter your area of interest. We are still investigating the specifics of them, and we will talk more about this in a future report when we get to work on various social features.</p>
-
-<p>Interest policies play an important role in the serialization process. For example, world entity power collections are omitted unless they have the <code class="language-plaintext highlighter-rouge">Proximity</code> policy, and some properties are added or removed based on changing policies. The latter one was the cause of one of the issues we had to solve when implementing team-up spawning. For some reason, the client failed to recognize team-ups as belonging to the current avatar and did not display a green circle indicator under them that should look like this:</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-06/teamup.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-06/teamup.jpg" alt="Team-Up" /></a></p>
-
-<p>As it turned out, the issue was that the property that the client uses to determine this ownership relation, <code class="language-plaintext highlighter-rouge">PowerUserOverrideID</code>, is compatible only with <code class="language-plaintext highlighter-rouge">Proximity</code> and <code class="language-plaintext highlighter-rouge">Trader</code> policies, and it is filtered out in other cases. Because team-ups are initially added to the AOI and serialized to the client with just the <code class="language-plaintext highlighter-rouge">Owner</code> policy during initial loading, this property was not included. The solution was to implement handling for the interest policy change event on the server to automatically send newly revealed properties to the client when existing entities in its AOI gain new interest policies.</p>
-
-<p>While there is still some work to do on this system, at this stage it is already capable of performing its most essential operations that allows it to act as a window to what is happening on the server for the client.</p>
-
-<h2 id="time-is-of-the-essence">Time is of the Essence</h2>
-
-<p>Another important area where we have recently had significant advancements is game simulation timing and event scheduling. We first started seriously considering this <a href="/MHServerEmu/blog/2024/04/30/progress-report-april-2024.html">back in April</a>, and are now at a point where we are approaching client-accuracy.</p>
-
-<p>As we were researching this, we discovered an intricate system of numerous clocks that would fit right in at Dr. Emmett Brown’s lab.</p>
-
-<style>.embed-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; } .embed-container iframe, .embed-container object, .embed-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }</style>
-<div class="embed-container">    <iframe title="YouTube video player" width="640" height="390" src="//www.youtube.com/embed/3isQI0nXQRE" frameborder="0" allowfullscreen=""></iframe></div>
-
-<p>In total there are five clocks that are actively used, and we had to add a sixth one to the mix for compatibility with .NET.</p>
-
-<ul>
-  <li>
-    <p><strong>.NET DateTime</strong> - a point in time from <code class="language-plaintext highlighter-rouge">January 1, 1</code> to <code class="language-plaintext highlighter-rouge">December 31, 9999</code>. This is the default date time format used by C# that you get from <code class="language-plaintext highlighter-rouge">DateTime.Now</code> and <code class="language-plaintext highlighter-rouge">DateTime.UtcNow</code>.</p>
-  </li>
-  <li>
-    <p><strong>DateTime</strong> - the number of microseconds since <code class="language-plaintext highlighter-rouge">January 1, 1970</code>. Also known as Unix time.</p>
-  </li>
-  <li>
-    <p><strong>CoreGameTime</strong> - the number of microseconds since <code class="language-plaintext highlighter-rouge">September 22, 2012 09:31:18 GMT+0000</code>. This epoch is not arbitrary: the game’s closed beta began on <code class="language-plaintext highlighter-rouge">October 1, 2012</code>, and this point in time must have been when the development team was making final preparations. In a way, this is the game’s true birthday.</p>
-  </li>
-  <li>
-    <p><strong>RealGameTime</strong> - the number of microseconds in full fixed time frames since <code class="language-plaintext highlighter-rouge">September 22, 2012</code>. More on that later.</p>
-  </li>
-  <li>
-    <p><strong>Game.CurrentTime</strong> - the current time step of the game simulation.</p>
-  </li>
-  <li>
-    <p><strong>GameEventScheduler.CurrentTime</strong> - the current game simulation time adjusted for the currently executing scheduled event. This is the clock used by most of the gameplay logic. If <code class="language-plaintext highlighter-rouge">GameEventScheduler</code> is not available, it falls back to <code class="language-plaintext highlighter-rouge">Game.CurrentTime</code>.</p>
-  </li>
-</ul>
-
-<p>Let’s unwrap what is happening here step by step.</p>
-
-<p>During server initialization we query system time with <code class="language-plaintext highlighter-rouge">DateTime.UtcNow</code> to get a timestamp of the initialization time. For performance and accuracy reasons, rather than querying system time each time the game wants to know what time it is, we create and start a <code class="language-plaintext highlighter-rouge">Stopwatch</code> class instance when we query the initialization timestamp. When time is requested, we add elapsed time from the stopwatch to our timestamp and convert it to <code class="language-plaintext highlighter-rouge">DateTime</code> or <code class="language-plaintext highlighter-rouge">CoreGameTime</code>. With that we have half of our required clocks taken care of.</p>
-
-<p><code class="language-plaintext highlighter-rouge">RealGameTime</code> is represented using a class called <code class="language-plaintext highlighter-rouge">FixedQuantumGameTime</code>. Behind this sci-fi sounding name we have basically a less accurate version of <code class="language-plaintext highlighter-rouge">CoreGameTime</code> that advances in fixed intervals, which in our case are 50 ms.</p>
-
-<p>When the game does the <code class="language-plaintext highlighter-rouge">UpdateFixedTime()</code> stage of the update loop, which handles time-sensitive processing such as physics and timers, it synchronizes the value of <code class="language-plaintext highlighter-rouge">RealGameTime</code> by calling the <code class="language-plaintext highlighter-rouge">FixedQuantumGameTime.UpdateToNow()</code> method that does something along these lines:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Get current CoreGameTime and time step length.</span>
-<span class="n">TimeSpan</span> <span class="n">gameTime</span> <span class="p">=</span> <span class="n">Clock</span><span class="p">.</span><span class="n">GameTime</span><span class="p">;</span>
-<span class="n">TimeSpan</span> <span class="n">quantumSize</span> <span class="p">=</span> <span class="n">TimeSpan</span><span class="p">.</span><span class="nf">FromMilliseconds</span><span class="p">(</span><span class="m">50</span><span class="p">);</span>
-
-<span class="c1">// Calculate the total number of steps.</span>
-<span class="c1">// Because Ticks are integers, we lose the remainder</span>
-<span class="c1">// of the division and get a nice round number.</span>
-<span class="kt">long</span> <span class="n">numTimeQuantums</span> <span class="p">=</span> <span class="n">gameTime</span><span class="p">.</span><span class="n">Ticks</span> <span class="p">/</span> <span class="n">quantumSize</span><span class="p">.</span><span class="n">Ticks</span><span class="p">;</span>
-
-<span class="c1">// Get a new TimeSpan representing the number of full steps.</span>
-<span class="n">TimeSpan</span> <span class="n">realGameTime</span> <span class="p">=</span> <span class="n">quantumSize</span> <span class="p">*</span> <span class="n">numTimeQuantums</span>
-</code></pre></div></div>
-
-<p>The game then advances its <code class="language-plaintext highlighter-rouge">CurrentTime</code> in 50 ms intervals until it catches up to <code class="language-plaintext highlighter-rouge">RealGameTime</code>. For every time its clock advances, the game calls <code class="language-plaintext highlighter-rouge">DoFixedTimeUpdate()</code> once. When everything is going smoothly and there are no time-consuming tasks running, like region generation, an <code class="language-plaintext highlighter-rouge">UpdateFixedTime()</code> call should do only a single <code class="language-plaintext highlighter-rouge">DoFixedTimeUpdate()</code>. To keep the simulation from being stuck in an endless loop in situations where it for some reason cannot keep up, there is an additional check that breaks the loop when it exceeds the expected frame time of 50 ms.</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// _gameTimer is a Stopwatch instance that starts with the game.</span>
-<span class="n">TimeSpan</span> <span class="n">updateStartTime</span> <span class="p">=</span> <span class="n">_gameTimer</span><span class="p">.</span><span class="n">Elapsed</span><span class="p">;</span>
-<span class="k">while</span> <span class="p">(</span><span class="n">_currentGameTime</span> <span class="p">+</span> <span class="n">FixedTimeBetweenUpdates</span> <span class="p">&lt;=</span> <span class="n">RealGameTime</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">_currentGameTime</span> <span class="p">+=</span> <span class="n">FixedTimeBetweenUpdates</span><span class="p">;</span>
-
-    <span class="nf">DoFixedTimeUpdate</span><span class="p">();</span>
-
-    <span class="c1">// Bail out if we have exceeded the frame budget</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">_gameTimer</span><span class="p">.</span><span class="n">Elapsed</span> <span class="p">-</span> <span class="n">updateStartTime</span> <span class="p">&gt;</span> <span class="n">FixedTimeBetweenUpdates</span><span class="p">)</span>
-        <span class="k">break</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Everything up until this point has been relatively straightforward, but now the real time shenanigans begin. During <code class="language-plaintext highlighter-rouge">DoFixedTimeUpdate()</code> the reins are partially handed over to the <code class="language-plaintext highlighter-rouge">GameEventScheduler</code>:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">private</span> <span class="k">void</span> <span class="nf">DoFixedTimeUpdate</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="c1">// Current simulation time is passed as an argument</span>
-    <span class="n">GameEventScheduler</span><span class="p">.</span><span class="nf">TriggerEvents</span><span class="p">(</span><span class="n">_currentGameTime</span><span class="p">);</span>
-    <span class="c1">// Everything else</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>In fact, <code class="language-plaintext highlighter-rouge">GameEventScheduler</code>’s clock has priority over the game’s when current time is requested by various systems:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="n">TimeSpan</span> <span class="n">CurrentTime</span> <span class="p">{</span> <span class="k">get</span> <span class="p">=&gt;</span> <span class="n">GameEventScheduler</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">?</span> <span class="n">GameEventScheduler</span><span class="p">.</span><span class="n">CurrentTime</span> <span class="p">:</span> <span class="n">_currentGameTime</span><span class="p">;</span> <span class="p">}</span>
-</code></pre></div></div>
-
-<p>So what does <code class="language-plaintext highlighter-rouge">EventScheduler</code> do? Essentially, it allows the game to set up timers and trigger actions when they expire. You provide it with with a <code class="language-plaintext highlighter-rouge">TimeSpan</code> representing a delay before something should happen and an object representing the callback that needs to be executed, and it does everything else.</p>
-
-<p>Believe it or not, this system appears to be an evolution of a similar system from <em>Diablo II</em>. Take a look at this code snippet from the <a href="https://github.com/ThePhrozenKeep/D2MOO">D2MOO</a> decompilation project:</p>
-
-<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// AI think delay setup</span>
-<span class="kt">int32_t</span> <span class="n">nAiDelay</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">pGame</span><span class="o">-&gt;</span><span class="n">nGameType</span> <span class="o">||</span> <span class="n">pGame</span><span class="o">-&gt;</span><span class="n">dwGameType</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="c1">// Get delay for the current difficulty from MonStats.txt</span>
-    <span class="n">nAiDelay</span> <span class="o">=</span> <span class="n">pMonStatsTxtRecord</span><span class="o">-&gt;</span><span class="n">nAIdel</span><span class="p">[</span><span class="n">pGame</span><span class="o">-&gt;</span><span class="n">nDifficulty</span><span class="p">];</span>
-<span class="p">}</span>
-<span class="k">else</span>
-<span class="p">{</span>
-    <span class="c1">// Fall back to normal difficulty</span>
-    <span class="n">nAiDelay</span> <span class="o">=</span> <span class="n">pMonStatsTxtRecord</span><span class="o">-&gt;</span><span class="n">nAIdel</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-<span class="p">}</span>
-
-<span class="c1">// Fall back to the default delay value</span>
-<span class="k">if</span> <span class="p">(</span><span class="n">nAiDelay</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="n">nAiDelay</span> <span class="o">=</span> <span class="mi">15</span><span class="p">;</span>
-<span class="p">}</span>
-
-<span class="c1">// Schedule the next think event</span>
-<span class="n">EVENT_SetEvent</span><span class="p">(</span><span class="n">pGame</span><span class="p">,</span> <span class="n">pModeChange</span><span class="o">-&gt;</span><span class="n">pUnit</span><span class="p">,</span> <span class="n">UNITEVENTCALLBACK_AITHINK</span><span class="p">,</span> <span class="n">nAiDelay</span> <span class="o">+</span> <span class="n">pGame</span><span class="o">-&gt;</span><span class="n">dwGameFrame</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
-</code></pre></div></div>
-
-<p>Diablo II’s timing is completely frame-based with the game running at a constant framerate of 25 Hz. The code in this example retrieves the monster AI think delay value from a data file (<code class="language-plaintext highlighter-rouge">MonStats.txt</code>) and schedules a think event. At 25 FPS each frame is going to take <code class="language-plaintext highlighter-rouge">1000 / 25 = 40 ms</code>, meaning this delay will take <code class="language-plaintext highlighter-rouge">15 * 40 = 600 ms</code>. At Nightmare and Hell difficulty modes this delay is <code class="language-plaintext highlighter-rouge">14 * 40 = 560 ms</code> and <code class="language-plaintext highlighter-rouge">13 * 40 = 520 ms</code> respectively.</p>
-
-<p>And here is reverse engineered code that does the equivalent in Marvel Heroes:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">void</span> <span class="nf">Think</span><span class="p">()</span>
-<span class="p">{</span>
-    <span class="c1">// ...</span>
-    <span class="kt">float</span> <span class="n">thinkTime</span> <span class="p">=</span> <span class="m">500</span><span class="p">;</span> <span class="c1">// slow think </span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">TargetEntity</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">||</span> <span class="n">AssistedEntity</span> <span class="p">!=</span> <span class="k">null</span><span class="p">)</span>
-        <span class="n">thinkTime</span> <span class="p">=</span> <span class="m">100</span><span class="p">;</span> <span class="c1">// fast think</span>
-    <span class="nf">ScheduleAIThinkEvent</span><span class="p">(</span><span class="n">TimeSpan</span><span class="p">.</span><span class="nf">FromMilliseconds</span><span class="p">(</span><span class="n">thinkTime</span><span class="p">)</span> <span class="p">*</span> <span class="n">Game</span><span class="p">.</span><span class="n">Random</span><span class="p">.</span><span class="nf">NextFloat</span><span class="p">(</span><span class="m">0.9f</span><span class="p">,</span> <span class="m">1.1f</span><span class="p">));</span>
-    <span class="c1">// ...</span>
-<span class="p">}</span>
-
-<span class="k">public</span> <span class="k">void</span> <span class="nf">ScheduleAIThinkEvent</span><span class="p">(</span><span class="n">TimeSpan</span> <span class="n">timeOffset</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="c1">// Various checks and additional variation</span>
-    <span class="c1">// for the offset happening here are omitted.</span>
-
-    <span class="n">eventScheduler</span><span class="p">.</span><span class="nf">ScheduleEvent</span><span class="p">(</span><span class="n">_thinkEvent</span><span class="p">,</span> <span class="n">nextThinkTimeOffset</span><span class="p">,</span> <span class="n">_pendingEvents</span><span class="p">);</span>
-    <span class="n">_thinkEvent</span><span class="p">.</span><span class="nf">Get</span><span class="p">().</span><span class="n">OwnerController</span> <span class="p">=</span> <span class="k">this</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>Diablo II’s units are now called entities, Excel .txt files became prototypes, and instead of the number of frames we provide a <code class="language-plaintext highlighter-rouge">TimeSpan</code> as an argument for scheduling an event. The “slow thinking mode” is pretty much equivalent to the thinking rate from Diablo II. And this is not where similarities end: internally, <code class="language-plaintext highlighter-rouge">EventScheduler</code> still operates based on frames, just like Diablo II.</p>
-
-<p>All scheduled events are grouped by “buckets”, with each bucket representing a frame. When an event is scheduled, it is put into a bucket based on the current time and requested delay, and its precise fire time is recorded.</p>
-
-<p>When the <code class="language-plaintext highlighter-rouge">TriggerEvents()</code> method is called from <code class="language-plaintext highlighter-rouge">DoFixedTimeUpdate()</code>, the event scheduler advances its clock in fixed time steps until it catches up to the <code class="language-plaintext highlighter-rouge">_currentGameTime</code> that was passed as an argument, and each time it advances it executes all events in the bucket corresponding to the frame. Here is what a simplified version of this code looks like:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// Determine time window</span>
-<span class="kt">long</span> <span class="n">startFrame</span> <span class="p">=</span> <span class="n">CurrentTime</span><span class="p">.</span><span class="nf">CalcNumTimeQuantums</span><span class="p">(</span><span class="n">_quantumSize</span><span class="p">);</span>
-<span class="kt">long</span> <span class="n">endFrame</span> <span class="p">=</span> <span class="n">updateEndTime</span><span class="p">.</span><span class="nf">CalcNumTimeQuantums</span><span class="p">(</span><span class="n">_quantumSize</span><span class="p">);</span>
-
-<span class="c1">// Process all frames that are within our time window</span>
-<span class="k">for</span> <span class="p">(</span><span class="kt">long</span> <span class="n">i</span> <span class="p">=</span> <span class="n">startFrame</span><span class="p">;</span> <span class="n">i</span> <span class="p">&lt;=</span> <span class="n">endFrame</span><span class="p">;</span> <span class="n">i</span><span class="p">++)</span>
-<span class="p">{</span>
-    <span class="k">foreach</span> <span class="p">(</span><span class="n">ScheduledEvent</span> <span class="n">@event</span> <span class="k">in</span> <span class="n">_buckets</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-    <span class="p">{</span>
-        <span class="c1">// Set event scheduler's time to the precise event fire time</span>
-        <span class="n">CurrentTime</span> <span class="p">=</span> <span class="n">@event</span><span class="p">.</span><span class="n">FireTime</span><span class="p">;</span>
-
-        <span class="c1">// Invalidate event</span>
-        <span class="n">_scheduledEvents</span><span class="p">.</span><span class="nf">Remove</span><span class="p">(</span><span class="n">@event</span><span class="p">);</span>
-        <span class="n">@event</span><span class="p">.</span><span class="n">EventGroupNode</span><span class="p">?.</span><span class="nf">Remove</span><span class="p">();</span>
-        <span class="n">@event</span><span class="p">.</span><span class="nf">InvalidatePointers</span><span class="p">();</span>
-
-        <span class="c1">// Run event callback</span>
-        <span class="n">@event</span><span class="p">.</span><span class="nf">OnTriggered</span><span class="p">();</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="c1">// Synchronize time with the game</span>
-<span class="n">CurrentTime</span> <span class="p">=</span> <span class="n">currentGameTime</span><span class="p">;</span>
-</code></pre></div></div>
-
-<p>Before the event scheduler triggers an event, it sets its clock to the precise time when the event is supposed to be fired. And because <code class="language-plaintext highlighter-rouge">Game.CurrentTime</code> returns the value of <code class="language-plaintext highlighter-rouge">GameEventScheduler.CurrentTime</code>, any game logic that runs as a result of the event callback is going to have precise time despite the simulation advancing in 50 ms steps.</p>
-
-<p>But here is the crazy thing: as far as I can tell, events within their frame buckets are not sorted by fire time. Therefore, it is possible for the time to go <em>backwards</em>, although only within the confines of a single frame. Which in a way makes sense: events happening within the same frame are batched together and happen “simultaneously”, so the execution order here is not critical. The main potential problem would be inconsistent timing due to an event callback potentially scheduling another event, but because time is always set to the precise fire time, it’s going to remain consistent.</p>
-
-<p>RIght now we have most of this system working, with the exception of the bucket management system. As a temporary solution we are storing all events in a single collection that we iterate to determine the events that would go in the bucket we would be processing, which is not ideal for performance, but it does the job well enough for now. The API for the system is pretty much done, and we can worry about optimizing internal implementation later.</p>
-
-<p>And this is how time in Marvel Heroes works.</p>
-
-<h2 id="finding-a-path-forward">Finding a Path Forward</h2>
-
-<p><em>AlexBond is back again this month to talk about his work on pathfinding and AI.</em></p>
-
-<hr />
-
-<p>Hello, it’s AlexBond again. In this report I would like to talk about how AI works and the <code class="language-plaintext highlighter-rouge">NaviPath</code> generation process.</p>
-
-<h3 id="aicontroller">AIController</h3>
-
-<p>For an agent’s AI to work, the agent needs to enter the simulation using <code class="language-plaintext highlighter-rouge">SetSimulated()</code>, and its AI controller needs to be activated. (<em>Editor’s note: “agent” is the term the game uses to refer to world entities that can interact with the game world, such as avatars, enemies, team-ups, and so on</em>).</p>
-
-<p>AI controller activation happens when an agent enters the game world, in the <code class="language-plaintext highlighter-rouge">OnEnteredWorld()</code> function: if the agent has a defined <code class="language-plaintext highlighter-rouge">BehaviorProfile</code>, an <code class="language-plaintext highlighter-rouge">AIController</code> instance is created. <code class="language-plaintext highlighter-rouge">AIController</code> consists of three main parts:</p>
-
-<ul>
-  <li>
-    <p><strong>Brain</strong> - a behavior profile for the <code class="language-plaintext highlighter-rouge">ProceduralAI</code> system.</p>
-  </li>
-  <li>
-    <p><strong>Senses</strong> - a class for determining potential allies and enemies that scans everyone every second in the defined <code class="language-plaintext highlighter-rouge">AggroRange</code>.</p>
-  </li>
-  <li>
-    <p><strong>Blackboard</strong> - AI’s memory where temporary state is stored in the form of a <code class="language-plaintext highlighter-rouge">PropertyCollection</code>, as well as various vectors.</p>
-  </li>
-</ul>
-
-<p>The main function of a controller is <code class="language-plaintext highlighter-rouge">Think()</code>. To keep server load in check, this function runs via a scheduled event every 90-110 ms in the “fast” thinking mode and every 450-500 ms in the “slow” thinking mode. When it runs, it activates the <code class="language-plaintext highlighter-rouge">Brain</code> and runs commands defined in the AI profile. AI profiles include some state logic and defines behavior templates for each state.</p>
-
-<p>Let’s take a look at a concrete example - the think function for <code class="language-plaintext highlighter-rouge">ProceduralProfileVanityPetPrototype</code>:</p>
-
-<div class="language-csharp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">public</span> <span class="k">override</span> <span class="k">void</span> <span class="nf">Think</span><span class="p">(</span><span class="n">AIController</span> <span class="n">ownerController</span><span class="p">)</span>
-<span class="p">{</span>
-    <span class="c1">// Guard checks omitted</span>
-    <span class="n">ProceduralAI</span> <span class="n">proceduralAI</span> <span class="p">=</span> <span class="n">ownerController</span><span class="p">.</span><span class="n">Brain</span><span class="p">;</span>
-    <span class="n">Agent</span> <span class="n">agent</span> <span class="p">=</span> <span class="n">ownerController</span><span class="p">.</span><span class="n">Agent</span><span class="p">;</span>
-    <span class="n">WorldEntity</span> <span class="n">master</span> <span class="p">=</span> <span class="n">ownerController</span><span class="p">.</span><span class="n">AssistedEntity</span><span class="p">;</span>
-    <span class="n">Game</span> <span class="n">game</span> <span class="p">=</span> <span class="n">agent</span><span class="p">.</span><span class="n">Game</span><span class="p">;</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">master</span> <span class="p">!=</span> <span class="k">null</span> <span class="p">&amp;&amp;</span> <span class="n">master</span><span class="p">.</span><span class="n">IsInWorld</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="kt">float</span> <span class="n">distanceToMasterSq</span> <span class="p">=</span> <span class="n">Vector3</span><span class="p">.</span><span class="nf">DistanceSquared2D</span><span class="p">(</span><span class="n">agent</span><span class="p">.</span><span class="n">RegionLocation</span><span class="p">.</span><span class="n">Position</span><span class="p">,</span> <span class="n">master</span><span class="p">.</span><span class="n">RegionLocation</span><span class="p">.</span><span class="n">Position</span><span class="p">);</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">distanceToMasterSq</span> <span class="p">&gt;</span> <span class="n">MaxDistToMasterBeforeTeleportSq</span><span class="p">)</span>
-        <span class="p">{</span>
-            <span class="c1">// Teleport to master</span>
-            <span class="nf">HandleContext</span><span class="p">(</span><span class="n">proceduralAI</span><span class="p">,</span> <span class="n">ownerController</span><span class="p">,</span> <span class="n">TeleportToMasterIfTooFarAway</span><span class="p">);</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="c1">// Move normally</span>
-    <span class="nf">HandleMovementContext</span><span class="p">(</span><span class="n">proceduralAI</span><span class="p">,</span> <span class="n">ownerController</span><span class="p">,</span> <span class="n">agent</span><span class="p">.</span><span class="n">Locomotor</span><span class="p">,</span> <span class="n">PetFollow</span><span class="p">,</span> <span class="k">false</span><span class="p">,</span> <span class="k">out</span> <span class="n">_</span><span class="p">);</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>First, the pet determines its <em>master</em> (<code class="language-plaintext highlighter-rouge">AssistedEntity</code>) and the distance between them. If this distance exceeds the defined value, the pet teleports using <code class="language-plaintext highlighter-rouge">HandleContext()</code>. Then movement is initiated using <code class="language-plaintext highlighter-rouge">HandleMovementContext()</code>.</p>
-
-<p><code class="language-plaintext highlighter-rouge">HandleMovementContext()</code> sets the state to <code class="language-plaintext highlighter-rouge">MoveTo</code>, which consists of four stages:</p>
-
-<ul>
-  <li>
-    <p>Validate</p>
-  </li>
-  <li>
-    <p>Start</p>
-  </li>
-  <li>
-    <p>Update</p>
-  </li>
-  <li>
-    <p>End</p>
-  </li>
-</ul>
-
-<p>The agent then receives a command based on the settings defined in the <code class="language-plaintext highlighter-rouge">ContextPrototype</code>. In our vanity pet example this command is simply generating a path to <code class="language-plaintext highlighter-rouge">AssistedEntity</code>.</p>
-
-<h3 id="generatepath">GeneratePath</h3>
-
-<p>Path generation begins inside the <code class="language-plaintext highlighter-rouge">Locomotor</code> class. First, it disables <em>influence points</em> for <em>owner</em> (the pet) and <em>other</em> (the avatar) by calling the <code class="language-plaintext highlighter-rouge">DisableNavigationInfluence()</code> method. It then proceeds to the generation process itself - <code class="language-plaintext highlighter-rouge">GeneratePathInternal()</code>.</p>
-
-<p>This process consists of three main steps:</p>
-
-<ul>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">GeneratePathStep()</code> - we scan all <code class="language-plaintext highlighter-rouge">NaviTriangle</code> instances near the <em>startTriangle</em> until we find our destination - <em>goalTriangle</em>. All steps are recorded in <em>genPathState</em>.</p>
-  </li>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">FunnelStep()</code> - a hard to understand algorithm, the goal of which is to remove unnecessary <code class="language-plaintext highlighter-rouge">NaviPoint</code> instances and determine <code class="language-plaintext highlighter-rouge">NaviSide</code> - the side to steer to avoid collision with an object (either left or right). The radius of the node to steer around is determined by summing the radiuses of the owner (the pet) and the <em>influenceRadius</em> - the radius of the object bound to the <code class="language-plaintext highlighter-rouge">NaviPoint</code>.</p>
-  </li>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">CalcAccurateDistance()</code> - now that we have a path, we calculate its actual length taking into account all necessary steering and picking the shortest sides.</p>
-  </li>
-</ul>
-
-<p>To illustrate this process, I have prepared two examples of path generation:</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-06/pathfinding-example-1.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-06/pathfinding-example-1.jpg" alt="Pathfinding Example 1" /></a></p>
-
-<p>As you an see, there are two entities between the pet and the avatar: S.T.A.S.H. and Maria Hill.</p>
-
-<center>
-<a href="/MHServerEmu/assets/blog/progress-report/2024-06/pathfinding-animation-1.gif"><img src="/MHServerEmu/assets/blog/progress-report/2024-06/pathfinding-animation-1.gif" alt="Pathfinding Animation 1" style="max-height: 400px;" /></a>
-</center>
-
-<p>Now let’s take a look at a more involved example:</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-06/pathfinding-example-2.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-06/pathfinding-example-2.jpg" alt="Pathfinding Example 2" /></a></p>
-
-<p>In this case we have obstacles in the form of walls. The radiuses of nodes to steer around will be equal to the pet’s. Three paths are generated, and the shortest one is picked.</p>
-
-<center>
-<a href="/MHServerEmu/assets/blog/progress-report/2024-06/pathfinding-animation-2.gif"><img src="/MHServerEmu/assets/blog/progress-report/2024-06/pathfinding-animation-2.gif" alt="Pathfinding Animation 2" style="max-height: 400px;" /></a>
-</center>
-
-<p>Finding and fixing bugs in implementations of these algorithms took me a week. I even had to implement SVG export for the navi system to visualize what was happening. In the end, all issues were solved, and now we have pets and team-ups working in the server emulator.</p>
-
-<p>As you run around with them, keep in mind that every 200 ms they perform complex calculations to find their path to you. In addition to that, <code class="language-plaintext highlighter-rouge">Locomotor</code> has a <em>repath</em> feature that checks and potentially rebuilds the path every 250 ms in case new objects appear in the way.</p>
-
-<p>Now you should have a better understanding of how AI works. Although team-ups currently do not attack, they scan for targets every second, and when we enable these targets, combat will begin!</p>
-
-<hr />
-
-<p>It is time for us to get back to coding. We hope you all are going to join us again in July for a special one year anniversary report!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry></feed>
+<p>Back to work now. See you in August!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry></feed>
