@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: June 2025 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: June 2025" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2025/06/29/progress-report-june-2025.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2025/06/29/progress-report-june-2025.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-06-29T11:00:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: June 2025" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-06-29T11:00:00+03:00","datePublished":"2025-06-29T11:00:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: June 2025","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2025/06/29/progress-report-june-2025.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2025/06/29/progress-report-june-2025.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: June 2025</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2025-06-29T11:00:00+03:00" itemprop="datePublished">Jun 29, 2025
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2025-06/header.jpg" alt="MHServerEmu Progress Report - June 2025" /></p>
+
+<p>Apparently this is the 20st Progress Report. Crazy stuff.</p>
+
+<h2 id="mhserveremu2013">MHServerEmu2013</h2>
+
+<p>Continuing Gazillion’s tradition of having anniversary celebrations in June, this month we have not only released 0.6.0, but also published the current work-in-progress source code for <a href="https://github.com/Crypto137/MHServerEmu2013">MHServerEmu2013</a> - a version of the server emulator that supports game version 1.10 from 2013. This is the “vanilla” version of the game, which means:</p>
+
+<ul>
+  <li>
+    <p>Original selection of 22 playable heroes before any of their level 52 reviews and other reworks.</p>
+  </li>
+  <li>
+    <p>Original versions of all the story regions, including The Raft having a funicular ride section.</p>
+  </li>
+  <li>
+    <p>Original endgame content consisting of green and red Terminals, Group Challenges, and the Limbo Survival Challenge.</p>
+  </li>
+  <li>
+    <p>PvP 1.0, which is actually somewhat fun.</p>
+  </li>
+  <li>
+    <p>Hero unlocks via random drops instead of Eternity Splinters.</p>
+  </li>
+</ul>
+
+<p>This is still very early work, so most of the gameplay aspects are not really functional yet, but I have made significant progress in backporting various fundamental features. You can load into the game, explore the world, and try out some of the old powers on target dummies in the Training Room, all with basic multiplayer support. Overall I would say the current state of MHServerEmu2013 is mostly equivalent to version 0.2.0 of the main server project.</p>
+
+<p>I should note that 1.48, which is the final pre-BUE version of the game, is still the priority as soon as we reach the 1.0 milestone next year. MHServerEmu2013 is a side project I have been working on from time to time, and there are no timeframes on when it is going to be fully playable.</p>
+
+<h3 id="how-its-done">How It’s Done</h3>
+
+<p>Supporting game version 1.10 presents a unique set of challenges:</p>
+
+<ul>
+  <li>
+    <p>The game’s code is significantly older than 1.48/1.52/1.53, so it predates various large scale refactoring efforts that occured over the game’s lifespan.</p>
+  </li>
+  <li>
+    <p>1.10 does not have Mac support, so we do not have access to debug symbols for this version. The earliest Mac build that has been archived is for game version 1.25, which is over a year newer.</p>
+  </li>
+  <li>
+    <p>We do not have any packet captures for 1.10, so in some cases more trial-and-error is required to figure out the correct way to respond to the client.</p>
+  </li>
+</ul>
+
+<p>There is a bit of a silver lining to 1.10 though: we have an <em>Internal</em> build of the client, 1.10.0.69, dated late May 2013. I have talked about differences between Internal and Shipping build configurations in previous reports, but to give a quick refresher, this is effectively the final beta build with various debug features enabled. This includes access to the debug HUD, game state visualization functionality, and more.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-06/internal-build-screenshot.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-06/internal-build-screenshot.jpg" alt="Marvel Heroes 1.10.0.69" /></a></p>
+
+<p>By default MHServerEmu2013 supports build 1.10.0.643, which is the final Shipping build of 1.10 from July 2013. By specifying the <code class="language-plaintext highlighter-rouge">BUILD_1_10_0_69</code> conditional compilation symbol the server can also be built for the aforementioned Internal build.</p>
+
+<p>So where do you start with supporting a different version of the game? The very first thing you need to do is extract network protocol information from the client and use it to generate message serialization code for the server. I have covered this process in the <a href="/MHServerEmu/blog/2024/04/30/progress-report-april-2024.html">April 2024 report</a>, but 1.10 specifically has a catch about this. Back then the game used a latency buffer for some of the server to client messages, which should in theory improve client-server synchronization at the cost of extra latency. In practice this means that some network messages need to be timestamped, which is implemented via a protobuf <em>extension field</em>. The existing tools we use to extract protocol information do not support protobuf extension fields, so some additional work was required to handle this.</p>
+
+<p>Now that we can communicate with the client, we can load into the game. However, there is a problem: the client blocks movement input when your hero is dead, and anything with 0 health is automatically considered dead. This means you cannot move around without setting your hero’s health to something higher than 0. To set the value of the <code class="language-plaintext highlighter-rouge">Health</code> property you need to know its index, which differs from version to version. Thankfully, this aspect works in 1.10 basically the same as later versions: the client executable contains a statically allocated lookup table of all properties, which can be extracted relatively easily.</p>
+
+<p>These two things are enough to just load into the game and run around a region that does not use procedural generation, such as Avengers Tower. This is exactly how I did <a href="https://github.com/Crypto137/MHServerEmuMini">MHServerEmuMini</a> about a year ago.</p>
+
+<p>As you probably know if you have been following these reports, <em>prototypes</em> are data structures used to define basically everything in the game, and no further progress could be made without them. There are only minor differences between 1.10 and 1.52 in how the prototype system works: the game still uses the GRTTI system to map Calligraphy blueprints to C++ classes, but not having debug symbols from the Mac version made extracting the data structures for C++ classes from the client more difficult. Another issue was related to how the prototype files are stored in 1.10: it uses a regular SQLite database with blobs for each file instead of a proprietary archive format, so IO changes were required to load everything into our server.</p>
+
+<p>I want MHServerEmu2013 to share as much code with the main server as possible, so rather than modifying how the server loads prototypes, I approached this from the opposite direction. I made a tool called <a href="https://github.com/Crypto137/MHSqlitePakRepacker">MHSqlitePakRepacker</a>, which can be used to convert legacy SQLite-based <code class="language-plaintext highlighter-rouge">.sip</code> archives to the proprietary format used by later versions of the game. It made the 1.10 prototype data compatible with not just the server, but also our other tools, like <a href="https://github.com/Crypto137/MHDataParser">MHDataParser</a> and <a href="https://github.com/Crypto137/OpenCalligraphy">OpenCalligraphy</a>. This lead to me solving the issue of getting prototype data structures: rather than trying to extract static GRTTI data, I instead implemented C# code generation using Calligraphy blueprints. The generated code needs some manual cleanup for long-term server usage, such as adding enums, reordering fields, and adjusting data types, but it is good enough to deserialize the entire game database even without any of this. Being able to generate code like this also made comparing prototype structures from different versions of the game much easier.</p>
+
+<p>This was the breakthrough I needed to start really digging into 1.10 and figuring how much the game logic differs from 1.52. Is some ways it turned out to be not as much as I expected. For instance, I was able to backport region generation code in just a day, and I was not very familiar with this code. The only relatively major difference was the fact that 1.10 has no support for road generation, which was added for Chapter 9 regions, so some of the code needed to be removed.</p>
+
+<p>From what I can tell, the biggest fundamental difference is in how the game handles AI. In addition to the <code class="language-plaintext highlighter-rouge">ProceduralAI</code> system used in later versions of the game, 1.10 also has an alternative <code class="language-plaintext highlighter-rouge">Brain</code> subtype called <code class="language-plaintext highlighter-rouge">BehaviorTree</code>. Both subtypes store their state in a <code class="language-plaintext highlighter-rouge">BehaviorBlackboard</code> and execute actions by entering various <code class="language-plaintext highlighter-rouge">StaticAI</code> states, and the difference lies in how the logic is defined: <code class="language-plaintext highlighter-rouge">BehaviorTree</code> is a fully data-driven system, while <code class="language-plaintext highlighter-rouge">ProceduralAI</code> uses data only as parameters for compiled C++ code. <code class="language-plaintext highlighter-rouge">BehaviorTree</code> is likely the older system, which provided more flexibility to game designers via Gazillion’s internal tools, but its performance was probably not good enough. I suspect for this reason the developers implemented the more optimized <code class="language-plaintext highlighter-rouge">ProceduralAI</code> subtype and gradually replaced designer-defined trees with more performant code written by programmers. It appears they were in the middle of this process when the game was released, so while a lot of entities use the newer system, some of them, mainly bosses, still rely on the legacy system. The good news is that <code class="language-plaintext highlighter-rouge">BehaviorTree</code> was fully phased out only by version 1.35 in June 2015, so we have a whole bunch of Mac builds that still support this system.</p>
+
+<p>Version 1.10 also makes much heavier use of the <code class="language-plaintext highlighter-rouge">RepVar</code> system, which assigns ids to individual fields of replicated data structures. For instance, the data required to display map icons for faraway entities (<code class="language-plaintext highlighter-rouge">MapPosition</code>, <code class="language-plaintext highlighter-rouge">MapOrientation</code>, <code class="language-plaintext highlighter-rouge">MapRegionId</code>, <code class="language-plaintext highlighter-rouge">MapAreaId</code>, and <code class="language-plaintext highlighter-rouge">MapCellId</code>) is replicated using properties in 1.52, but 1.10 uses five <code class="language-plaintext highlighter-rouge">RepVar</code> fields in the <code class="language-plaintext highlighter-rouge">WorldEntity</code> class, each with its own replication id. Just like with AI, it appears Gazillion was in the middle of transitioning away from using the <code class="language-plaintext highlighter-rouge">RepVar</code> system when 1.10 was released, which contributed to some confusion when I was investigating this. To move around in the game world entities need to have a <code class="language-plaintext highlighter-rouge">Locomotor</code> component; if an entity does not have one, it cannot move. Movement is replicated to clients by sending the <code class="language-plaintext highlighter-rouge">LocomotionState</code> of the <code class="language-plaintext highlighter-rouge">Locomotor</code> instance, and it looks like at some point prior to 1.10 this was also replicated using <code class="language-plaintext highlighter-rouge">RepVar</code> fields instead of dedicated messages. This change must have happened not long before 1.10, because the <code class="language-plaintext highlighter-rouge">Locomotor</code> class still has a replication id field even though it no longer uses the <code class="language-plaintext highlighter-rouge">RepVar</code> system. And because whether an entity has a <code class="language-plaintext highlighter-rouge">Locomotor</code> component is defined by its prototype, we have a situation where only <em>some</em> entities require an extra useless id written in the middle of their data. Figuring all of this out would have been a lot easier if we had a packet capture for 1.10, but unfortunately the only thing we have to rely on is digging into the client code and cross-referencing it with newer versions of the game, which is a lot more time consuming.</p>
+
+<p>In conclusion, every major feature needs to be untangled, reevaluated, and cleaned up, but I can see a path to how the entirety of 1.10 can be restored. I will continue working on this as a side project, but, as I already mentioned, the priority still lies with the main 1.52/1.48 server for now.</p>
+
+<h2 id="crafting">Crafting</h2>
+
+<p>Returning to the present, this month I tried to get the gameplay side of the server as close to a feature complete state as possible before I return to my backend work. The largest remaining feature was crafting, which is where most of my efforts went into this month.</p>
+
+<p>“Crafting” is less of its own system, and more of an umbrella term that covers various aspects of the item system that needed to be finished. The first thing on this list was implementing stack splitting, which also included additional validation to prevent potential duping.</p>
+
+<p>Next, I needed to implement some missing functionality of the item rolling system. To apply changes to existing items, referred to as <em>mutations</em>, what you actually need to do is use your existing item to fill out a template, and then use this template to roll a <em>new</em> item. This template is represented by an instance of the <code class="language-plaintext highlighter-rouge">LootCloneRecord</code> class, and mutations are applied to it via various subtypes of the <code class="language-plaintext highlighter-rouge">LootMutationPrototype</code> class. In total there are 21 mutation types, which cover adding/removing affixes, rerolling values by changing the seed, and adjusting other parameters, like level and rarity.</p>
+
+<p>The crafter NPCs you interact with are implemented as special vendor types. Each recipe available to craft is an item in a vendor inventory, and when you learn a new recipe from a consumable item, this item is transferred to the vendor inventory corresponding to the recipe. Although these are “vendor” inventories, they all actually belong to your player entity, which is what allows you to have the same selection of recipes available when you interact with any crafter NPC of a specific type.</p>
+
+<p>Each recipe consists of two main parts: <code class="language-plaintext highlighter-rouge">RecipeInputs</code> and <code class="language-plaintext highlighter-rouge">RecipeOutputs</code>. <code class="language-plaintext highlighter-rouge">RecipeInputs</code> specifies a set of ingredients that is required to craft a recipe. There are three categories of ingredients:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">RestrictionSetInput</code> - any item manually provided by the player that matches the specified filters (e.g. any item of Unique rarity).</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">AllowedItemListInput</code> - any item manually provided by the player from a list of specific items.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">AutoPopulatedInput</code> - a specific item that is automatically retrieved from player inventories.</p>
+  </li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">RecipeOutputs</code> is just a loot table that is used to roll the resulting items. Ingredients provided as inputs are exposed to this loot table, allowing it to fill out <code class="language-plaintext highlighter-rouge">LootCloneRecord</code> instances mentioned above if necessary. If the output table rolls successfully, the new items are added to the <code class="language-plaintext highlighter-rouge">PlayerCraftingResults</code> inventory, and the provided ingredients are destroyed. Recipes can also have currency costs, which are paid when ingredients are destroyed. Creating new items and destroying provided ingredients at the same time creates the illusion that the provided items are modified, but the items you get are actually “clones” of your ingredients with mutations applied to them.</p>
+
+<p>Most of my time went into implementing and testing various mutation types. One silly bug I discovered while doing this involved runewords. Runeword tooltips are supposed to include icons of runes used in the recipe, but for some mysterious reason sometimes you would get items with no icons:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-06/runeword-icon-bug.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-06/runeword-icon-bug.jpg" alt="Runeword Icon Bug" /></a></p>
+
+<p>After some investigation I figured it out. Because crafting generates new items by rolling, runeword affixes are applied by creating a pool of affixes limited just to the ones required for the recipe, and then applying the entire pool. This is the same basic process that is used to roll prefixes and suffixes on random items, so the order of runeword affixes is also random. Only one affix in a runeword references the set of icons that needs to be displayed in the tooltip, and in version 1.52 there is a client bug where it stops looking for rune icon sets if the first affix does not have one. Because of this, icons would be shown only when the icon affix would randomly roll first. As a workaround, I added code that ensures that rune icon affixes are always inserted into the affix list as the first element.</p>
+
+<p>And this is all there really is to the crafting system. With it implemented, I now consider the game to be in a feature-complete state a single player experience, and I feel comfortable shifting my focus towards more social aspects.</p>
+
+<h2 id="the-little-things">The Little Things</h2>
+
+<p>While I have been doing a lot of testing as I was working on various features (I must have completed the Times Square tutorial over 50 times at this point), I have not taken too much time to actually play the game as a normal player. Now that I feel the game is in a solid state as a single player experience, I decided to take a small break from working on major features and just play the game for a bit. I started a new account on a local server with no cheats, no auto-unlocks, and all rates set to x1.</p>
+
+<p>As I was doing this, I took note of minor things that would be easy to fix. One example of this is the store catalog: early in the development process I ran a script to add all costumes available in the client to the catalog. While it was fun to mess around with at the time, I felt it was too messy now, so I went back and cleaned it up. I have removed all the costumes that are not supposed to be in the store, like default costumes, fortune card costume, and non-functional dev costumes, and restored the original prices for everything else using the Marvel Heroes Compendium by Mjoll as reference. I have also added character and stash unlocks for “removed” heroes (Fantastic Four and Silver Surfer), so it is now possible to get them without using chat commands.</p>
+
+<p>One thing that was bothering me quite a lot was the artifact drop rate situation. There were reports from players about it not feeling right pretty much from the moment the loot system was first implemented, but I could not find any problem with the code. I thought maybe, although unlikely, the missing loot system features related to crafting have some kind of indirect effect on drop rates. Well, all the features were now implemented, I played through the whole campaign, and got a grand total of 0 (zero) artifact drops, not counting guaranteed mission rewards. Something was absolutely wrong with it, so I took another look at it.</p>
+
+<p>There are many loot tables that can roll artifacts, but most of them are used for targeted drops in specific content, like boss artifacts in terminals. The table that is used to roll the actually random artifact drops, which includes the vast majority of lower level artifacts, is called <code class="language-plaintext highlighter-rouge">SpecialsArtifactsRespec</code> (originally it was also used to roll Retcon Devices, therefore the name). We now have much better tools to explore the changes made over the game’s history, and I decided to see if this is an issue with version 1.52 specifically. I compared it to 1.48, and my hunch was correct:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-06/the-great-artifact-scam-of-2017.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-06/the-great-artifact-scam-of-2017.png" alt="The Great Artifact Scam of 2017" /></a></p>
+
+<p>Gazillion <em>reduced the random artifact drop rate by 99.9%</em> at some point between December 20, 2016 and September 7, 2017. But surely this must be a bug or something, right? I checked all the individual builds, and found the exact one where this change was introduced: 1.50.0.402, released on February 10, 2017, a few weeks after the infamous Biggest Update Ever. The patch notes for this version are <a href="http://web.archive.org/web/20170222211727/https://forums.marvelheroes.com/discussion/312743/marvel-heroes-2016-2-03-patch-notes">archived</a>, so we can still take a look at them:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-06/ssb-patch-notes.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-06/ssb-patch-notes.png" alt="SSB Patch Notes" /></a></p>
+
+<p>Time to put my tinfoil hat on, because it appears I might have uncovered a bona fide conspiracy: it appears Gazillion secretly nerfed artifact drop rate to make S.H.I.E.L.D. Supply Boosts the primary source of random artifact drops and push people to buy them. This change was most likely aimed at new players they were expecting with the launch of the console version, and it went largely unnoticed by veteran PC players, who were occupied with grinding targeted boss drops, which are not affected by this. However, now that everyone has to start from scratch, this change has a very clear effect on player experience. Furthermore, these random artifact drops are affected by special item find (SIF), so this change also essentially nerfs all older SIF boosts.</p>
+
+<p>Nightly builds of the server now include a data patch that reverts this change, restoring “natural” artifact drops. I have also looked through other data changes made in build 1.50.0.402, but I have not found anything else that could be considered a stealth nerf.</p>
+
+<p>I will most likely continue playing and investigating smaller issues like this, but starting next month I plan to put most of my efforts into the backend again to get as many of the highly anticipated social features as possible ready in time for 0.7.0’s release in September.</p>
+
+<hr />
+
+<p>This is it for today. See you all in July.</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2025/06/29/progress-report-june-2025.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>

@@ -305,6 +305,12 @@
 
 <p>But here is the crazy thing: as far as I can tell, events within their frame buckets are not sorted by fire time. Therefore, it is possible for the time to go <em>backwards</em>, although only within the confines of a single frame. Which in a way makes sense: events happening within the same frame are batched together and happen “simultaneously”, so the execution order here is not critical. The main potential problem would be inconsistent timing due to an event callback potentially scheduling another event, but because time is always set to the precise fire time, it’s going to remain consistent.</p>
 
+<hr />
+
+<p><strong>UPDATED (JUNE 2025).</strong> There is actually a “second level” of bucketing for the current frame, with additional buckets for each millisecond (50 subbuckets for a 50 ms frame). Therefore, “time travel” can in fact happen only at submillisecond precision, which in practice is not used by game events.</p>
+
+<hr />
+
 <p>RIght now we have most of this system working, with the exception of the bucket management system. As a temporary solution we are storing all events in a single collection that we iterate to determine the events that would go in the bucket we would be processing, which is not ideal for performance, but it does the job well enough for now. The API for the system is pretty much done, and we can worry about optimizing internal implementation later.</p>
 
 <p>And this is how time in Marvel Heroes works.</p>
