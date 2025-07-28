@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: July 2025 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: July 2025" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2025/07/28/progress-report-july-2025.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2025/07/28/progress-report-july-2025.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-07-28T19:20:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: July 2025" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-07-28T19:20:00+03:00","datePublished":"2025-07-28T19:20:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: July 2025","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2025/07/28/progress-report-july-2025.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2025/07/28/progress-report-july-2025.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: July 2025</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2025-07-28T19:20:00+03:00" itemprop="datePublished">Jul 28, 2025
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2025-07/header.jpg" alt="MHServerEmu Progress Report - July 2025" /></p>
+
+<p>We are now officially in the third year of development.</p>
+
+<h2 id="player-manager">Player Manager</h2>
+
+<p>This month I fully focused on improving the server’s backend to make it possible to implement some of the long awaited social features, like parties.</p>
+
+<p>As a reminder, in Gazillion’s architecture game servers are never directly exposed to the client. Instead, the client connects to a Frontend server, through which it establishes a connection to the Player Manager server. As far as the client is concerned, it communicates with the Player Manager. On the backend side one or more game servers are connected to the Player Manager, and the latter routes client messages to them. Overall it looks like this:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-07/game-server-connection.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-07/game-server-connection.png" alt="Game Server Connection" /></a>
+</center>
+
+<p>Because there is only a single “real” network connection, this entire architecture can be implemented as a single monolithic server. This is what we did for MHServerEmu, which is a single process, where the roles of individual servers are handled by what we call “services”. While not ideal in terms of horizontal scaling, this decision allowed us to make the server much easier to set up and run.</p>
+
+<p>So far most of our efforts went into restoring the gameplay logic used by game instances, while our implementation of the Player Manager was mostly just scaffolding designed to get a single player into a game instance. There were some band-aid fixes to prevent the emulator from blowing up under load, like the current load balancing system used by public servers, where essentially multiple independent copies of the entire game are created to distribute the load. However, all of this needed to be rebuilt.</p>
+
+<p>We have a pretty decent understanding of what the Player Manager’s responsibilities are supposed to be because one of the protocols for server-to-server communication was accidentally included in test center client builds for version 1.53. Here are the major ones:</p>
+
+<ul>
+  <li>
+    <p>Log clients in and out as they connect and disconnect.</p>
+  </li>
+  <li>
+    <p>Manage game and region instances across all game servers.</p>
+  </li>
+  <li>
+    <p>Orchestrate player transfers between game and region instances.</p>
+  </li>
+  <li>
+    <p>Route client messages to appropriate game servers.</p>
+  </li>
+  <li>
+    <p>Facilitate additional social features: social circles (e.g. friend lists), parties, and matchmaking.</p>
+  </li>
+</ul>
+
+<p>Effectively, the Player Manager is the traffic controller for the entire game. This is overall similar to the functionality provided by online services like Battle.net in games like Diablo II.</p>
+
+<p>The first order of business was overhauling how client management worked. Previously we would do this straight from network IO threads that invoked connect/disconnect events, but this caused all kinds of race conditions to happen all the time. I did quick fixes as issues arised, and eventually they all turned into a Rube Goldberg machine of locks, retries, and timeouts that was very hard to maintain, and it would still occasionally have minor problems. I replaced all of this with a producer-consumer style implementation, where various IO threads “produce” events, which are all “consumed” by a single worker thread. This not only eliminated the vast majority of race conditions, but also naturally lead to implementing a login queue system, which is crucial for making sure MHServerEmu can survive under loads heavier than what the server hardware can handle.</p>
+
+<p>Our prior implementation of the Player Manager also did the work of creating and running game instances, which made things messy when services needed to communicate with game instances without going through the Player Manager, like the Leaderboard service. In addition, this made it harder to hypothetically separate game instances into a separate server process if the need ever arises. I have moved this functionality into a dedicated service, and the Player Manager now interacts with game instances using handles. While this somewhat increased the overall complexity of the system, it also made it a more accurate representation of the original server architecture.</p>
+
+<p>With this the Player Manager now has a much more solid foundation for implementing new features, but some more work was required from the game server side of things.</p>
+
+<h2 id="game-threading">Game Threading</h2>
+
+<p>Although Marvel Heroes was marketed as an MMO, its world structure is really an extension of the system that was used in Diablo II. The world consists of a number of game instances, and within each game instance there is one or more regions. What creates the illusion of a unified world is how you transfer between these instances: rather than picking a game from a list in a Battle.net interface panel, you automatically exit one game and enter another when you click on a transition entity in the game world. Some regions are designated as public, which means public game instances are created to host them, while others are considered private, and they are hosted by a private game instance the belongs to a specific player. There are also match regions that can behave as public or private depending on what the player who creates them chooses. The overall structure is supposed to look like this:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-07/world-structure.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-07/world-structure.png" alt="World Structure" /></a></p>
+
+<p>Our initial quick and dirty solution was to have a single game instance to host all regions with a dedicated thread to process it, which is more like how single player games are usually made. Eventually I added the functionality to increase the number of instances to allow public servers to handle more load, but the overall system remained the same, and the number of threads matched the number of game instances. In order to implement parties we need to replicate the original system, because what joining a party actually does is provide other players access to the leader’s private game instance. However, doing it means drastically increasing the number of game instances from just a few to potentially hundreds. Having dedicated threads for every single game instance would cause all sorts of performance issues, so we needed another solution for threading.</p>
+
+<p>We now have a dedicated pool of worker game threads that can process an arbitrary number of game instances. This uses the same basic idea as the producer-consumer pattern, but game threads act as both producers and consumers. Work is scheduled via a time-based priority queue: when a game instance finishes its tick, it calculates the time when the next update should happen, and this time is used as the priority for the priority queue. This queue is shared by all worker threads, so any of them can potentially do the work. Threads go to sleep when there is no work.</p>
+
+<p>This new implementation not only decouples the number of game instances from the number of threads, but also allows us to potentially have more granularity in how regions are processed. Some regions, like Cosmic Midtown Patrol when it is full of players, can take significantly more time to process than something like a terminal region with a single player in it. When multiple “heavy” regions are in the same game instance, processing all of them may take longer than the target frame time of 50 ms. Not hitting this target manifests as lag, and “light” regions end up having to wait for the thread to process all the madness happening in “heavy” regions first. This is one of the main causes of lag that you can occasionally see on public servers during prime time. Once regions are distributed across game instances as planned, “heavy” regions may still lag if things get too crazy, but they will no longer bring other regions down with them, as long as there are not too many of them.</p>
+
+<h2 id="region-transfers">Region Transfers</h2>
+
+<p>The new threading system enabled us to potentially have many more game instances, but there is still the issue of how you actually move a player from <code class="language-plaintext highlighter-rouge">RegionA</code> in <code class="language-plaintext highlighter-rouge">Instance1</code> to <code class="language-plaintext highlighter-rouge">RegionB</code> in <code class="language-plaintext highlighter-rouge">Instance2</code>. There are many things that can potentially cause a player to move from one region to another:</p>
+
+<ul>
+  <li>
+    <p>Clicking on a transition.</p>
+  </li>
+  <li>
+    <p>Selecting a region in the waypoint menu.</p>
+  </li>
+  <li>
+    <p>Using the bodyslider.</p>
+  </li>
+  <li>
+    <p>Triggering a mission action or a MetaGame state.</p>
+  </li>
+  <li>
+    <p>Resurrecting after dying.</p>
+  </li>
+  <li>
+    <p>Teleporting to a party member.</p>
+  </li>
+  <li>
+    <p>Activating Prestige.</p>
+  </li>
+</ul>
+
+<p>In order for the Player Manager to be able to orchestrate this, it needs a common API for initiating all of these transfers from gameplay code. Unfortunately, we accumulated some technical debt on this front as well, and it needed to be cleaned up before we could proceed.</p>
+
+<p>One of the more egregious troublemakers with this has been the direct transition system. This refers to portals that are bound to specific region instances. Originally they were implemented for “bonus levels”, like the totally non-existent Classified Bovine Sector, but later on direct transitions were also used for the Danger Room mode. Danger Room in particular has been a major source of headache, because each “floor” in this mode is its own separate region. There is also an intricate data plumbing system that transfers properties from the item that opens the portal to the portal itself, and then through all subregions.</p>
+
+<p>While working on this, I have also discovered that one of the assumptions I had about the region transfer process was actually a misconception. I previously believed that we had to do the full game exit procedure on every region transfer, which involves destroying and recreating all entities owned by the transferring player, including all avatars and items. The main reason for this was that reusing the same player entity caused all sorts of issues with the client, including completely breaking the inventory grid. However, as it turns out we <em>can</em> reuse the same player entity, as long as we just remove the avatar entity from the game world and never let the player entity actually exit the game. There is subtle difference between the two, but it results in us not triggering any of the critical issues client-side and saving some resources server-side.</p>
+
+<p>These backend improvements require significant changes to the fundamental systems that have not been really touched in quite some time, so weird issues can pop up, and everything needs to be thoroughly tested before proceeding with the next step. One example of such weird issue was a bug where resurrecting in the Fisk Tower terminal would teleport the player to the pre-update story version of the Fisk Tower region.</p>
+
+<p>At the time of writing this, the stage is almost set to make the final seismic shift by implementing seamless transitions between game instances. Once this is done and tested, I will be able to work on social circles and parties.</p>
+
+<hr />
+
+<p>This is all I have for you today. See you next time!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2025/07/28/progress-report-july-2025.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>
