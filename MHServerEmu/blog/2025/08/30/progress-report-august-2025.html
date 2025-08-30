@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: August 2025 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: August 2025" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2025/08/30/progress-report-august-2025.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2025/08/30/progress-report-august-2025.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-08-30T12:40:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: August 2025" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-08-30T12:40:00+03:00","datePublished":"2025-08-30T12:40:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: August 2025","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2025/08/30/progress-report-august-2025.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2025/08/30/progress-report-august-2025.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: August 2025</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2025-08-30T12:40:00+03:00" itemprop="datePublished">Aug 30, 2025
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2025-08/header.jpg" alt="MHServerEmu Progress Report - August 2025" /></p>
+
+<p>Welcome to another episode of MHServerEmu Progress Report.</p>
+
+<h2 id="070-status">0.7.0 Status</h2>
+
+<p>Unfortunately, the backend changes needed to implement additional social features took longer than expected. The new instancing system is working, and I have just merged friend and ignore lists at the time of writing this. However, I have not had the opportunity to work on parties yet. Because this is probably the most highly anticipated social feature, I believe it is better to delay the next release by a few weeks and try to get it in. The goal is still to release 0.7.0 in September, but closer to the tail end of the month.</p>
+
+<p>Although the new instancing system needed more time to cook, its deployment has been very successful so far. One of the big changes with the new system is how load is distributed across worker threads, which I covered in detail in <a href="/MHServerEmu/blog/2025/07/28/progress-report-july-2025.html">the previous report</a>. Thanks to this working out as well as I hoped, some of the popular community servers are now able to handle higher numbers of concurrent players with much fewer issues. We now also follow mostly the same rules as the original Gazillion implementation in terms of how instances are managed. One exception to this is how we handle hub regions (referred to internally as <em>towns</em>): the original data specifies a 20 player limit for most hub regions, which we are ignoring. As a result, we now have a single mega-instance of each hub on the server that can fit everyone. Performance-wise this is fine because most powers are disabled in hubs, and there are no enemies. The mood has gotten a lot more lively now:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-08/lively-hub.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-08/lively-hub.jpg" alt="Lively Hub" /></a></p>
+
+<h2 id="communities">Communities</h2>
+
+<p>The most significant feature-enabling backend change is that we now have a way for game instances to communicate with each other through the Player Manager. The next step was to expand our implementation of <em>communities</em>.</p>
+
+<p>A community is a collection of <em>circles</em> and <em>members</em>. A member represents a player that can be a part of one or more circles in a community. Each player entity has its own community instance. The data contained in your community is displayed in the Social panel, and each tab (Friends, Nearby, Ignored, Supergroup) represents a circle.</p>
+
+<p>The biggest issue with communities is how overengineered the whole system is:</p>
+
+<ul>
+  <li>
+    <p>In addition to “System” circles represented by tabs in the Social panel, there are also “User” circles that were supposed to be customizable. This aspect was never fully implemented, but the entire serialization system, including the mode that is used to replicate this data to the client, is designed with customizable circles in mind, so we have to do it in a similar convoluted way.</p>
+  </li>
+  <li>
+    <p>The static data definitions for System circles are not integrated into the prototype system used by the rest of the game. Instead, all circle definitions are hardcoded, even though the system was apparently supposed to be fully customizable.</p>
+  </li>
+  <li>
+    <p>Even though it is not displayed in the Social tab, there is an additional hidden circle that contains your party members.</p>
+  </li>
+  <li>
+    <p>The Supergroup tab displays last online time for all players. This time is replicated to the client using the <a href="https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime">Windows FILETIME format</a>, which is “the number of 100-nanosecond intervals since January 1, 1601 (UTC)”. This is the only place in the game that uses this time format, and it is immediately converted back to a regular <a href="https://en.wikipedia.org/wiki/Unix_time">Unix timestamp</a> as soon as it is received by the client.</p>
+  </li>
+</ul>
+
+<p>This unnecessary additional complexity makes it difficult to determine what is the essential functionality that we actually need to implement.</p>
+
+<p>Each community member has a <code class="language-plaintext highlighter-rouge">CommunityMemberBroadcast</code> structure associated with it:</p>
+
+<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">message</span> <span class="nc">CommunityMemberAvatarSlot</span> <span class="p">{</span>
+    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">avatarRefId</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">costumeRefId</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">uint32</span>    <span class="na">level</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">uint32</span>    <span class="na">prestigeLevel</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">string</span>    <span class="na">onlineId</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">CommunityMemberBroadcast</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">memberPlayerDbId</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">currentRegionRefId</span>    <span class="o">=</span> <span class="mi">2</span> <span class="p">[</span><span class="k">default</span> <span class="o">=</span> <span class="mi">123</span><span class="p">];</span>
+    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">currentDifficultyRefId</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="k">repeated</span> <span class="n">CommunityMemberAvatarSlot</span>    <span class="na">slots</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">string</span>    <span class="na">currentPlayerName</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="k">repeated</span> <span class="kt">uint64</span>    <span class="na">memberPlayerDbIdIgnoreList</span>    <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">int32</span>    <span class="na">isOnline</span>    <span class="o">=</span> <span class="mi">7</span> <span class="p">[</span><span class="k">default</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">];</span>
+    <span class="k">optional</span> <span class="kt">int64</span>    <span class="na">lastLogoutTimeAsFileTimeUtc</span>    <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">currentCostumeRefId</span>    <span class="o">=</span> <span class="mi">9</span> <span class="p">[</span><span class="k">default</span> <span class="o">=</span> <span class="mi">123</span><span class="p">];</span>
+    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">consoleAccountId</span>    <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">secondaryConsoleAccountId</span>    <span class="o">=</span> <span class="mi">11</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">string</span>    <span class="na">secondaryPlayerName</span>    <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>A new <code class="language-plaintext highlighter-rouge">CommunityMemberBroadcast</code> instance is generated when a status of a player in-game changes (e.g. you enter a region or switch to a different avatar). This instance is first served to other players in the same game instance (e.g. to update the Nearby tab), and then it is sent to the Player Manager. Afterwards, it is routed to other game instances to update communities of other players that may be interested in it.</p>
+
+<p>When the Social panel is open, the client polls the server for status updates every 10 seconds. Because of this, the Player Manager needs to not only route broadcast data, but also cache it for potential repeated queries, including those involving players that are currently offline.</p>
+
+<p>We now have 3 out of 5 System circles functional now: Friends, Nearby, and Ignored. Parties are next on the list, and for Supergroups we are going to need even more backend changes to support features like, for example, managing member ranks while they are offline.</p>
+
+<p>I wanted communities to be useful for something other than stalking your friends, so I did some work on the Grouping Manager and implemented tells (private chat messages). Now you can plan world domination or play out your Marvel fantasies without letting the whole server know about it.</p>
+
+<hr />
+
+<p>This is it for today. Stay tuned!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2025/08/30/progress-report-august-2025.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>
