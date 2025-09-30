@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: September 2025 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: September 2025" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2025/09/30/progress-report-september-2025.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2025/09/30/progress-report-september-2025.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-09-30T14:25:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: September 2025" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-09-30T14:25:00+03:00","datePublished":"2025-09-30T14:25:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: September 2025","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2025/09/30/progress-report-september-2025.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2025/09/30/progress-report-september-2025.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: September 2025</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2025-09-30T14:25:00+03:00" itemprop="datePublished">Sep 30, 2025
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2025-09/header.jpg" alt="MHServerEmu Progress Report - September 2025" /></p>
+
+<p>It’s party time. P-A-R-T-Why? Because I gotta!</p>
+
+<h2 id="parties">Parties</h2>
+
+<p>The long awaited Party system is finally here, and now you can play most of the content in the game with your friends. While the implementation of the Party system itself took only a few weeks, it really is the culmination of the two months of backend work that preceded it, including overhauling how instancing works and implementing the Community system, which we covered in previous reports.</p>
+
+<p>Like other social features, the Party system breaks the boundaries of individual game instances to connect players across them. One thing that makes parties special is that they are “owned” by the server rather than individual players: the player who started a party may leave it and log out, but the party will continue to exist for as long as it still has any members. Because of this, authoritative representations of parties need to exist in one of the services that run for as long as server itself does. This is where the confusion begins.</p>
+
+<p>As a reminder, there are two services that the client remains connected to for the entire duration of a session, no matter what game instance it is currently being hosted by: the Player Manager and the Grouping Manager. Originally, all party functionality was handled by the appropriately named Grouping Manager, but there was a pretty major change in 2017. It appears that when Gazillion was integrating their social functionality into the console online services, PlayStation Network and Xbox Live, they decided to move party functionality from the Grouping Manager to the Player Manager. As a result, the Grouping Manager became little more than a chat service, while the Player Manager ended up being effectively the primary service that orchestrated the entire game.</p>
+
+<p>One example of a minor point of confusion this change caused is the API used for party requests. In versions of the game prior to the Biggest Update Ever (BUE) the client did party requests using a number of separate network messages:</p>
+
+<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">message</span> <span class="nc">NetMessageRequestPartyJoinPortal</span> <span class="p">{</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">NetMessageDeclineGroupInvite</span> <span class="p">{</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">NetMessageLeaveGroup</span> <span class="p">{</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">NetMessageChangeGroupLeader</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">targetMemberId</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">NetMessageBootPlayer</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">targetMemberId</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">NetMessageDisbandGroup</span> <span class="p">{</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">NetMessageGroupChangeType</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="n">GroupType</span>    <span class="na">type</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">NetMessageGroupChangeTypeConfirmResponse</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">playerId</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">bool</span>    <span class="na">accept</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>In BUE this was changed into what is essentially a subprotocol, and all requests were unified into a single structure called <code class="language-plaintext highlighter-rouge">PartyOperationPayload</code>:</p>
+
+<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">message</span> <span class="nc">PartyOperationPayload</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">requestingPlayerDbId</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">string</span>    <span class="na">requestingPlayerName</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">requestingPlayerPsnAccountId</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">targetPlayerDbId</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">string</span>    <span class="na">targetPlayerName</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="k">required</span> <span class="n">GroupingOperationType</span>    <span class="na">operation</span>    <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">string</span>    <span class="na">psnSessionId</span>    <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">difficultyTierProtoId</span>    <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">NetMessagePartyOperationRequest</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="n">PartyOperationPayload</span>    <span class="na">payload</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>However, you may notice that the <code class="language-plaintext highlighter-rouge">operation</code> enumeration is still referred to as a “grouping” operation:</p>
+
+<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">enum</span> <span class="n">GroupingOperationType</span> <span class="p">{</span>
+    <span class="na">eGOP_InvitePlayer</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="na">eGOP_AcceptInvite</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="na">eGOP_DeclineInvite</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="na">eGOP_JoinPartyWithPSNSessionId</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="na">eGOP_LeaveParty</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="na">eGOP_DisbandParty</span>    <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="na">eGOP_ServerNotification</span>    <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="na">eGOP_KickPlayer</span>    <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+    <span class="na">eGOP_ChangeLeader</span>    <span class="o">=</span> <span class="mi">9</span><span class="p">;</span>
+    <span class="na">eGOP_ConvertToRaid</span>    <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+    <span class="na">eGOP_ConvertToRaidAccept</span>    <span class="o">=</span> <span class="mi">11</span><span class="p">;</span>
+    <span class="na">eGOP_ConvertToRaidDecline</span>    <span class="o">=</span> <span class="mi">12</span><span class="p">;</span>
+    <span class="na">eGOP_ConvertToParty</span>    <span class="o">=</span> <span class="mi">13</span><span class="p">;</span>
+    <span class="na">eGOP_ChangeDifficulty</span>    <span class="o">=</span> <span class="mi">14</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>This is because this enumeration actually comes from the pre-BUE version of the party API: it was simply moved from <code class="language-plaintext highlighter-rouge">GroupingManager.proto</code> to <code class="language-plaintext highlighter-rouge">CommonMessages.proto</code>. The functionality itself is mostly the same, but untangling subtle API nuances like this took a little bit of time.</p>
+
+<p>It gets messier when it comes to replicating the authoritative data from the Player Manager to everything that needs to use it. Here is the big picture overview of what it looks like with a party of two members in two game instances:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-09/party-data.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-09/party-data.png" alt="Party Data Replication Diagram" /></a>
+</center>
+
+<p>When a player is added to a game instance, this game instance needs to know if the player is in a party, so the Player Manager sends this data in a structure called <code class="language-plaintext highlighter-rouge">PartyInfo</code>:</p>
+
+<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">message</span> <span class="nc">PartyMemberInfo</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">playerDbId</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">string</span>    <span class="na">playerName</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="k">repeated</span> <span class="kt">uint64</span>    <span class="na">boosts</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">consoleAccountId</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">uint64</span>    <span class="na">secondaryConsoleAccountId</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">string</span>    <span class="na">secondaryPlayerName</span>    <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kd">message</span> <span class="nc">PartyInfo</span> <span class="p">{</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">groupId</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">required</span> <span class="n">GroupType</span>    <span class="na">type</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">leaderDbId</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
+    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">difficultyTierProtoId</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">string</span>    <span class="na">groupPSNSessionId</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="k">repeated</span> <span class="n">PartyMemberInfo</span>    <span class="na">members</span>    <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">string</span>    <span class="na">voiceChatFrontendIPAddr</span>    <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
+    <span class="k">optional</span> <span class="kt">string</span>    <span class="na">voiceChatFrontendPort</span>    <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The game instance uses this data to either construct a new local representation of a party or update an existing one. It is also relayed to the client, so that it can construct or update its own representation of the same party. The representation in the game instance is shared by all party members present in the instance, and it is destroyed when there are no longer any members in the instance.</p>
+
+<p>When the game instance representation changes, it notifies the local <code class="language-plaintext highlighter-rouge">Player</code> entities representing members present in the instance. Each <code class="language-plaintext highlighter-rouge">Player</code> entity has a <code class="language-plaintext highlighter-rouge">Community</code> instance bound to it, which has a circle dedicated to holding current party members (see the <a href="/MHServerEmu/blog/2025/08/30/progress-report-august-2025.html">previous report</a> for more information on how the Community system works). The client relies on the Party circle to display hero icons for party members, and the server needs it to determine active <em>party filters</em> - conditions required to trigger scoring events for certain party-related achievements (e.g. do something in a party with specific heroes).</p>
+
+<p>Replicating the party representation itself and the party community circle is not enough for the client. For it to “understand” that it is currently in a party, the party’s id needs to be replicated separately using the <code class="language-plaintext highlighter-rouge">RepVar</code> system. This is a legacy replication system that was used more extensively in older versions of the game, like 1.10. Over time <code class="language-plaintext highlighter-rouge">RepVar</code> fields were gradually replaced with regular protobuf messages, but there are still some places where they remain, such as this one. The client uses the id replicated in this way mainly for interaction validation, such as not allowing the player to go through portals belonging to other parties or preventing the use of prestige consumables while in a party.</p>
+
+<p>But wait, there is more. In order for the client to be able to display the health meters of party members in the same game instance, it needs to have the <code class="language-plaintext highlighter-rouge">Player</code> entities of party members replicated to it using the <code class="language-plaintext highlighter-rouge">Party</code> channel of the Area of Interest system, and there is an issue with that. The ownership relation between a <code class="language-plaintext highlighter-rouge">Player</code> entity and an <code class="language-plaintext highlighter-rouge">Avatar</code> entity is established via the latter’s <code class="language-plaintext highlighter-rouge">InvLoc</code>. In other words, the <code class="language-plaintext highlighter-rouge">Avatar</code> being played is stored in the <code class="language-plaintext highlighter-rouge">Player</code>’s <code class="language-plaintext highlighter-rouge">AvatarInPlay</code> inventory. Due to how the Area of Interest system is implemented, changing an entity’s <code class="language-plaintext highlighter-rouge">InvLoc</code> destroys and recreates the entity client-side. This causes problems when you invite an <code class="language-plaintext highlighter-rouge">Avatar</code> that is already present in your client’s Area of Interest to a party: partying up adds the <code class="language-plaintext highlighter-rouge">Player</code> entity of the invitee to your client’s Area of Interest, but the current <code class="language-plaintext highlighter-rouge">Avatar</code> entity is already replicated to your client without the ownership relation established, because the owning <code class="language-plaintext highlighter-rouge">Player</code> entity was not yet exposed to your client when it happened. To solve this edge case, Gazillion introduced an additional protobuf message called <code class="language-plaintext highlighter-rouge">NetMessageInventoryMove</code> that is used to move an already replicated entity to the newly replicated owner’s inventory client-side.</p>
+
+<p>The end result of all of this is that replicated party data is scattered across many different representations in various game instances and clients hosted by them. All of it can very easily get out of sync and cause all sorts of weird issues that appear to be “random”. Debugging this was also annoying because everything had to be done with two or more instances of the game client running. Despite all the difficulties on the way there, the Party system is now functional and stable.</p>
+
+<h2 id="080-plans">0.8.0 Plans</h2>
+
+<p>With the Party system implemented and version 0.7.0 released, we are now in the final stretch of development. The remaining systems, like supergroups and PvP, are more like subsets of existing systems, such as Community and MetaGame respectively. This means that version 0.8.0, which we currently plan to release in December, is going to be the final major release before 1.0.0.</p>
+
+<p>As you may know if you have read our FAQs, we plan to do a wipe in 1.0.0 by making existing saved data incompatible. For people who want to continue playing using their 0.x accounts on a self-hosted server, we will be releasing one final update, 0.8.1, which will include all the bug fixes and optimization changes that we are going to do between 0.8.0 and 1.0.0. We will share more details about this later.</p>
+
+<p>Once 1.0.0 is out, we will be shifting our focus towards supporting older versions of the game. As we have mentioned previously, the highest priority for this is 1.48 from late 2016, which is the final pre-BUE version. Although it is not going to be “officially” supported until after 1.0.0, I have some news to share regarding early progress that has been made.</p>
+
+<h2 id="pre-bue-progress">Pre-BUE Progress</h2>
+
+<p>I was feeling burnt out after months of working on social features, so I decided to do something fun for a change. While I had a reasonably good plan for supporting pre-BUE versions of the game based on the <a href="/MHServerEmu/blog/2024/05/31/progress-report-may-2024.html">proof-of-concept server from 2024</a>, it was still mostly theoretical. I was relatively confident that it would not take long to get some version of the fully-featured server working with 1.48, so I decided to take a small break from 1.52 and give it a go.</p>
+
+<p>There are two things you need to do to make the server compatible with a different version of the game:</p>
+
+<ol>
+  <li>
+    <p>Update the network protocol. This means generating new <code class="language-plaintext highlighter-rouge">NetMessage</code> classes from <code class="language-plaintext highlighter-rouge">.proto</code> schemas extracted from the client and changing the code that references message fields that no longer exist. One example of this are messages that reference avatars by index: they were modified to support couch co-op on consoles, but the concept of avatar indices did not exist pre-BUE, so everything that references it needs to be removed.</p>
+  </li>
+  <li>
+    <p>Update prototype structure definitions. This means adjusting all the <code class="language-plaintext highlighter-rouge">Prototype</code> classes to match the old data. For example, the difficulty slider feature did not exist pre-BUE, but there was still the concept of difficulty inherent to the region. To accomodate this, the <code class="language-plaintext highlighter-rouge">TuningPrototype</code> class needs to be renamed to <code class="language-plaintext highlighter-rouge">DifficultyPrototype</code>, and its fields need to be adjusted. This has a cascading effect on all gameplay code that references the changed prototype classes and their fields.</p>
+  </li>
+</ol>
+
+<p>Most of the data structure changes can be automated with code generation, so what remains to be done manually is fixing hundreds of compile errors from code referencing non-existing fields. Because 1.52 and 1.48 are actually not that different under the hood, fixing all the compile errors took me just a single day. With that I was able to go back to December 2016:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-09/v48-screenshot-1.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-09/v48-screenshot-1.jpg" alt="1.48 Avengers Tower" /></a></p>
+
+<p>All the old content and features were there, including the point-based power system:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-09/v48-screenshot-2.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-09/v48-screenshot-2.jpg" alt="1.48 Power Points" /></a></p>
+
+<p>However, just getting it to work is the “easy” part. Playing the game reveals all kinds of subtle issues, including powers disappearing from the action bar, power points not being awarded on level up, some of the bosses not spawning, and many more. I have spent another day fixing some of the more glaring problems, but getting everything to a polished state would require implementing various missing features and investigating the remaining inconsistencies between the server and the older client version. The overall scope of the required work is similar to a single quarterly server release.</p>
+
+<p>I have published a <a href="https://github.com/Crypto137/MHServerEmu/tree/v48">separate branch</a> containing the current work-in-progress 1.48 code. There are no nightly builds and no instructions for setting it up, but if you are feeling adventurous you can try getting it up and running. I will most likely continue doing a little bit of work on it as a side project, but it will not be the primary focus until 1.0.0 is out early next year.</p>
+
+<hr />
+
+<p>And with this another Progress Report comes to an end. See you next time!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2025/09/30/progress-report-september-2025.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>
