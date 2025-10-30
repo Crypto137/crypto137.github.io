@@ -1,4 +1,190 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2025-09-30T14:41:12+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: September 2025</title><link href="https://crypto137.github.io/MHServerEmu/blog/2025/09/30/progress-report-september-2025.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: September 2025" /><published>2025-09-30T14:25:00+03:00</published><updated>2025-09-30T14:25:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2025/09/30/progress-report-september-2025</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2025/09/30/progress-report-september-2025.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2025-09/header.jpg" alt="MHServerEmu Progress Report - September 2025" /></p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.3.3">Jekyll</generator><link href="https://crypto137.github.io/MHServerEmu/feed.xml" rel="self" type="application/atom+xml" /><link href="https://crypto137.github.io/MHServerEmu/" rel="alternate" type="text/html" /><updated>2025-10-30T03:23:18+03:00</updated><id>https://crypto137.github.io/MHServerEmu/feed.xml</id><title type="html">MHServerEmu Blog</title><subtitle>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</subtitle><entry><title type="html">MHServerEmu Progress Report: October 2025</title><link href="https://crypto137.github.io/MHServerEmu/blog/2025/10/30/progress-report-october-2025.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: October 2025" /><published>2025-10-30T03:15:00+03:00</published><updated>2025-10-30T03:15:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2025/10/30/progress-report-october-2025</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2025/10/30/progress-report-october-2025.html"><![CDATA[<p><img src="/MHServerEmu/assets/blog/progress-report/2025-10/header.jpg" alt="MHServerEmu Progress Report - October 2025" /></p>
+
+<p>Time for the spookiest MHServerEmu Progress Report of the year. Again.</p>
+
+<h2 id="minor-improvements">Minor Improvements</h2>
+
+<p>The work on 0.8.0 is going full steam ahead. This is our final major stable release in the 0.x series, and a lot of work that remains comes from the laundry list of “do it sometime later”. Well, “later” is now, and these things need to be taken care of.</p>
+
+<p>In October I have spent some time to cross out a number of minor things from this list. Here are some of them:</p>
+
+<ul>
+  <li>
+    <p>Implemented the floor selection dialog when interacting with the elevator in Avengers Tower in Chapter 10.</p>
+  </li>
+  <li>
+    <p>Implemented orb effect reduction based on shrinkage progress when it is picked up.</p>
+  </li>
+  <li>
+    <p>Implemented credit drops when hitting Doop for a high enough percentage of his health in a single hit.</p>
+  </li>
+  <li>
+    <p>Implemented the <code class="language-plaintext highlighter-rouge">CombatActive</code> flag, which prevents players from getting loot in some cases if their heroes are not engaged in combat.</p>
+  </li>
+  <li>
+    <p>Players now get some mission loot drops even if they are not near the loot source entity, as long they have contributed to the mission.</p>
+  </li>
+  <li>
+    <p>Ported the improved <code class="language-plaintext highlighter-rouge">RepVar</code> system implementation from MHServerEmu2013, resulting in some validation issues related to the Party system being resolved.</p>
+  </li>
+  <li>
+    <p>Fixed a number of issues with item-based procs not being unassigned when they should.</p>
+  </li>
+</ul>
+
+<p>This is just the beginning of the polishing stage. More minor improvements and fixes like this will be coming over the course of 0.8’s development.</p>
+
+<h2 id="web-api-overhaul">Web API Overhaul</h2>
+
+<p>Most of my October development efforts went into overhauling our server’s web API implementation. Before I go into what exactly I have been doing, I would like to provide some context.</p>
+
+<p>There are two ways for MHServerEmu to communicate with the outside world. The primary way is via stateful connections based on TCP sockets: this is how the vast majority of client-server communication happens. The other way is by using stateless HTTP connections: the game originally used them for the initial authentication step in the login process, as well as to access the Billing service when purchasing G bundles via the in-game web browser.</p>
+
+<p>Previously, we had a very rudimentary HTTP server implementation that we used from the very early days of MHServerEmu for authentication. Over time I also bolted on some additional functionality to use the same “AuthServer” as a web API for simple features, like creating accounts and retrieving performance metrics. However, this original implementation was done in quick way just to get things going, and it needed major changes to keep up with the increasing functionality and performance requirements.</p>
+
+<p>Here are some of the problems the old implementation had:</p>
+
+<ul>
+  <li>
+    <p>Adding new endpoints and changing the output of existing ones required modifying existing code in multiple places, which was unintuitive and bug-prone.</p>
+  </li>
+  <li>
+    <p>We were doing essentially server-side HTML rendering, which involved some wheel reinventing and could potentially cause performance issues that would affect the rest of the server.</p>
+  </li>
+  <li>
+    <p>There were very few security measures, which made it a prime attack vector for potential attacks on the server.</p>
+  </li>
+</ul>
+
+<p>I knew this would require a major rewrite for a long time, so I avoided implementing features that rely heavily on HTTP requests, such as making use of the in-game “Add G” panel. Now that the game is in an almost feature-complete state, I have the time to take care of this properly.</p>
+
+<p>Here is what I did to address the issues:</p>
+
+<ul>
+  <li>
+    <p>Endpoints are now represented by classes that implement methods corresponding to standard HTTP request methods (e.g. <code class="language-plaintext highlighter-rouge">GET</code> requests are handled by an implementation of the <code class="language-plaintext highlighter-rouge">Get()</code> method). Instances of these classes are created and registered using dependency injection. This encapsulates individual endpoints into separate classes / files and allows us to add and modify them without changing the lower level code. (This section reads somewhat like an OOP textbook, but I believe going with the popular approach was the appropriate solution in this particular case.)</p>
+  </li>
+  <li>
+    <p>Endpoints now use JSON as the default serialization format for both input and output. All HTML rendering functionality has been moved into a JavaScript-based “dashboard” application that runs in the user’s browser. This approach allows the server to avoid doing unnecessary work and enables more in-depth frontend customization without modifying the backend code.</p>
+  </li>
+  <li>
+    <p>Additional security measures have been implemented, including more robust exception handling and rate limiting. There is more than can be done on this front, and I will continue working it all the way to 1.0 and beyond.</p>
+  </li>
+</ul>
+
+<p>At the time of writing this, I have finished porting all of our existing web API functionality to the new JS-based dashboard. Here is an example of what the new graphical representation of the <code class="language-plaintext highlighter-rouge">/RegionReport</code> endpoint looks like:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/web-dashboard.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/web-dashboard.png" alt="Web Dashboard - Region Report" /></a></p>
+
+<p>This JS dashboard is intended to be more of a reference implementation: users are free to customize the representation of data provided by the server’s web API however they like.</p>
+
+<p>This is only scratching the surface of what is now possible. The next item on the list is restoring the in-game “Add G” panel, which we are going to use to convert Eternity Splinters to Gs without relying on chat commands. In the long term, we now have a much more user-friendly way of interacting with the server, which we will most likely use to make certain server management functionality more accessible, such as granting accounts special priviliges. However, exposing features like this to the web API inherently includes potential security risks, so we need to be careful when implementing them.</p>
+
+<h2 id="pvp">PvP</h2>
+
+<p><em>AlexBond is back again to talk about his work restoring the last remaining game activity - PvP.</em></p>
+
+<hr />
+
+<p>Hey to all PvP enjoyers, AlexBond here. The time has come to bring back the game mode nobody cares about. I am talking about Fire &amp; Ice PvP, which remained stuck in the beta stage.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-waypoint.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-waypoint.jpg" alt="Fire &amp; Ice PvP Waypoint" /></a></p>
+
+<p>Not many people know this, but there were actually <a href="https://web.archive.org/web/20140409132516/https://marvelheroes.com/community/dev-blog/doomsaw-dev-blog-august-9th-2013">two other PvP modes in development</a>. The plan was to release them by the Holidays 2013, but the Holidays never came…</p>
+
+<blockquote>
+  <p>We have two other PVP modes planned, including a large “strategic” PVP map that involves killing a bunch of mini-bosses, capturing nodes, cutting off supply lines and ultimately destroying the enemy headquarters. This should be done by the Holidays.</p>
+</blockquote>
+
+<p>Unfortunately, version 1.52 contains assets only for a single PvP mode, referred to internally as DefenderPvP. However, there are prototypes for unreleased PvP regions. Here is what they were going to look like:</p>
+
+<center>NexusPvP (Nexus War)</center>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-nexus-war.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-nexus-war.png" alt="Nexus War PvP" /></a></p>
+
+<center>SvartalfheimPvP</center>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-svartalfheim.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-svartalfheim.png" alt="Svartalfheim PvP" /></a></p>
+
+<center>FactionPvP (this mode was available in older versions of the game)</center>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-faction.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-faction.png" alt="Faction PvP" /></a></p>
+
+<center>DangerRoomPvP</center>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-danger-room.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-danger-room.png" alt="Danger Room PvP" /></a></p>
+
+<center>DefenderPvP (Fire &amp; Ice PvP, this is the mode available in 1.52)</center>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-defender.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-defender.png" alt="Defender PvP" /></a></p>
+
+<p>This mode is controlled by a class called <code class="language-plaintext highlighter-rouge">PvPDefenderGameMode</code> with its data defined in <code class="language-plaintext highlighter-rouge">PvPDefenderGameModePrototype</code>:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-1.png" style="width: 75%;" alt="PvPDefenderGameModePrototype" /></a>
+</center>
+
+<p>The primary functionality of this mode is managing three types of mobs:</p>
+
+<ul>
+  <li>
+    <p><strong>Attackers</strong>: packs of ranged and melee mobs that spawn every 35 seconds at your team’s base and move towards the enemy team’s base.</p>
+  </li>
+  <li>
+    <p><strong>Turrets</strong>: immobile ranged mobs that defend the way to your team’s base.</p>
+  </li>
+  <li>
+    <p><strong>Defenders</strong>: ranged mobs that stand in team bases. Defeating the opposite team’s Defender is the victory condition.</p>
+  </li>
+</ul>
+
+<p>Every kill in this mode is reported by a <em>banner</em> (a text message in the middle of the screen). Occasionally kills also trigger voice lines based on what is defined in the main prototype.</p>
+
+<p>There is also a number of score statistics defined in the <code class="language-plaintext highlighter-rouge">PvPScoreEventHandlerPrototype</code> that need to be tracked to be displayed in a scoreboard. This prototype specifies column indices for a <code class="language-plaintext highlighter-rouge">ScoreTableSchema</code>:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-2.png" alt="PvPScoreEventHandlerPrototype" /></a>
+</center>
+
+<p>Data for most columns is tracked via <code class="language-plaintext highlighter-rouge">EntityDead</code> and <code class="language-plaintext highlighter-rouge">AdjustHealth</code> game events. The exception for this is <code class="language-plaintext highlighter-rouge">Runestones</code>, which is tracked through the <code class="language-plaintext highlighter-rouge">OnPropertyChange()</code> callback for the <code class="language-plaintext highlighter-rouge">RunestonesAmount</code> property.</p>
+
+<p>I was confused when I was working on implementing event handling for this because inside <code class="language-plaintext highlighter-rouge">ScoreTableSchemaPrototype</code> there is also a field called <code class="language-plaintext highlighter-rouge">Event</code> that is always set to <code class="language-plaintext highlighter-rouge">Invalid</code>…</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-3.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-3.png" alt="ScoreTableSchemaPrototype" /></a>
+</center>
+
+<p>At first, I mistakenly assumed that this is where tracking events are defined, but it turned out PvP events are actually defined through <code class="language-plaintext highlighter-rouge">EventHandler</code>. While looking into this, I also discovered Gazillion’s plan for creating similar scoreboards for X-Defense and Holo-Sim, but it appears they decided not to do it.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-4-5.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-4-5.png" alt="ScoreTableSchemaPrototype 2" /></a></p>
+
+<p>The scoreboard UI that displays tracked data has issues: columns names are offset by one. Unfortunately, this cannot be fixed server-side…</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-scoreboard.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-scoreboard.jpg" alt="Scoreboard" /></a></p>
+
+<p>There are also hidden mechanisms for boosting new players in PvP modes. These boosts increase outcoming and reduce incoming damage. Here is an example of a curve for such boost:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-hidden-mult-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-hidden-mult-1.png" alt="Hidden Multiplier Curve" /></a>
+</center>
+
+<p>Each consecutive match reduces this boost. In fact, there are many other boosts like this that were planned:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-hidden-mult-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-hidden-mult-2.png" alt="Hidden Multiplier List" /></a>
+</center>
+
+<p>Many of these curves are dummies with placeholder values, but some of them have meaningful multipliers. For example, <code class="language-plaintext highlighter-rouge">DamageBoostForWinPct</code> uses the <code class="language-plaintext highlighter-rouge">PvPRecentWinLossRatio</code> property that is calculated based on recent PvP performance. I will leave implementing these boosts to Crypto, because powers are his field of work.</p>
+
+<p>As you can see from reading this report, the developers had many plans for expanding PvP, but most of these plans were abandoned, and the only remaining mode, Fire &amp; Ice PvP, remained in beta. You will be able to check this mode out (and never play it again) when matchmaking is implemented. This is all I have to share about this.</p>
+
+<p>This is my final large scale contribution to the emulator, and until 1.0 is out I will be working only on bug fixes and optimization. I am glad that I have been able to contribute to this project, and seeing it thrive is very important for me. I will also continue working on <a href="https://github.com/AlexBond2/MHUpkManager">MHUpkManager</a>: perhaps in the future it will enable us to restore other PvP modes.</p>
+
+<hr />
+
+<p>Back to the grind. See you all again in November!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">MHServerEmu Progress Report: September 2025</title><link href="https://crypto137.github.io/MHServerEmu/blog/2025/09/30/progress-report-september-2025.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: September 2025" /><published>2025-09-30T14:25:00+03:00</published><updated>2025-09-30T14:25:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2025/09/30/progress-report-september-2025</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2025/09/30/progress-report-september-2025.html"><![CDATA[<!--more-->
+
+<p><img src="/MHServerEmu/assets/blog/progress-report/2025-09/header.jpg" alt="MHServerEmu Progress Report - September 2025" /></p>
 
 <p>It’s party time. P-A-R-T-Why? Because I gotta!</p>
 
@@ -1347,104 +1533,4 @@
 
 <hr />
 
-<p>Back to the coding mines for us. See you all next time!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry><entry><title type="html">MHServerEmu Progress Report: December 2024</title><link href="https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024.html" rel="alternate" type="text/html" title="MHServerEmu Progress Report: December 2024" /><published>2024-12-30T17:45:00+03:00</published><updated>2024-12-30T17:45:00+03:00</updated><id>https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024</id><content type="html" xml:base="https://crypto137.github.io/MHServerEmu/blog/2024/12/30/progress-report-december-2024.html"><![CDATA[<!--more-->
-
-<p><img src="/MHServerEmu/assets/blog/progress-report/2024-12/header.jpg" alt="MHServerEmu Progress Report - December 2024" /></p>
-
-<p>Another year is almost over, and we are steadily approaching our goal of fully restoring Marvel Heroes.</p>
-
-<h2 id="conditions">Conditions</h2>
-
-<p>With version 0.4.0’s release the game is now in a state that most people would probably consider “playable”. However, our work is still far from over, and now we need to focus on restoring the remaining depth of various systems.</p>
-
-<p>In December it was time for me to go back to work on powers, which is something many people have been anxiously waiting for while I was busy with other features. We already had the basic framework for them in place since <a href="/MHServerEmu/blog/2024/07/31/progress-report-july-2024.html">July</a>, and more backend work was done in <a href="/MHServerEmu/blog/2024/09/30/progress-report-september-2024.html">September</a> while I was implementing dynamic combat levels, but all of that was just the tip of the power iceberg that we now need to tackle head-on:</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-12/power-iceberg.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-12/power-iceberg.jpg" alt="The Power Iceberg" /></a></p>
-
-<p>The next big step for powers was implementing <em>conditions</em>, which is the term the game uses internally for various buffs and debuffs that can be applied to world entities. Here is an overview of how it works.</p>
-
-<p>Each <code class="language-plaintext highlighter-rouge">WorldEntity</code> instance has a <code class="language-plaintext highlighter-rouge">ConditionCollection</code> that contains <code class="language-plaintext highlighter-rouge">Condition</code> instances that have been applied to it. Conditions are applied as a result of various powers and can come from two main sources: a standalone <code class="language-plaintext highlighter-rouge">ConditionPrototype</code>, or a “mix-in” prototype within the <code class="language-plaintext highlighter-rouge">PowerPrototype</code> of the power that applied the condition. Generally speaking, standalone conditions are conditions that can be applied by different powers, such as boosts, while mix-in conditions are exclusive to a single power. The vast majority of conditions come from power mix-ins.</p>
-
-<p>At their core <code class="language-plaintext highlighter-rouge">Condition</code> instances are essentially <code class="language-plaintext highlighter-rouge">PropertyCollection</code> instances with extra metadata that determine parameters like duration, pause state, and prototype overrides. When a <code class="language-plaintext highlighter-rouge">Condition</code> is added to a <code class="language-plaintext highlighter-rouge">ConditionCollection</code>, it is <em>accrued</em> to the collection’s owner, which includes attaching the condition’s properties to the owner’s in the same way as, for example, when you equip an item. Many conditions also affect the appearance of the entity they are applied to with various visual effects and animation changes.</p>
-
-<p>Condition properties can cause a wide variety of effects. While some are simple stat modifiers, others are used to flag entities with <em>status effects</em>, like stuns and knockups. A whole separate category is over time properties, which are applied continuously using <em>tickers</em>. This is how things like damage over time (DoT) and regeneration effects are implemented.</p>
-
-<p>If a condition’s metadata contains a valid duration, its end is scheduled when it is added. Some conditions do not have a duration, which means they have to be removed by an external event, like a power ending. A good example of this are bounce powers where the avatar is the one bouncing, like the ones Ant-Man and Daredevil have: when the bounce power activates, a condition is applied that makes the avatar’s mesh invisible and prevents movement. This condition is removed only when the bounce power ends, the timing of which varies depending on the distance between bounce targets. Another example is passive powers: they are powers that are automatically activated when an entity becomes simulated, which results in a condition that stays on for as long as the passive power is assigned. There are also conditions that last for as long as some movement is happening, like knockback conditions that prevent entities from moving themselves until the forced knockback movement ends.</p>
-
-<p>Conditions can have various <em>stacking behaviors</em> defined in their prototypes, which restrict how multiple instances of the same condition can be applied to an entity. The main defining feature of a <code class="language-plaintext highlighter-rouge">StackingBehaviorPrototype</code> is its <code class="language-plaintext highlighter-rouge">ApplicationStyle</code>, which can have one of six possible values:</p>
-
-<ul>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">DontRefresh</code>: condition instances are applied separately from one another.</p>
-  </li>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">Refresh</code>: applying new condition instances resets the duration of other instances that have already been applied.</p>
-  </li>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">Recreate</code>: applying new condition instances removes all other instances.</p>
-  </li>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">MatchDuration</code>: the duration of the newly applied instances match the longest remaining duration out of all instances that have already been applied.</p>
-  </li>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">SingleStackAddDuration</code>: only a single condition instance can be applied, and additional applications extend the duration of the applied instance.</p>
-  </li>
-  <li>
-    <p><code class="language-plaintext highlighter-rouge">MultiStackAddDuration</code>: a combination of <code class="language-plaintext highlighter-rouge">Refresh</code> and <code class="language-plaintext highlighter-rouge">SingleStackAddDuration</code>, which results in the duration of other instances that have already been applied being refreshed and extended.</p>
-  </li>
-</ul>
-
-<p>Condition instances are grouped into stacks using a structure called <code class="language-plaintext highlighter-rouge">StackId</code>, which consists of a prototype reference and a creator id. Based on the <code class="language-plaintext highlighter-rouge">StackingBehaviorPrototype</code>, in some cases conditions applied by different powers or created by different owners can still belong to the same stack. Finally, the stacking behavior determines how many instances should be applied per application, as well as how many instances in total can be applied using the same <code class="language-plaintext highlighter-rouge">StackId</code>.</p>
-
-<p>There are some unique quirks related to condition persistence. Because only world entities can have conditions applied to them, and the player entity representing the account is not a world entity, account-wide conditions, like boosts, are “faked” by copying them when you switch between avatars. Conditions also need to be carefully serialized and deserialized, because many conditions are not supposed to run out when you are offline.</p>
-
-<p>As of the time of writing this, the core implementation of the condition system is available for testing in nightly work-in-progress builds of version 0.5.0. Some additional features still need to be implemented, including pausing conditions in hub regions and property ticking. Tickers specifically are going to have a huge effect on the entire combat, because they are also going to allow us to implement various primary and secondary resources used by different heroes.</p>
-
-<h2 id="bounce-powers">Bounce Powers</h2>
-
-<p>As alluded to above, bounce powers are also now functional. This includes targeted powers that bounce around, like Storm’s Chain Lightning, bouncing projectiles, such as Captain America’s Shield Bounce, and powers where the avatar is bouncing in a chain of attacks, like Daredevil’s Street Sweeper. What is interesting about all of these is that everything about them is smoke and mirrors, <em>there is no actual movement happening</em>.</p>
-
-<p>When a power is applied, its properties and the properties of its owner are snapshotted and recorded into a <code class="language-plaintext highlighter-rouge">PowerPayload</code> object. Some of these properties determine the “bounciness” of the power: <code class="language-plaintext highlighter-rouge">BounceCountPayload</code>, <code class="language-plaintext highlighter-rouge">BounceRangePayload</code>, and <code class="language-plaintext highlighter-rouge">BounceSpeedPayload</code>. When the payload is delivered and its effects are applied to its target, the game checks the remaining bounce count, and if it is higher than zero, it “bounces” the payload to another target, which simply changes its target id and schedules a new delivery after a delay. This delay is calculated from the payload’s bounce range and speed.</p>
-
-<p>All the visuals of an object physically bouncing between targets is completely faked by the client. Every time a bounce delay is calculated, the server informs the client about it using the following message:</p>
-
-<div class="language-protobuf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">message</span> <span class="nc">NetMessagePowerBounce</span> <span class="p">{</span>
-    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">idPowerUser</span>    <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">idLastTarget</span>    <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
-    <span class="k">required</span> <span class="n">NetStructPoint3</span>    <span class="na">lastTargetPosition</span>    <span class="o">=</span> <span class="mi">3</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">idNewTarget</span>    <span class="o">=</span> <span class="mi">4</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">powerPrototypeId</span>    <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">userOriginalAssetId</span>    <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">uint64</span>    <span class="na">userCurrentAssetId</span>    <span class="o">=</span> <span class="mi">7</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">float</span>    <span class="na">projectileSpeed</span>    <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
-    <span class="k">required</span> <span class="kt">int32</span>    <span class="na">fxRandomSeed</span>    <span class="o">=</span> <span class="mi">9</span><span class="p">;</span>
-<span class="p">}</span>
-</code></pre></div></div>
-
-<p>The client uses data from this message to fake all the movement.</p>
-
-<p>One last piece of the puzzle is how bounce targets are determined. When a bouncing payload’s target is set, its id is recorded as a <code class="language-plaintext highlighter-rouge">PowerPreviousTargetsID</code> property: depending on the power, these properties are later used to deprioritize or even completely avoid targets (if the <code class="language-plaintext highlighter-rouge">BounceCanRepeatTarget</code> flag is not set on the payload). When the payload hits a target, the game scans all entities in a radius around it, skipping those that have the <code class="language-plaintext highlighter-rouge">InvalidBounceTarget</code> property or are not valid targets for a particular power for other reasons. The most suitable target is then picked, taking into account distance, whether the entity has already been hit by this payload, and whether it is an enemy or a destructible environment object. The highest priority is given to closest enemies that have not been hit.</p>
-
-<p>The bouncing continues until the payload either runs out of bounces or fails to find a new valid target. When the bouncing ends, the client is notified of it via one final <code class="language-plaintext highlighter-rouge">NetMessagePowerBounce</code>, which it uses to play the finishing visual effect or animation (e.g. a weapon returning to its owner). And with all of that we have bouncing:</p>
-
-<div><video controls="" width="100%" /><source src="/MHServerEmu/assets/blog/progress-report/2024-12/bounce.webm" type="video/webm" /></div>
-
-<p>This is a relatively minor addition in the grand scheme of things, but it made many powers across the entire hero roster usable.</p>
-
-<h2 id="achievements-and-leaderboards">Achievements and Leaderboards</h2>
-
-<p>While I was busy working on powers <del>and totally not grinding in Path of Exile 2</del>, Alex was hard at work implementing achievements and leaderboards, which utilize event-based tracking similar to missions, in which he has become quite an expert in it over the past months.</p>
-
-<p>One peculiar thing about how achievements and leaderboards work is how their static data is delivered. The logical appoach would have been to have achievements be more rigid and rely on client-side data, while doing the leaderboards in a more dynamic way that relies on server data, but it is actually the other way around. The entire achievement database is sent from the server to the client on login, while all the leaderboards are hardcoded into the client and cannot be changed without a patch. Thankfully, we have a dump of the achievement database for version 1.52 we extracted from captured packets, which gave us a mostly complete dataset for this version. However, unfortunately, it is the only one we have, meaning that supporting achievements for other versions, like 1.48, is going to require pretty extensive reconstruction efforts using secondary sources, such as archived versions of the good old Marvel Heroes Compendium by Mjoll. We may have to build some custom tools to make the reconstruction process easier, but with enough time and effort this is a problem that can be solved. On the bright side, this also means that custom achievements will be relatively easy to implement.</p>
-
-<p>Achievements are now functional and available for testing in nightly 0.5.0 builds. Some achievements may not be obtainable right now due to certain gameplay features not being implemented, but the overall achievement system is working, and more things will be properly tracked as they are done. The tracking for achievements also includes retroactive granting for some achievements, like reaching specific level thresholds and collecting thematic sets of items.</p>
-
-<p><a href="/MHServerEmu/assets/blog/progress-report/2024-12/achievements.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2024-12/achievements.jpg" alt="Achievements" /></a></p>
-
-<p>As I am writing this, Alex has now turned his attention to leaderboards, which proved to actually be a tougher nut to crack. One reason for this is that leaderboards have a lot of unfinished functionality, like guild leaderboards that were never used. They also required a pretty significant amount of backend work, mainly because leaderboards have instances that run in real time, with expired instances being archived in the database in case somebody decides to claim their rewards at some point in the future. All of this is in addition to tracking and reward systems similar to missions and achievements.</p>
-
-<p>Although it was more laborious than expected, an early version of leaderboards is now being tested, and if things go well it will be merged and added to nightly builds relatively soon.</p>
-
-<hr />
-
-<p>That is all we have for you this year. See you all in the next one!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry></feed>
+<p>Back to the coding mines for us. See you all next time!</p>]]></content><author><name></name></author><category term="blog" /><summary type="html"><![CDATA[]]></summary></entry></feed>

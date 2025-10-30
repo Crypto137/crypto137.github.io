@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: October 2025 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: October 2025" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2025/10/30/progress-report-october-2025.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2025/10/30/progress-report-october-2025.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-10-30T03:15:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: October 2025" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-10-30T03:15:00+03:00","datePublished":"2025-10-30T03:15:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: October 2025","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2025/10/30/progress-report-october-2025.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2025/10/30/progress-report-october-2025.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: October 2025</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2025-10-30T03:15:00+03:00" itemprop="datePublished">Oct 30, 2025
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2025-10/header.jpg" alt="MHServerEmu Progress Report - October 2025" /></p>
+
+<p>Time for the spookiest MHServerEmu Progress Report of the year. Again.</p>
+
+<h2 id="minor-improvements">Minor Improvements</h2>
+
+<p>The work on 0.8.0 is going full steam ahead. This is our final major stable release in the 0.x series, and a lot of work that remains comes from the laundry list of “do it sometime later”. Well, “later” is now, and these things need to be taken care of.</p>
+
+<p>In October I have spent some time to cross out a number of minor things from this list. Here are some of them:</p>
+
+<ul>
+  <li>
+    <p>Implemented the floor selection dialog when interacting with the elevator in Avengers Tower in Chapter 10.</p>
+  </li>
+  <li>
+    <p>Implemented orb effect reduction based on shrinkage progress when it is picked up.</p>
+  </li>
+  <li>
+    <p>Implemented credit drops when hitting Doop for a high enough percentage of his health in a single hit.</p>
+  </li>
+  <li>
+    <p>Implemented the <code class="language-plaintext highlighter-rouge">CombatActive</code> flag, which prevents players from getting loot in some cases if their heroes are not engaged in combat.</p>
+  </li>
+  <li>
+    <p>Players now get some mission loot drops even if they are not near the loot source entity, as long they have contributed to the mission.</p>
+  </li>
+  <li>
+    <p>Ported the improved <code class="language-plaintext highlighter-rouge">RepVar</code> system implementation from MHServerEmu2013, resulting in some validation issues related to the Party system being resolved.</p>
+  </li>
+  <li>
+    <p>Fixed a number of issues with item-based procs not being unassigned when they should.</p>
+  </li>
+</ul>
+
+<p>This is just the beginning of the polishing stage. More minor improvements and fixes like this will be coming over the course of 0.8’s development.</p>
+
+<h2 id="web-api-overhaul">Web API Overhaul</h2>
+
+<p>Most of my October development efforts went into overhauling our server’s web API implementation. Before I go into what exactly I have been doing, I would like to provide some context.</p>
+
+<p>There are two ways for MHServerEmu to communicate with the outside world. The primary way is via stateful connections based on TCP sockets: this is how the vast majority of client-server communication happens. The other way is by using stateless HTTP connections: the game originally used them for the initial authentication step in the login process, as well as to access the Billing service when purchasing G bundles via the in-game web browser.</p>
+
+<p>Previously, we had a very rudimentary HTTP server implementation that we used from the very early days of MHServerEmu for authentication. Over time I also bolted on some additional functionality to use the same “AuthServer” as a web API for simple features, like creating accounts and retrieving performance metrics. However, this original implementation was done in quick way just to get things going, and it needed major changes to keep up with the increasing functionality and performance requirements.</p>
+
+<p>Here are some of the problems the old implementation had:</p>
+
+<ul>
+  <li>
+    <p>Adding new endpoints and changing the output of existing ones required modifying existing code in multiple places, which was unintuitive and bug-prone.</p>
+  </li>
+  <li>
+    <p>We were doing essentially server-side HTML rendering, which involved some wheel reinventing and could potentially cause performance issues that would affect the rest of the server.</p>
+  </li>
+  <li>
+    <p>There were very few security measures, which made it a prime attack vector for potential attacks on the server.</p>
+  </li>
+</ul>
+
+<p>I knew this would require a major rewrite for a long time, so I avoided implementing features that rely heavily on HTTP requests, such as making use of the in-game “Add G” panel. Now that the game is in an almost feature-complete state, I have the time to take care of this properly.</p>
+
+<p>Here is what I did to address the issues:</p>
+
+<ul>
+  <li>
+    <p>Endpoints are now represented by classes that implement methods corresponding to standard HTTP request methods (e.g. <code class="language-plaintext highlighter-rouge">GET</code> requests are handled by an implementation of the <code class="language-plaintext highlighter-rouge">Get()</code> method). Instances of these classes are created and registered using dependency injection. This encapsulates individual endpoints into separate classes / files and allows us to add and modify them without changing the lower level code. (This section reads somewhat like an OOP textbook, but I believe going with the popular approach was the appropriate solution in this particular case.)</p>
+  </li>
+  <li>
+    <p>Endpoints now use JSON as the default serialization format for both input and output. All HTML rendering functionality has been moved into a JavaScript-based “dashboard” application that runs in the user’s browser. This approach allows the server to avoid doing unnecessary work and enables more in-depth frontend customization without modifying the backend code.</p>
+  </li>
+  <li>
+    <p>Additional security measures have been implemented, including more robust exception handling and rate limiting. There is more than can be done on this front, and I will continue working it all the way to 1.0 and beyond.</p>
+  </li>
+</ul>
+
+<p>At the time of writing this, I have finished porting all of our existing web API functionality to the new JS-based dashboard. Here is an example of what the new graphical representation of the <code class="language-plaintext highlighter-rouge">/RegionReport</code> endpoint looks like:</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/web-dashboard.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/web-dashboard.png" alt="Web Dashboard - Region Report" /></a></p>
+
+<p>This JS dashboard is intended to be more of a reference implementation: users are free to customize the representation of data provided by the server’s web API however they like.</p>
+
+<p>This is only scratching the surface of what is now possible. The next item on the list is restoring the in-game “Add G” panel, which we are going to use to convert Eternity Splinters to Gs without relying on chat commands. In the long term, we now have a much more user-friendly way of interacting with the server, which we will most likely use to make certain server management functionality more accessible, such as granting accounts special priviliges. However, exposing features like this to the web API inherently includes potential security risks, so we need to be careful when implementing them.</p>
+
+<h2 id="pvp">PvP</h2>
+
+<p><em>AlexBond is back again to talk about his work restoring the last remaining game activity - PvP.</em></p>
+
+<hr />
+
+<p>Hey to all PvP enjoyers, AlexBond here. The time has come to bring back the game mode nobody cares about. I am talking about Fire &amp; Ice PvP, which remained stuck in the beta stage.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-waypoint.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-waypoint.jpg" alt="Fire &amp; Ice PvP Waypoint" /></a></p>
+
+<p>Not many people know this, but there were actually <a href="https://web.archive.org/web/20140409132516/https://marvelheroes.com/community/dev-blog/doomsaw-dev-blog-august-9th-2013">two other PvP modes in development</a>. The plan was to release them by the Holidays 2013, but the Holidays never came…</p>
+
+<blockquote>
+  <p>We have two other PVP modes planned, including a large “strategic” PVP map that involves killing a bunch of mini-bosses, capturing nodes, cutting off supply lines and ultimately destroying the enemy headquarters. This should be done by the Holidays.</p>
+</blockquote>
+
+<p>Unfortunately, version 1.52 contains assets only for a single PvP mode, referred to internally as DefenderPvP. However, there are prototypes for unreleased PvP regions. Here is what they were going to look like:</p>
+
+<center>NexusPvP (Nexus War)</center>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-nexus-war.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-nexus-war.png" alt="Nexus War PvP" /></a></p>
+
+<center>SvartalfheimPvP</center>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-svartalfheim.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-svartalfheim.png" alt="Svartalfheim PvP" /></a></p>
+
+<center>FactionPvP (this mode was available in older versions of the game)</center>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-faction.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-faction.png" alt="Faction PvP" /></a></p>
+
+<center>DangerRoomPvP</center>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-danger-room.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-danger-room.png" alt="Danger Room PvP" /></a></p>
+
+<center>DefenderPvP (Fire &amp; Ice PvP, this is the mode available in 1.52)</center>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-defender.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-defender.png" alt="Defender PvP" /></a></p>
+
+<p>This mode is controlled by a class called <code class="language-plaintext highlighter-rouge">PvPDefenderGameMode</code> with its data defined in <code class="language-plaintext highlighter-rouge">PvPDefenderGameModePrototype</code>:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-1.png" style="width: 75%;" alt="PvPDefenderGameModePrototype" /></a>
+</center>
+
+<p>The primary functionality of this mode is managing three types of mobs:</p>
+
+<ul>
+  <li>
+    <p><strong>Attackers</strong>: packs of ranged and melee mobs that spawn every 35 seconds at your team’s base and move towards the enemy team’s base.</p>
+  </li>
+  <li>
+    <p><strong>Turrets</strong>: immobile ranged mobs that defend the way to your team’s base.</p>
+  </li>
+  <li>
+    <p><strong>Defenders</strong>: ranged mobs that stand in team bases. Defeating the opposite team’s Defender is the victory condition.</p>
+  </li>
+</ul>
+
+<p>Every kill in this mode is reported by a <em>banner</em> (a text message in the middle of the screen). Occasionally kills also trigger voice lines based on what is defined in the main prototype.</p>
+
+<p>There is also a number of score statistics defined in the <code class="language-plaintext highlighter-rouge">PvPScoreEventHandlerPrototype</code> that need to be tracked to be displayed in a scoreboard. This prototype specifies column indices for a <code class="language-plaintext highlighter-rouge">ScoreTableSchema</code>:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-2.png" alt="PvPScoreEventHandlerPrototype" /></a>
+</center>
+
+<p>Data for most columns is tracked via <code class="language-plaintext highlighter-rouge">EntityDead</code> and <code class="language-plaintext highlighter-rouge">AdjustHealth</code> game events. The exception for this is <code class="language-plaintext highlighter-rouge">Runestones</code>, which is tracked through the <code class="language-plaintext highlighter-rouge">OnPropertyChange()</code> callback for the <code class="language-plaintext highlighter-rouge">RunestonesAmount</code> property.</p>
+
+<p>I was confused when I was working on implementing event handling for this because inside <code class="language-plaintext highlighter-rouge">ScoreTableSchemaPrototype</code> there is also a field called <code class="language-plaintext highlighter-rouge">Event</code> that is always set to <code class="language-plaintext highlighter-rouge">Invalid</code>…</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-3.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-3.png" alt="ScoreTableSchemaPrototype" /></a>
+</center>
+
+<p>At first, I mistakenly assumed that this is where tracking events are defined, but it turned out PvP events are actually defined through <code class="language-plaintext highlighter-rouge">EventHandler</code>. While looking into this, I also discovered Gazillion’s plan for creating similar scoreboards for X-Defense and Holo-Sim, but it appears they decided not to do it.</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-4-5.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-proto-4-5.png" alt="ScoreTableSchemaPrototype 2" /></a></p>
+
+<p>The scoreboard UI that displays tracked data has issues: columns names are offset by one. Unfortunately, this cannot be fixed server-side…</p>
+
+<p><a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-scoreboard.jpg"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-scoreboard.jpg" alt="Scoreboard" /></a></p>
+
+<p>There are also hidden mechanisms for boosting new players in PvP modes. These boosts increase outcoming and reduce incoming damage. Here is an example of a curve for such boost:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-hidden-mult-1.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-hidden-mult-1.png" alt="Hidden Multiplier Curve" /></a>
+</center>
+
+<p>Each consecutive match reduces this boost. In fact, there are many other boosts like this that were planned:</p>
+
+<center>
+<a href="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-hidden-mult-2.png"><img src="/MHServerEmu/assets/blog/progress-report/2025-10/pvp-hidden-mult-2.png" alt="Hidden Multiplier List" /></a>
+</center>
+
+<p>Many of these curves are dummies with placeholder values, but some of them have meaningful multipliers. For example, <code class="language-plaintext highlighter-rouge">DamageBoostForWinPct</code> uses the <code class="language-plaintext highlighter-rouge">PvPRecentWinLossRatio</code> property that is calculated based on recent PvP performance. I will leave implementing these boosts to Crypto, because powers are his field of work.</p>
+
+<p>As you can see from reading this report, the developers had many plans for expanding PvP, but most of these plans were abandoned, and the only remaining mode, Fire &amp; Ice PvP, remained in beta. You will be able to check this mode out (and never play it again) when matchmaking is implemented. This is all I have to share about this.</p>
+
+<p>This is my final large scale contribution to the emulator, and until 1.0 is out I will be working only on bug fixes and optimization. I am glad that I have been able to contribute to this project, and seeing it thrive is very important for me. I will also continue working on <a href="https://github.com/AlexBond2/MHUpkManager">MHUpkManager</a>: perhaps in the future it will enable us to restore other PvP modes.</p>
+
+<hr />
+
+<p>Back to the grind. See you all again in November!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2025/10/30/progress-report-october-2025.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>
