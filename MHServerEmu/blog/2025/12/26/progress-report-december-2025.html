@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>MHServerEmu Progress Report: December 2025 | MHServerEmu Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="MHServerEmu Progress Report: December 2025" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2025/12/26/progress-report-december-2025.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2025/12/26/progress-report-december-2025.html" />
+<meta property="og:site_name" content="MHServerEmu Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2025-12-26T01:00:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="MHServerEmu Progress Report: December 2025" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2025-12-26T01:00:00+03:00","datePublished":"2025-12-26T01:00:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.","headline":"MHServerEmu Progress Report: December 2025","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2025/12/26/progress-report-december-2025.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2025/12/26/progress-report-december-2025.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu Blog" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu Blog</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">MHServerEmu Progress Report: December 2025</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2025-12-26T01:00:00+03:00" itemprop="datePublished">Dec 26, 2025
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/progress-report/2025-12/header.jpg" alt="MHServerEmu Progress Report - December 2025" /></p>
+
+<p>Merry Christmas and happy holidays, everyone! I have one last Progress Report to share this year.</p>
+
+<h2 id="080-and-beyond">0.8.0 and Beyond</h2>
+
+<p>With the release of version 0.8.0, MHServerEmu has officially reached a feature-complete state. This means that all major gameplay and social systems that existed when the game was shut down in 2017 have been restored, and I am now shifting my focus towards various minor tasks on my laundry list.</p>
+
+<p>The next release is going to be version 0.8.1. The plan for this minor release is for it to include the vast majority of changes that will be done before 1.0.0, but keep it compatible with existing account data for players who want to keep playing without losing their progress. 1.0.0 will follow shortly after and will not be compatible with existing account data, enforcing a fresh start if you choose to update. This is the only planned “wipe” we are going to have.</p>
+
+<p>I am currently aiming to release version 1.0.0 in the first quarter of 2026, meaning March 31st is the final deadline. I am optimistic that it will be ready before that date, but I still want to allow us some leeway just in case something takes longer than expected. A more concrete release date will be announced when it is set in stone.</p>
+
+<p>The changes I will be working on until then fit into three broad categories: polish, bug fixes, and optimization.</p>
+
+<p><strong>Polish</strong> primarily covers various minor features that did not make it into one of the major releases for one reason or another. For example, did you know that when Gazillion developers were removing stat and power point bonuses from the campaign, they missed a +150 Health bonus for completing the invaded version of Xavier’s School in Chapter 10? For this one remaining mission reward to work as it is defined in the game data, we are going to need to implement stat rewards that were supposedly a pre-BUE feature. There are not that many features like this left, and I would prefer to take care of them before 1.0.</p>
+
+<p>When it comes to <strong>bug fixes</strong>, we are aware of a pretty significant number of issues that existed in the game in 2017, which we dub “Gazillion issues”. We are <em>not</em> going to be fixing many of these issues, because resolving many of them would require doing client-side patches, and in some cases the fixes could have unexpected side effects on the game’s balance. We will be focusing primarily on issues with our own server code, as well as potentially game-breaking Gazillion issues that can be mitigated completely server-side. One good example of an issue with our code that needs to be resolved before 1.0 is how new accounts can get stuck in a soft-locked mission state in The Raft if a disconnect happens at the wrong moment, requiring an account wipe to proceed.</p>
+
+<p>As for <strong>optimization</strong>, the server is in a relatively decent state on this front if you are playing on a self-hosted local server, but we still need to do some work for popular public servers to be able to handle larger player counts and longer uptimes we expect for 1.0. A lot of this is going to involve minimizing unnecessary memory allocations to reduce the work the garbage collector needs to do and mitigate some of the memory fragmentation issues that have been emerging on the more popular public servers over longer periods of uptime.</p>
+
+<p>One last thing to note is that because we do not have any major features left to talk about, I will no longer be writing these Progress Reports on a monthly cadence. Instead, future Progress Reports will be coming out when I actually have something to share. There may also be other forms of content posted on this blog, so stay tuned!</p>
+
+<h2 id="matchmaking">Matchmaking</h2>
+
+<p>Looking back at what I worked on in December, the most time and effort went into restoring the matchmaking system. Let’s take a look at how it works.</p>
+
+<p>Each region in Marvel Heroes can be flagged in game data with one or more <code class="language-plaintext highlighter-rouge">RegionQueueMethod</code> flags. Regions flagged this way use a separate instance management system that is designed to work with matchmaking. Gazillion engineers set up region prototypes in a way where <code class="language-plaintext highlighter-rouge">RegionQueueMethod</code> flags could be applied by game designers only in two predefined sets: <code class="language-plaintext highlighter-rouge">PvPQueue</code> and <code class="language-plaintext highlighter-rouge">DailyQueue</code>. The main difference between them is that <code class="language-plaintext highlighter-rouge">DailyQueue</code> allows you to bypass the matchmaking process and enter the match region by yourself or with just your party members, which is not possible for <code class="language-plaintext highlighter-rouge">PvPQueue</code>.</p>
+
+<p>When a player initiates a transfer to a match region (e.g. by selecting it in the Waypoint menu), this transfer request is converted to a <code class="language-plaintext highlighter-rouge">RegionRequestQueueCommandVar</code> and sent to the Player Manager service, which handles matchmaking.</p>
+
+<p>The matchmaking system is rather complex and consists of three major components:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">RegionRequestQueue</code> - manages matchmaking for a particular region.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">RegionRequestGroup</code> - represents an atomic group of 1-10 players queued for a match together.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">Match</code> - represents a collection of <code class="language-plaintext highlighter-rouge">RegionRequestGroup</code> instances divided into one or more <code class="language-plaintext highlighter-rouge">MatchTeam</code> instances.</p>
+  </li>
+</ul>
+
+<p>When players queue up for a region, a <code class="language-plaintext highlighter-rouge">RegionRequestGroup</code> is created for them and registered in the <code class="language-plaintext highlighter-rouge">RegionRequestQueue</code> corresponding to the region. Every time a new group is registered, the queue attempts to fill up the current pending <code class="language-plaintext highlighter-rouge">Match</code> instance. When all <code class="language-plaintext highlighter-rouge">MatchTeam</code> instances in a <code class="language-plaintext highlighter-rouge">Match</code> are fully filled up, a region is created and the players are transferred to it.</p>
+
+<p>While it sounds relatively straightforward on paper, there is a lot of complexity in managing states of individual members in groups and how they interact with other systems. Here is a diagram of possible states for a queued player:</p>
+
+<p><center><img src="/MHServerEmu/assets/blog/progress-report/2025-12/region-request-group-member.png" /></center></p>
+
+<p>These member states are replicated from the Player Manager to game instances the queued players are currently in, and they are then further relayed to connected clients. Most of these state changes end up being represented client-side as various notification popups you see when you queue up for a region.</p>
+
+<p>When players choose to bypass the matchmaking process, a <code class="language-plaintext highlighter-rouge">RegionRequestGroup</code> is still created for them and they go through the same system, but the <code class="language-plaintext highlighter-rouge">RegionRequestQueue</code> immediately starts a <code class="language-plaintext highlighter-rouge">Match</code> without waiting for it to be completely filled up.</p>
+
+<p>The main reason we needed to get matchmaking working is because the game’s one and only PvP mode, Fire &amp; Ice, is designed with it in mind. While it is possible to force a PvP match to start without matchmaking with some server-side hackery, there is no player-friendly way to do it in-game. Right now it functions exactly like it did back in Gazillion days, requiring two teams of five players each in the same level bracket (20-29, 30-39, 40-49, 50-59, or 60). With the lower player counts and lesser PvP engagement than Gazillion developers expected when they put these restrictions in place, we are considering doing various tweaks to make PvP matches easier to start, but the specifics have not been decided yet.</p>
+
+<h2 id="supergroups">Supergroups</h2>
+
+<p>Another social system that received a significant amount of my attention this month is supergroups, also referred to internally as “guilds”. Supergroups are effectively Parties 2: Electric Boogaloo, so I strongly recommend you to read <a href="/MHServerEmu/blog/2025/09/30/progress-report-september-2025.html">the September 2025 report</a> where we covered parties in detail.</p>
+
+<p>Supergroups use a replication system very similar to parties, where there are authoritative <code class="language-plaintext highlighter-rouge">MasterGuild</code> instances handled by the Player Manager. Data from them is replicated to game instances to be used in game-side <code class="language-plaintext highlighter-rouge">Guild</code> and <code class="language-plaintext highlighter-rouge">GuildMember</code> representations, as well as the Community system. However, there are some additional bells and whistles that make supergroups more involved.</p>
+
+<p>The most crucial difference is the fact that supergroups are persistent, and supergroup members can be modified while they are offline. This means membership data needs to also be replicated to the database and be kept separate from regular player data. Taking into account the relatively small number of players and supergroups that servers are going to have, I opted to load all supergroups from the database at server startup and keep them in memory to avoid the complexity of potentially having to wait for database responses when handling requests. This means that the only thing we need to do to keep everything in sync is send updates to the database when we make changes to <code class="language-plaintext highlighter-rouge">MasterGuild</code> instances.</p>
+
+<p>Supergroups also have some additional customization options compared to parties. In particular, you can name your supergroup, set its Message of the Day (MotD), and give specific members elevated priviliges by promoting them to officers. All of these changes need to be validated, applied, communicated to members across different game instances, and saved to the database.</p>
+
+<p>There is extra functionality needed on the side of the Community system to be able to display last online time for members in the Supergroup tab of the Social panel. Last online time needs to be tracked, saved to the database, and queried for players who have not logged in since the last server restart. One advantage of having all guilds loaded at all times is that here we can skip querying last online time for players who are not members of supergroups, because it is not needed for Friend and Ignore lists.</p>
+
+<p>Some rethinking was also needed for how we handle chat. Supergroups can have up to 600 members in version 1.52, and if we continued to resolve message receivers game-side like we used to, this would require including up to 600 player ids with each supergroup chat message sent to the Grouping Manager. This is not a good idea for all sorts of reasons, so I implemented a proper chat room system. The Grouping Manager now keeps track of supergroups for online players, which allows it to resolve receivers on its own by knowing just the id of the player who sent the message, which is always included anyway. I have also applied this more optimized system to local region and party chat rooms.</p>
+
+<p>With all of this, supergroups are now functional, and the last major piece of the puzzle is put in place. The game is now in a feature-complete state, and I can focus on the final polish.</p>
+
+<hr />
+
+<p>Thank you for following the development of MHServerEmu. I hope to see you all again next year for the official launch of version 1.0!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2025/12/26/progress-report-december-2025.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu Blog</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu Blog</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>
