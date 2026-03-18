@@ -45,21 +45,23 @@
   </header>
 
   <div class="post-content">
-    <p>MHServerEmu is a volunteer-driven research project aimed at reverse engineering the underlying technology developed by Gazillion Entertainment to run Marvel Heroes. We do not host any game servers ourselves.</p>
+    <p>MHServerEmu is a volunteer-driven research project aimed at reverse engineering the underlying technology developed by Gazillion Entertainment to run game servers for the now defunct online ARPG <a href="https://en.wikipedia.org/wiki/Marvel_Heroes_(video_game)">Marvel Heroes</a>.</p>
 
-<p>This website is a blog for documenting progress. The source code for the server emulator we are developing is hosted on <a href="https://github.com/Crypto137/MHServerEmu">GitHub</a>. You can download the latest nightly build <a href="/MHServerEmu/download/">here</a>.</p>
+<p>The main result of our work is a server emulator, the source code for which is available on <a href="https://github.com/Crypto137/MHServerEmu">GitHub</a> under the <a href="https://www.gnu.org/licenses/agpl-3.0.html#license-text">AGPLv3</a> license. You can find the instructions for downloading and setting it up <a href="/MHServerEmu/download/">here</a>.</p>
 
-<p>If you would like to discuss the emulator, ask questions, or help with the development, feel free to join our <a href="https://discord.gg/hjR8Bj52t3">Discord</a>.</p>
+<p>The server emulator can be used to play Marvel Heroes offline or over LAN using legally obtained copies of the game client. There are also publicly available community servers that use MHServerEmu to enable online play. We do not host any such servers ourselves, and we are not directly affiliated with individual public community servers. There is no “official” community server.</p>
 
-<p>MHServerEmu is a completely non-commercial project: we do not make any money off of this or take donations in any form. If you have paid money for this, you have been scammed.</p>
+<p>Feel free to join our <a href="https://discord.gg/hjR8Bj52t3">Discord</a> if you would like to discuss the server emulator and its development.</p>
+
+<p>MHServerEmu is not monetized, and we do not accept donations in any way, shape, or form. If you have paid money for this, you have been scammed.</p>
 
 <hr />
 
 <h2 id="faq">FAQ</h2>
 
-<h3 id="what-is-this-are-you-remaking-the-game-is-it-going-to-use-unreal-engine-5">What is this? Are you remaking the game? Is it going to use Unreal Engine 5?</h3>
+<h3 id="did-you-remake-the-game-are-you-using-unreal-engine-5">Did you remake the game? Are you using Unreal Engine 5?</h3>
 
-<p>We are not remaking the game. We are restoring it to the state it was in before it was shut down.</p>
+<p>We did not remake the game. We restored it to the state it was in before it was shut down.</p>
 
 <p>Marvel Heroes was built using a client-server architecture, which means the game consists of an Unreal Engine 3 based client application that runs on your PC and a remote server that the client connects to. We are using the original client as is without any modifications, and we are <a href="https://en.wikipedia.org/wiki/Reverse_engineering">reverse engineering</a> the server software using the information available in the client.</p>
 
@@ -67,37 +69,47 @@
 
 <p>All of this is completely custom technology developed by Gazillion, and Unreal Engine acts as a sort of graphical wrapper. Porting the client to another engine, such as Unreal Engine 5, is completely outside the scope of this project.</p>
 
+<h3 id="is-the-game-fully-playable">Is the game fully playable?</h3>
+
+<p>All systems and content that were in the game when it was shut down in 2017 have been restored.</p>
+
 <h3 id="what-versions-of-the-game-do-you-plan-to-support">What versions of the game do you plan to support?</h3>
 
-<p>Currently we are working on version 1.52, released in September 2017. This is the version that was live when the game was shut down.</p>
+<p>So far we have restored the final build of version 1.52, released in September 2017. This is the build that was live when the game was shut down.</p>
 
-<p>After we get version 1.52 fully working, we plan on going back and trying to implement support for other versions as well. The prime candidates for that in the order or priority are:</p>
+<p>We plan on going back and implementing support for other versions as well. The prime candidates for this in the order or priority are:</p>
 
 <ul>
   <li>
-    <p>1.48 - the final pre-BUE version from December 2016.</p>
+    <p>1.48 - the final pre-BUE version from late 2016.</p>
   </li>
   <li>
-    <p>1.53 - the final test center build from November 2017.</p>
+    <p>1.10 - the “vanilla” version from mid 2013, around the time the game was first launched.</p>
   </li>
   <li>
-    <p>1.10 - the “vanilla” version from June 2013, around the time the game was first launched.</p>
+    <p>1.53 - the final version that was publicly available on the test center in late 2017.</p>
   </li>
 </ul>
 
-<p>Each additional version is a significant undertaking, and the further back we go, the harder it is to support due to technical differences and a lack of data.</p>
-
-<p>As of right now we do not have any plans to support console versions of the game due to technical challenges with running and debugging the console client. This may eventually change as work on PlayStation 4 and Xbox One emulation on PC progresses.</p>
-
 <p>BUE refers to the Biggest Update Ever, also known as Marvel Heroes 2016 2.0, released in January 2017. This update contained many changes that were initially made with the upcoming console port in mind, and it ended up being controversial among players.</p>
 
-<h3 id="how-can-i-help">How can I help?</h3>
+<p>There are no timeframes for when support for other version of the game client will be implemented.</p>
 
-<p>We are currently not looking for help with the development of the server emulator. However, we are looking for some of the rarer versions of the game client that are not on Steam:</p>
+<p>As of right now, we do not have any plans to support console versions of the game due to technical challenges with acquiring, running, and debugging the console client. This may eventually change as work on PlayStation 4 and Xbox One emulation on PC progresses.</p>
+
+<h3 id="is-there-anything-i-can-do-to-help">Is there anything I can do to help?</h3>
+
+<p>We are currently <em>not</em> looking for help with the development of the server emulator. There are other ways you can potentially contribute though.</p>
+
+<p><strong>We are looking for some of the rarer versions of the game client that are not on Steam:</strong></p>
 
 <ul>
   <li>
-    <p>Early beta versions released in late 2012-early 2013: <code class="language-plaintext highlighter-rouge">1.5.0.361</code>, <code class="language-plaintext highlighter-rouge">1.5.0.408</code>, <code class="language-plaintext highlighter-rouge">1.5.0.417</code>, <code class="language-plaintext highlighter-rouge">1.5.0.422</code>, <code class="language-plaintext highlighter-rouge">1.7.0.258</code>, <code class="language-plaintext highlighter-rouge">1.7.0.597</code>, <code class="language-plaintext highlighter-rouge">1.8.0.31</code>, <code class="language-plaintext highlighter-rouge">1.8.0.52</code>, <code class="language-plaintext highlighter-rouge">1.8.0.149</code>, <code class="language-plaintext highlighter-rouge">1.8.0.232</code>, <code class="language-plaintext highlighter-rouge">1.8.0.361</code>, <code class="language-plaintext highlighter-rouge">1.8.0.394</code>, <code class="language-plaintext highlighter-rouge">1.8.0.514</code>, <code class="language-plaintext highlighter-rouge">1.8.0.537</code>, <code class="language-plaintext highlighter-rouge">1.8.0.595</code>, <code class="language-plaintext highlighter-rouge">1.9.0.286</code>, <code class="language-plaintext highlighter-rouge">1.9.0.318</code>, <code class="language-plaintext highlighter-rouge">1.9.0.422</code>, <code class="language-plaintext highlighter-rouge">1.9.0.496</code>, <code class="language-plaintext highlighter-rouge">1.9.0.531</code>.</p>
+    <p>Early beta versions released in late 2012-early 2013:</p>
+
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">1.5.0.361</code>, <code class="language-plaintext highlighter-rouge">1.5.0.408</code>, <code class="language-plaintext highlighter-rouge">1.5.0.417</code>, <code class="language-plaintext highlighter-rouge">1.5.0.422</code>, <code class="language-plaintext highlighter-rouge">1.7.0.258</code>, <code class="language-plaintext highlighter-rouge">1.7.0.597</code>, <code class="language-plaintext highlighter-rouge">1.8.0.31</code>, <code class="language-plaintext highlighter-rouge">1.8.0.52</code>, <code class="language-plaintext highlighter-rouge">1.8.0.149</code>, <code class="language-plaintext highlighter-rouge">1.8.0.232</code>, <code class="language-plaintext highlighter-rouge">1.8.0.361</code>, <code class="language-plaintext highlighter-rouge">1.8.0.394</code>, <code class="language-plaintext highlighter-rouge">1.8.0.514</code>, <code class="language-plaintext highlighter-rouge">1.8.0.537</code>, <code class="language-plaintext highlighter-rouge">1.8.0.595</code>, <code class="language-plaintext highlighter-rouge">1.9.0.286</code>, <code class="language-plaintext highlighter-rouge">1.9.0.318</code>, <code class="language-plaintext highlighter-rouge">1.9.0.422</code>, <code class="language-plaintext highlighter-rouge">1.9.0.496</code>, <code class="language-plaintext highlighter-rouge">1.9.0.531</code>.</li>
+    </ul>
   </li>
   <li>
     <p>Mac open beta from June-July 2014 (most likely <code class="language-plaintext highlighter-rouge">1.23.0.x</code> or <code class="language-plaintext highlighter-rouge">1.24.0.x</code>).</p>
@@ -109,7 +121,8 @@
 
 <p>Please keep in mind that we are looking for complete copies of all client files, and not installers or leftover files.</p>
 
-<p>We are also looking for decrypted dumps of any versions of the PS4 / Xbox One client.</p>
+<p><strong>We are also looking for decrypted dumps (fPKG) of of the PS4 client.</strong>
+In order to dump the game client you need to have it installed on a jailbroken PS4 or PS5.</p>
 
 <p>These versions of the game client are not critical for the server development process, buy they will allow us to more thoroughly preserve Marvel Heroes.</p>
 
