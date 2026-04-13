@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Restoring Events in MHServerEmu 1.0.1 | MHServerEmu</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="Restoring Events in MHServerEmu 1.0.1" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A volunteer-driven research project aimed at reverse engineering the server technology developed by Gazillion Entertainment." />
+<meta property="og:description" content="A volunteer-driven research project aimed at reverse engineering the server technology developed by Gazillion Entertainment." />
+<link rel="canonical" href="https://crypto137.github.io/MHServerEmu/blog/2026/04/13/event-restoration.html" />
+<meta property="og:url" content="https://crypto137.github.io/MHServerEmu/blog/2026/04/13/event-restoration.html" />
+<meta property="og:site_name" content="MHServerEmu" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2026-04-13T17:50:00+03:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Restoring Events in MHServerEmu 1.0.1" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","dateModified":"2026-04-13T17:50:00+03:00","datePublished":"2026-04-13T17:50:00+03:00","description":"A volunteer-driven research project aimed at reverse engineering the server technology developed by Gazillion Entertainment.","headline":"Restoring Events in MHServerEmu 1.0.1","mainEntityOfPage":{"@type":"WebPage","@id":"https://crypto137.github.io/MHServerEmu/blog/2026/04/13/event-restoration.html"},"url":"https://crypto137.github.io/MHServerEmu/blog/2026/04/13/event-restoration.html"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/MHServerEmu/assets/main.css">
+  <link rel="icon" type="image/x-icon" href="/MHServerEmu/assets/favicon.ico"><link type="application/atom+xml" rel="alternate" href="https://crypto137.github.io/MHServerEmu/feed.xml" title="MHServerEmu" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/MHServerEmu/">MHServerEmu</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/MHServerEmu/about/">About</a><a class="page-link" href="/MHServerEmu/download/">Download</a><a class="page-link" href="https://github.com/Crypto137/MHServerEmu">GitHub Repo</a>
+<a class="page-link" href="https://discord.gg/hjR8Bj52t3">Discord</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Restoring Events in MHServerEmu 1.0.1</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2026-04-13T17:50:00+03:00" itemprop="datePublished">Apr 13, 2026
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p><img src="/MHServerEmu/assets/blog/news/2026-04/event-restoration/header.jpg" alt="Restoring Events in MHServerEmu 1.0.1" /></p>
+
+<p>The recently released <a href="https://github.com/Crypto137/MHServerEmu/releases/tag/1.0.1">version 1.0.1</a> introduced native support for various weekly and seasonal events to MHServerEmu. There are some fun aspects of this system that I would like to talk about, so let’s dive in.</p>
+
+<h2 id="the-problem">The Problem</h2>
+
+<p>Perhaps <em>the</em> most frequent question I have been hearing since the release of 1.0.0 is “How do I enable event X?”. This makes a lot of sense: events were a huge part of the game’s original run, with something different happening practically every week. One could easily assume that turning an event on is as simple as flipping a switch, but, unfortunately, it is somewhat more complicated than that.</p>
+
+<p>There is no formal “Weekly/Seasonal Event” system in Marvel Heroes that would handle things like Cosmic Chaos and Operation Omega. When these events were first introduced, Gazillion were releasing game updates almost every week, and these patches would often make changes to game data to “enable” or “disable” particular events. Later in the game’s lifespan the developers began gradually transitioning towards making event data toggleable via the Live Tuning system. This is pure speculation on my part, but I suspect this might had been at least partially motivated by the console port: game patches on consoles generally require passing a certification process, which makes patching just to toggle an event a less viable approach. Despite this gradual shift, some aspects of some events still required patching all the way to the game’s shutdown, and there were still no formal events defined in game data.</p>
+
+<p>Event-specific game data changes were made and toggled in a rather inconsistent manner, which was further complicated by the fact that there were multiple iterations of some events, and several events were implemented by overwriting existing files for past events. Therefore, restoring each event required carefully analyzing many game versions, cross-referencing them with archived patch notes, and figuring out the best way to make adjustments to the final shipped game build to replicate legacy events.</p>
+
+<p>With loot tables there were generally two approaches that were taken by Gazillion. One was to add event loot tables across the game with the <code class="language-plaintext highlighter-rouge">LiveTuningDefaultEnabled</code> flag set to <code class="language-plaintext highlighter-rouge">False</code>, requiring them to be toggled on via the Live Tuning system. Another was to add a loot table to the <code class="language-plaintext highlighter-rouge">SpecialEventsTable</code>, which is the loot table used to make something drop “everywhere”, often paired with a cooldown that works similarly to Eternity Splinters. In some cases these two approaches were combined: for example, <code class="language-plaintext highlighter-rouge">CosmicWorldstonesTable</code> used in the Cosmic Chaos event was permanently added to the <code class="language-plaintext highlighter-rouge">SpecialEventsTable</code> while also being disabled by default. Loot tables are not categorized by event in game data, and different tables for the same event can be both disabled and enabled by default. An example of this is the A.R.M.O.R. Incursion event: the <code class="language-plaintext highlighter-rouge">SharedQuestARMORDrives</code> table that rolls event currency for completing Shared Quests is enabled by default, while all other tables for this event are disabled.</p>
+
+<p>Missions are another important aspect of some events. As I discovered, many event missions are enabled by default and need to be disabled with Live Tuning. Not doing this created a state of superposition that you could observe in 1.0.0 and before, where parts of different events were all active all the time, like the daily Holo-Sim mission that is supposed to be available only during Operation Omega, and the Cosmo pet mission that should be limited to the anniversary celebration in June. Some missions, such as daily missions for the Mardi Gras event, were “hard” disabled by setting the <code class="language-plaintext highlighter-rouge">DesignState</code> field in their prototypes to <code class="language-plaintext highlighter-rouge">NotInGame</code>. Unfortunately, these missions cannot be properly enabled back without a client-side patch.</p>
+
+<p>One particularly problematic event mission turned out to be A.R.M.O.R. Defender: it needs to be completed four times across different periods of the A.R.M.O.R. Incursion event to unlock the <a href="https://itembase.mhbugle.com/achievement/835/">A.R.M.O.R. Defense</a> achievement and its exclusive reward, Howard the Duck team-up. The issue was that just turning the mission off and back on does not reset its completion state, making the achievement unobtainable. I had to do a thorough investigation of all game versions that were released between July 2015 and January 2016 to figure out exactly how it was handled. What I uncovered was a string of classic Gazillion mess-ups:</p>
+
+<ul>
+  <li>
+    <p>July 24: A.R.M.O.R. Defender is added as a weekly mission, making it potentially repeatable within the same event period.</p>
+  </li>
+  <li>
+    <p>September 3: The mission is disabled for undisclosed reasons.</p>
+  </li>
+  <li>
+    <p>November 5: A.R.M.O.R. Defender becomes a regular one-time mission.</p>
+  </li>
+  <li>
+    <p>December-January: Players begin reporting issues with the mission on the game’s official forums.</p>
+  </li>
+  <li>
+    <p>January 22: <a href="https://old.reddit.com/r/marvelheroes/comments/426c39/armor_defender_broken/cz82ver/">Asros confirms a fix in the pipeline for the “next patch”</a>.</p>
+  </li>
+  <li>
+    <p>January 24: A new test center build is published that introduces the <code class="language-plaintext highlighter-rouge">eMTV_EventInstance</code> Live Tuning variable.</p>
+  </li>
+  <li>
+    <p>January 29: The patch that contains this change is officially released.</p>
+  </li>
+</ul>
+
+<p>This mission is just a single aspect of a single event. Doing this for all events required pretty considerable effort, but thankfully I had previously documented all released game versions in a spreadsheet, which helped significantly.</p>
+
+<p>Some events made other special changes that cannot be toggled via Live Tuning. For example, demonic enemies are added to Midtown Patrol during the Mystic Mayhem event by replacing the <code class="language-plaintext highlighter-rouge">MidtownAmbientPopBosses</code> MetaState with <code class="language-plaintext highlighter-rouge">MidtownAmbientPopBossesMysticMayhem</code> in the <code class="language-plaintext highlighter-rouge">PatrolMidtownMode</code> prototype. Another special change would be adding <code class="language-plaintext highlighter-rouge">MooCowSummonAffix</code> to the <code class="language-plaintext highlighter-rouge">BossAffixesBaseSet</code> prototype, allowing bosses to roll a cow-summoning affix during the Cowtastrophe event. Changes were also made to assets on the Unreal Engine side, such as adding Halloween decorations to Avengers Tower or making it snow in Midtown for Christmas. None of these changes are possible without a server restart, and some of them are impossible without client-side patches.</p>
+
+<p>As you can see, events in Marvel Heroes are actually a bit of a mess to say the least. However, because of how important they are to the game, something needed to be done to make them accessible without players manually tinkering with patches and Live Tuning presets.</p>
+
+<h2 id="implementation">Implementation</h2>
+
+<p>The main goal I had for the implementation of the native event system was for it to be completely automated and foolproof. Therefore, events needed to be systemized.</p>
+
+<p>The resulting format for event definitions is effectively a set of metadata for a Live Tuning data file, which includes its proper display name, optional daily login gift item, a flag to hide it, and an optional list of missions that need to be reset per event period, such as the previously mentioned A.R.M.O.R. Defender mission. These event definitions are stored in a new file located in <code class="language-plaintext highlighter-rouge">Data/Game/LiveTuning/Events.json</code>. The event system is hooked into the existing Live Tuning system: when Live Tuning data is loaded, the server picks what event files to include based on a set of rules defined in the <code class="language-plaintext highlighter-rouge">Data/Game/LiveTuning/EventSchedule.json</code> file. To allow events to rotate automatically, the server will now automatically reload Live Tuning data when the daily mission reset happens at 10:00 UTC+0.</p>
+
+<p>Both <code class="language-plaintext highlighter-rouge">Events.json</code> and <code class="language-plaintext highlighter-rouge">EventSchedule.json</code> can be overriden by adding files named <code class="language-plaintext highlighter-rouge">EventsOverride.json</code> and <code class="language-plaintext highlighter-rouge">EventScheduleOverride.json</code>, which is a way to easily keep your custom schedule when you update the server, even if there are changes to the default data. The server comes bundled a wide selection of events in its default schedule, so you do not have to do this if you are not a tinkerer.</p>
+
+<p>The rules are perhaps the most interesting aspect of the new scheduler. In this initial iteration we support five types of events:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">AlwaysOn</code>: should be self-explanatory.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">WeeklyRotation</code>: represents a rotation of events lasting a week each. The rollover happens on the day of the week specified in the <code class="language-plaintext highlighter-rouge">StartDayOfWeek</code> field. This is what we use for the “core” rotation, which includes Cosmic Chaos, Odin’s Bounty, Operation Omega, Mystic Mayhem, and A.R.M.O.R. Incursion. We also have a secondary weekly rotation that runs in parallel with Heroes for Hire, The Wealth of Kings County, and Orders from the Hand.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">DayOfWeek</code>: events with this rule run on the day of the week specified in the <code class="language-plaintext highlighter-rouge">StartDayOfWeek</code> field. This is what is used by the Midtown Madness event, which happens every Monday.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">SpecialDate</code>: events that run every year on the month and day specified in <code class="language-plaintext highlighter-rouge">StartMonth</code> and <code class="language-plaintext highlighter-rouge">StartDay</code> fields for the duration defined in the <code class="language-plaintext highlighter-rouge">DurationDays</code> field. This covers the vast majority of seasonal events, including Anniversary in June, Winter Holiday in December, and so on.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">SpecialDateLunar</code>: a very special case designed to handle the Lunar New Year event. For this we use the <code class="language-plaintext highlighter-rouge">ChineseLunisolarCalendar</code> class provided by the .NET standard library to programmatically determine the correct Chinese New Year start date for a given year. Technically, the current implementation provided by Microsoft will work only until 2101, but hopefully it gets updated before then.</p>
+  </li>
+</ul>
+
+<p>Along with the new scheduler I also did a major pass on our default Live Tuning data to make sure event-specific content is available only during associated events. This may be a net nerf, especially if you manually enabled event loot tables before this update, but it brings the game to a state that is more closely aligned with the original experience.</p>
+
+<p>While this initial implementation is a significant step forward compared to moving files around, there are still aspects that can be improved in future iterations:</p>
+
+<ul>
+  <li>
+    <p>There are more events that can be potentially restored and added to the default schedule, including Cowtastrophe / Cowpocalypse, Mardi Gras, Easter, and the Guardians of the Galaxy themed event with Planet X Bark drops.</p>
+  </li>
+  <li>
+    <p>Odin’s Bounty event currently boosts all possible content at the same time, although it is supposed to rotate on a 4 hour cadence.</p>
+  </li>
+  <li>
+    <p>The server prints a list of currently running events in a secondary message of the day in chat, but this could be made better by making use of the News panel with dynamically generated content.</p>
+  </li>
+</ul>
+
+<p>I hope to explore these and other changes in future updates, but there are no ETAs or guarantees.</p>
+
+<hr />
+
+<p>Thank you for following the development of MHServerEmu, I hope you all enjoyed this more focused blog post format. See you next time!</p>
+
+  </div><a class="u-url" href="/MHServerEmu/blog/2026/04/13/event-restoration.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/MHServerEmu/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">MHServerEmu</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">MHServerEmu</li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/crypto137"><svg class="svg-icon"><use xlink:href="/MHServerEmu/assets/minima-social-icons.svg#github"></use></svg> <span class="username">crypto137</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>A volunteer-driven research project aimed at reverse engineering the server technology developed by Gazillion Entertainment.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+<script type="text/javascript" src="/MHServerEmu/assets/js/lightbox.js"></script>
+	<link rel="stylesheet" href="/MHServerEmu/assets/css/lightbox.css">
+  </body>
+
+</html>
